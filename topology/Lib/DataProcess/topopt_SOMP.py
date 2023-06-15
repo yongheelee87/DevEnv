@@ -189,7 +189,7 @@ class SOMP(KE):
 
     def stop(self):
         self._save_data()  # 데이터 저장
-        print(self.res_density)
+        print("Density:\n{}\n".format(self.res_density))
         plt.show(block=True)  # 그림 창 고정
 
     def update_params(self, str_params):

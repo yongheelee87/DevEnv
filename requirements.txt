@@ -30,3 +30,4 @@ Werkzeug
 waitress
 Flask-Caching
 cvxopt
+sympy
