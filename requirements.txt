@@ -31,3 +31,4 @@ waitress
 Flask-Caching
 cvxopt
 sympy
+opencv-python
