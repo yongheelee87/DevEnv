@@ -7,9 +7,12 @@ IMG_NAME = r'D_90_5.tif'
 THRESHOLD_COLOR = 240
 BOTTOM_CROP = 0.07  # 밑부분 자르기
 DRAWING_LINE_THICK = -1  # 외곽선 두께. thinkness < 0이면 내부를 채운다.
-DRAWING_BGR = (255, 255, 204)  # 외곽선 컬러 blue, green, red
+# DRAWING_BGR = (255, 255, 204)  # 외곽선 컬러 blue, green, red
+DRAWING_BGR = (147, 249, 150)  # 외곽선 컬러 blue, green, red
 DRAWING_VOID_BGR = (0, 0, 255)  # 외곽선 Void 컬러 blue, green, red
 THRESHOLD_AREA = 40  # 이것보다 작은 AREA 필터
+VOID_THRESHOLD_AREA = 10  # Void 이것보다 작은 AREA 필터
+BLACK_THRESHOLD_AREA = 200  # Void Black 기준
 
 def get_contours(image):
     # convert to grayscale
@@ -44,7 +47,7 @@ if __name__ == '__main__':
     im = im[:int(im.shape[0]*(1-BOTTOM_CROP)), :]
     im_origin = im.copy()
 
-    void = VoidExtract(im, IMG_NAME)
+    void = VoidExtract(im, IMG_NAME, VOID_THRESHOLD_AREA, BLACK_THRESHOLD_AREA)
 
     bubble_cnt, bubble_close_cnt, bubble_area = get_contours(im)
     void_cnt, _, void_area = get_contours(void.get_image())

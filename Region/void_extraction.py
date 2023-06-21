@@ -3,11 +3,11 @@ import numpy as np
 
 
 class VoidExtract:
-    def __init__(self, image, img_name):
+    def __init__(self, image, img_name, min_area, thresh):
         self.im = image
         self.im_name = img_name
-        self.minArea = 10
-        self.black_thresh = 200  # Black Thresh
+        self.minArea = min_area
+        self.black_thresh = thresh  # Black Thresh
 
     def get_image(self):
         # Threshold image:
