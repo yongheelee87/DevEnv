@@ -49,7 +49,7 @@ if __name__ == '__main__':
     bubble_cnt, bubble_close_cnt, bubble_area = get_contours(im)
     void_cnt, _, void_area = get_contours(void.get_image())
 
-    print('ercentage of total area :\n- Area of Bubble: {:.5f}%\n- Area of Void: {:.5f}%\n'.format(bubble_area, void_area))
+    print('Percentage of total area :\n- Area of Bubble: {:.5f}%\n- Area of Void: {:.5f}%\n'.format(bubble_area, void_area))
 
     cv2.drawContours(im, bubble_close_cnt, -1, DRAWING_BGR, DRAWING_LINE_THICK)
     cv2.drawContours(im, bubble_close_cnt, -1, DRAWING_BGR, 2)
