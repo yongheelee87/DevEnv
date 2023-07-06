@@ -3,16 +3,16 @@ import numpy as np
 
 from void_extraction import *
 
-IMG_NAME = r'D_90_5.tif'
-THRESHOLD_COLOR = 240
+IMG_NAME = r'F_0_w_m003.tif'
+THRESHOLD_COLOR = 250
+THRESHOLD_AREA = 10  # 이것보다 작은 AREA 필터
 BOTTOM_CROP = 0.07  # 밑부분 자르기
 DRAWING_LINE_THICK = -1  # 외곽선 두께. thinkness < 0이면 내부를 채운다.
 # DRAWING_BGR = (255, 255, 204)  # 외곽선 컬러 blue, green, red
 DRAWING_BGR = (147, 249, 150)  # 외곽선 컬러 blue, green, red
 DRAWING_VOID_BGR = (0, 0, 255)  # 외곽선 Void 컬러 blue, green, red
-THRESHOLD_AREA = 40  # 이것보다 작은 AREA 필터
 VOID_THRESHOLD_AREA = 10  # Void 이것보다 작은 AREA 필터
-BLACK_THRESHOLD_AREA = 200  # Void Black 기준
+BLACK_THRESHOLD_AREA = 210  # Void Black 기준
 
 def get_contours(image):
     # convert to grayscale
