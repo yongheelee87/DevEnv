@@ -1,0 +1,3 @@
+CMD,Time[sec],Env_Val,T32_Sym,T32_Val,CAN_Frame,CAN_Sig,CAN_Val,CAN_Time
+WAIT,1,,,,,,,
+CAN_WRITE,,,,,,,,
