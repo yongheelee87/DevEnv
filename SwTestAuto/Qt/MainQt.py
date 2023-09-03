@@ -70,7 +70,7 @@ class WindowClass(QMainWindow, form_class):
             event.ignore()
 
     def backgroundInit(self):
-        title = "SW TEST Automation {} for Control TASK".format(self.version)
+        title = "SW TEST Automation {} for SDV".format(self.version)
         self.setWindowTitle(title)
 
     def connectBtnInit(self):

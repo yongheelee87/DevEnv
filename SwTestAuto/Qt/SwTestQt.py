@@ -1,3 +1,4 @@
+import re
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from Lib.DataProcess.TestCaseProcess import *
@@ -10,9 +11,9 @@ class SwTestView(QWidget, swtest_form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.project = 'OPU'
+        self.project = Configure.set['system']['project']
 
-        self.swTest = TestProcess()
+        self.swTest = TestProcess(self.project)
         self.connectBtnInit()
         self.connectLineInit()
 
@@ -97,9 +98,31 @@ class SwTestView(QWidget, swtest_form):
         open_path(self.swTest.map_mode_path)
 
     def func_line_Testcase_num(self):
+
+        line_testcase_num_str = re.sub(r'[^0-9,~]', '', self.line_Testcase_num.text().replace(' ', ''))
+        testcase_lst = []
+        for num_str in line_testcase_num_str.split(','):
+            if '~' in num_str:
+                temp = num_str.split('~')
+                if temp[1] != '':
+                    for i in range(int(temp[0]), int(temp[1]) + 1):
+                        testcase_lst.append(str(i))
+                else:
+                    testcase_lst.append(temp[0])
+            else:
+                testcase_lst.append(num_str)
+
+        self.testcase_num_str = []
+        for v in testcase_lst:
+            if v not in self.testcase_num_str and v != '':
+                self.testcase_num_str.append(v)
+        print(self.testcase_num_str)
+
+        '''
         line_testcase_num_str = self.line_Testcase_num.text()
         self.testcase_num_str = line_testcase_num_str.split()
         print(self.testcase_num_str)
+        '''
 
     def func_line_Testcase_num_range(self):
         line_testcase_num_range_str = self.line_Testcase_num_range.text()

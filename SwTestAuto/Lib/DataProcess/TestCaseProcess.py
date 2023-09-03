@@ -16,10 +16,10 @@ class TestProcess:
     main test class for process
     """
 
-    def __init__(self):
+    def __init__(self, project):
         self.main_path = os.getcwd()
         self.map_dict = dict()
-        self.script_path = os.path.join(self.main_path, 'data', 'input', 'script', 'OPU')
+        self.script_path = os.path.join(self.main_path, 'data', 'input', 'script', project)
         self.map_script_path = ''
         self.map_mode_path = ''
 
