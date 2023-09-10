@@ -111,7 +111,6 @@ class TestCaseWindow(QWidget):
         for v in testcase_lst:
             if v not in self.testcase_num_str and v != '':
                 self.testcase_num_str.append(v)
-        print(self.testcase_num_str)
 
     def _update_map_script(self):
         self.swTest.script_path = os.path.join(self.swTest.main_path, 'data', 'input', 'script', self.project)

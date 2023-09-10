@@ -33,15 +33,15 @@ class TestProcess:
         return temp
 
     def stop(self):
-        logging_print(".... SW TEST Automation Test completed ....\n")
+        print(".... SW TEST Automation Test completed ....\n")
         time.sleep(1)
 
     def start(self, tc_num: list):
-        logging_print(
+        print(
             ".... SW TEST Automation Test Start! Please Do not try additional command until it completes ....\n")
         self.map_dict = self._update_map_script()  # Update Map Script for Test Case Function
         testcase_input = sorted(tc_num, key=int)
-        logging_print("TestCase Number = {}\n".format(testcase_input))
+        print("TestCase Number = {}\n".format(testcase_input))
 
         start_time = time.time()  # 시작 시간 저장
         time_start = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(time.time()))
@@ -52,7 +52,7 @@ class TestProcess:
         print(df_result)
         # Total_TESTCASE 파일이 열러 있는지 확인 후 열려 있다면 덮어쓰기 금지
         if check_process_open(TOTAL_RESULT_FILE) is True:
-            logging_print("Error: {} can not be available. The csv file is open\n".format(TOTAL_RESULT_FILE))
+            print("Error: {} can not be available. The csv file is open\n".format(TOTAL_RESULT_FILE))
         else:  # Total_TESTCASE 덮어쓰기 가능
             export_csv_dataframe(df_result, RESULT_FILE_PATH, TOTAL_RESULT_FILE)  # Total_TESTCASE.csv 업데이트
 
@@ -125,7 +125,7 @@ class TestProcess:
         result.loc[data_index]['Output'] = ''
         result.loc[data_index]['Last_Run_Time'] = time_var
 
-        logging_print("Success: {} Test Done\n".format(func_name))
+        print("Success: {} Test Done\n".format(func_name))
 
         return ret
 
@@ -154,7 +154,7 @@ class TestProcess:
             for i in range(fail_amt):
                 test = result_fail.iloc[i, 0]
                 fail_case.append(str(test))
-            logging_print("Test Result Fail Case: {}\n".format(fail_case))
+            print("Test Result Fail Case: {}\n".format(fail_case))
         else:
             fail_case = 'Nothing'
 

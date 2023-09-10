@@ -1,10 +1,9 @@
 from templates import *
+from measure import *
+
 from sys import modules
 from PyQt5.QtCore import QDateTime, QThread, pyqtSlot, QTimer
 from Lib.Common.basicFunction import *
-
-from measure.measCTCW import MeasCTCW
-from measure.measSWA import MeasSWA
 
 
 class MeasureWindow(QWidget):

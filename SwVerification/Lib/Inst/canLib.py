@@ -47,8 +47,7 @@ class CANDev:
             self.status = CAN_IN_USE
         except:
             try:
-                self.bus = interface.Bus(bustype=bus_type, channel=ch, bitrate=bit_rate, app_name=app_type,
-                                         data_bitrate=data_rate, fd=True)
+                self.bus = interface.Bus(bustype=bus_type, channel=ch, bitrate=bit_rate, app_name=app_type, data_bitrate=data_rate, fd=True)
                 self.notifier = Notifier(self.bus, [_get_message, self.buffer])
                 self.status = CAN_DEV
             except CanError:
@@ -172,6 +171,9 @@ class CANDev:
             print("Success: STOP WRITE CAN MESSAGE\n")
         except CanError:
             print("Error: STOP WRITE CAN MESSAGE\n")
+
+    def get_msg_name(self, id):
+        return self.db.get_message_by_frame_id(id).name  # 해당 CAN message frame name 정보 가져오기
 
     def _stop_overlap_msg(self, frame_name: str):
         if frame_name in self.tx_period.keys():

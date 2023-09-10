@@ -1,10 +1,7 @@
-import os
 import datetime
 from enum import Enum, auto
 import threading
 import openpyxl
-import numpy as np
-import pandas as pd
 
 from Lib.Inst.visaLib import *
 from Lib.Inst.telnetLib import *
@@ -41,7 +38,7 @@ class CmdState(Enum):
     SEQUENCE_END = auto()
 
 
-class MeasureTVTC:
+class MeasSDR:
     def __init__(self):
         super().__init__()
         self.measurement_script = None

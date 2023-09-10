@@ -22,9 +22,13 @@ class Trace32:
         self.status = False  # status 선언
 
         if 'TRACE32' in self.config.sections():
-            self.open_exe(t32api_path=self.config['TRACE32']['api_path'],
-                          window_cmm=self.config['TRACE32']['window_cmm'])  # T32 exe 실행
+            if self.config['TRACE32']['auto_start'] == 'True':
+                self.open_exe(t32api_path=self.config['TRACE32']['api_path'])  # T32 exe 실행
+
             self.connect_dev()  # 연결
+
+            if self.config['TRACE32']['auto_start'] == 'True':
+                self.cd_do(self.config['TRACE32']['window_cmm'])
 
     def connect_dev(self):
         '''
@@ -44,10 +48,9 @@ class Trace32:
         else:
             logging_print('[INFO] TRACE32 is NOT CONNECTED with HOST\nIF YOU WANT TO USE TRACE32, CHECK IF TRACE32 POWERVIEW IS OPENED AND RETRY THE CONNECTION\n')
 
-    def open_exe(self, t32api_path: str, window_cmm: str):
+    def open_exe(self, t32api_path: str):
         '''
         :param t32api_path: Paths currently installed
-        :param window_cmm: window cmm path to be used
         '''
         t32api_path_lst = t32api_path.split(os.path.sep)
         t32_exe = os.path.join('C:' + os.sep, t32api_path_lst[1], 'bin', 'windows64', 't32mppc.exe')
@@ -57,8 +60,6 @@ class Trace32:
             subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             # Wait until the TRACE32 instance is started
             time.sleep(3)
-            if os.path.exists(window_cmm):
-                self.cd_do(window_cmm)
         logging_print('Success: OPEN Trace32\n')
 
     def cmd(self, str_cmd: str, time_out: int = 2):
@@ -76,7 +77,10 @@ class Trace32:
         '''
         :param run_cmd: commands including path
         '''
-        self.cmd("CD.DO " + run_cmd)
+        if os.path.exists(run_cmd):
+            self.cmd("CD.DO " + run_cmd)
+        else:
+            print('Error: No file {}\n'.format(run_cmd))
 
     def write_symbol(self, symbol: str, value: int or float):
         '''
