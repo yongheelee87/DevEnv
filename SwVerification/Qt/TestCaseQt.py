@@ -2,7 +2,6 @@ from templates import *
 import re
 from PyQt5.QtCore import QThread
 from Lib.DataProcess.TestCaseProcess import *
-from Lib.Inst.canLib import *
 
 
 class TestCaseWindow(QWidget):

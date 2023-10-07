@@ -37,8 +37,7 @@ class TestProcess:
         time.sleep(1)
 
     def start(self, tc_num: list):
-        print(
-            ".... SW TEST Automation Test Start! Please Do not try additional command until it completes ....\n")
+        print(".... SW TEST Automation Test Start! Please Do not try additional command until it completes ....\n")
         self.map_dict = self._update_map_script()  # Update Map Script for Test Case Function
         testcase_input = sorted(tc_num, key=int)
         print("TestCase Number = {}\n".format(testcase_input))

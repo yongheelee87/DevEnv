@@ -1,8 +1,7 @@
 from templates import *
-from PyQt5.QtCore import pyqtSlot, QTimer
-from Lib.Inst.canLib import *
-from Lib.Common.basicFunction import *
+from PyQt5.QtCore import pyqtSlot
 from Qt.CanTraceQt import CanTraceWindow
+from Lib.Inst.canLib import *
 
 
 class CanWindow(QWidget):

@@ -5,3 +5,4 @@ import pandas as pd
 from . measCTCW import MeasCTCW
 from . measSWA import MeasSWA
 from . measSDR import MeasSDR
+from . measCDW import MeasCDW

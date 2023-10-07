@@ -1,5 +1,5 @@
 from templates import *
-from PyQt5.QtCore import pyqtSlot, QTimer
+from PyQt5.QtCore import pyqtSlot
 from Lib.Inst.canLib import *
 
 
@@ -74,13 +74,17 @@ class CanTraceWindow(QWidget):
     def func_update_rx_data(self):
         idx = 0
         for dev in canBus.lst_dev:
-            can_rx_data = canBus.devs[dev].rx.msg_dict
-            if bool(can_rx_data):
-                str_can_rx_data = str(can_rx_data).replace("{", '').replace("}", '').replace(", ", '\n')
-                pre_location = self.lst_monitor[idx].verticalScrollBar().value()
-                self.lst_monitor[idx].setPlainText(str_can_rx_data)
-                self.lst_monitor[idx].verticalScrollBar().setValue(pre_location)
-                idx += 1
+            str_rx = dev + '\n\n'
+            for id in canBus.devs[dev].rx.msg_dict.keys():
+                can_rx_data = canBus.devs[dev].msg_read_id(can_id=int(id))
+                if bool(can_rx_data):
+                    str_can_rx_data = 'Frame: {}\n'.format(str(canBus.devs[dev].get_msg_name(int(id))))
+                    str_can_rx_data += str(can_rx_data).replace("{", '').replace("}", '').replace(", ", '\n')
+                    str_rx += str_can_rx_data + '\n\n'
+            pre_location = self.lst_monitor[idx].verticalScrollBar().value()
+            self.lst_monitor[idx].setPlainText(str_rx)
+            self.lst_monitor[idx].verticalScrollBar().setValue(pre_location)
+            idx += 1
 
     @pyqtSlot(bool)
     def func_btn_Rx_Read_toggle(self, state):
