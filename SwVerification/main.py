@@ -15,7 +15,7 @@ if __name__ == "__main__":
             System.Auto = True
 
     if System.Auto is False:
-        from Qt.MainQt import *
+        from Qt import *
 
         # Logging module 초기화
         logging_initialize()
@@ -34,7 +34,10 @@ if __name__ == "__main__":
         os._exit(0)
     else:
         from Lib.DataProcess.autoTest import *
+        print("The program is named SW TEST Automation {}. It provides the functions for the measurement and automation with various devices\n".format(System.Ver))
+
         auto_test = AutoTest()
+        print("Current Test Environment\n{}\n".format(auto_test.df_inst))
         auto_test.run()
 
         # 프로그램 동작이 끌날시 시스템 종료 코드

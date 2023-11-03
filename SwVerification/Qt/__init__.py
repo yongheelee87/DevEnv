@@ -1,7 +1,7 @@
 # ///////////////////////////////////////////////////////////////
 #
 # BY: YONGHEE LEE
-# PROJECT MADE WITH: measurement with script command
+# PROJECT MADE WITH: Qt Front code for Designer
 # V: 1.0.0
 #
 # This project can be used freely for all uses, as long as they maintain the
@@ -9,10 +9,8 @@
 # interface (GUI) can be modified without any implication.
 #
 # ///////////////////////////////////////////////////////////////
+from templates import *
 from Lib.Common.basicFunction import *
 
-# Measure Class
-from . measCTCW import MeasCTCW
-from . measSWA import MeasSWA
-from . measSDR import MeasSDR
-from . measCDW import MeasCDW
+# Qt Window
+from . MainQt import MainWindow

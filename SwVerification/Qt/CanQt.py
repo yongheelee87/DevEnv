@@ -1,6 +1,6 @@
 from templates import *
 from PyQt5.QtCore import pyqtSlot
-from Qt.CanTraceQt import CanTraceWindow
+from . CanTraceQt import CanTraceWindow
 from Lib.Inst.canLib import *
 
 

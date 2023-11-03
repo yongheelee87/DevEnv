@@ -1,8 +1,12 @@
+import logging
 from templates import *
-from Qt.MeasureQt import *
-from Qt.TestCaseQt import *
-from Qt.InstQt import *
-from Qt.ConfigureQt import *
+# Qt Window
+from . MeasureQt import *
+from . TestCaseQt import *
+from . InstQt import *
+from . ConfigureQt import *
+
+from Lib.Common.basicFunction import *
 
 
 class QTextEditLogger(logging.Handler):

@@ -1,6 +1,6 @@
 
-from Qt.CanQt import CanWindow
-from Qt.Trace32Qt import Trace32Window
+from . CanQt import CanWindow
+from . Trace32Qt import Trace32Window
 
 from templates import *
 from Lib.Inst.Trace32Lib import *
@@ -71,4 +71,3 @@ class InstWindow(QWidget):
             else:
                 lst_inst_data.append([inst, visa.status[inst]])
         return pd.DataFrame(lst_inst_data, columns=['Name', 'Connect'])
-

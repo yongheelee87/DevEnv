@@ -22,13 +22,17 @@ class Trace32:
         self.status = False  # status 선언
 
         if 'TRACE32' in self.config.sections():
-            if self.config['TRACE32']['auto_start'] == 'True':
+            state_auto = True if check_process_open('TRACE32 PowerView') is False and self.config['TRACE32']['auto_start'] == 'True' else False
+            if state_auto is True:
                 self.open_exe(t32api_path=self.config['TRACE32']['api_path'])  # T32 exe 실행
 
             self.connect_dev()  # 연결
 
-            if self.config['TRACE32']['auto_start'] == 'True':
+            if state_auto is True:
                 self.cd_do(self.config['TRACE32']['window_cmm'])
+                self.cd_do(self.config['TRACE32']['flash_cmm'])
+                time.sleep(2)
+                self.cmd('Go')
 
     def connect_dev(self):
         '''
@@ -52,14 +56,10 @@ class Trace32:
         '''
         :param t32api_path: Paths currently installed
         '''
-        t32api_path_lst = t32api_path.split(os.path.sep)
-        t32_exe = os.path.join('C:' + os.sep, t32api_path_lst[1], 'bin', 'windows64', 't32mppc.exe')
-        config_file = os.path.join('C:' + os.sep, t32api_path_lst[1], 'config.t32')
-        command = [t32_exe, '-c', config_file]
-        if not check_process_open('TRACE32 PowerView'):
-            subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-            # Wait until the TRACE32 instance is started
-            time.sleep(3)
+        t32_exe = os.path.join(t32api_path, 'bin', 'windows64', 't32mppc.exe')
+        os.startfile(t32_exe)
+        # Wait until the TRACE32 instance is started
+        time.sleep(3)
         logging_print('Success: OPEN Trace32\n')
 
     def cmd(self, str_cmd: str, time_out: int = 2):
@@ -77,7 +77,7 @@ class Trace32:
         '''
         :param run_cmd: commands including path
         '''
-        if os.path.exists(run_cmd):
+        if os.path.exists(run_cmd.split()[0]):
             self.cmd("CD.DO " + run_cmd)
         else:
             print('Error: No file {}\n'.format(run_cmd))

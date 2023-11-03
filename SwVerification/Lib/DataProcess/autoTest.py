@@ -1,7 +1,7 @@
-import os
-
 import yaml
 import time
+from Lib.Inst.Trace32Lib import *
+from Lib.Inst.canLib import *
 from Lib.Common.basicFunction import *
 
 RESULT_FILE_PATH = os.path.join(os.getcwd(), 'data', 'result')
@@ -10,6 +10,7 @@ RESULT_FILE_PATH = os.path.join(os.getcwd(), 'data', 'result')
 class AutoTest:
     def __init__(self):
         self.swTest = None # TestProcess class 메모리
+        self.df_inst = self._get_inst_status()
         self.map_path = './data/config/auto_test.yaml'
         self.map_dict = dict()
         self.script_path = None  # Test script path
@@ -122,3 +123,15 @@ class AutoTest:
         con = [[time_start], [time_end], [elapsed_time], [lst_tc], [len(lst_tc)], [len_pass], [len_skip], [len_fail], [fail_case]]
         df_tc_sum = pd.DataFrame(con, columns=["Value"], index=ind)
         df_tc_sum.to_csv(file_path + "\\" + "Summary_{}.csv".format(os.path.basename(file_path)), encoding='cp1252')
+
+    def _get_inst_status(self):
+        lst_inst_data = []
+        lst_inst = [i for i in Configure.set.sections() if 'system' not in i and 'XCP' not in i]
+        for inst in lst_inst:
+            if Configure.set[inst]['type'] == 'T32':
+                lst_inst_data.append([inst, t32.status])
+            elif Configure.set[inst]['type'] == 'can':
+                lst_inst_data.append([inst, False if canBus.devs[inst].status == CAN_ERR else True])
+            else:
+                lst_inst_data.append([inst, visa.status[inst]])
+        return pd.DataFrame(lst_inst_data, columns=['Name', 'Connect'])

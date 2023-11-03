@@ -1,5 +1,5 @@
 # MAIN FILE
-from Qt.MainQt import *
+from Qt import *
 from . app_settings import *
 from . custom_grips import *
 
