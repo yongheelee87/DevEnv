@@ -4,7 +4,8 @@ matplotlib.use('Agg')
 import os
 import matplotlib.pyplot as plt
 
-def signal_step_graph(data, col, x_col, filename):
+
+def signal_step_graph(data, col, x_col, filepath, filename):
     plt.rcParams['axes.xmargin'] = 0
 
     df = pd.DataFrame(data, columns=col)
@@ -36,5 +37,4 @@ def signal_step_graph(data, col, x_col, filename):
     plt.locator_params(axis='x', nbins=5)
     plt.xlabel('Time[sec]')
 
-    folder = sorted([i for i in os.listdir('./data/result') if '.' not in i])[-1]
-    plt.savefig('./data/result/{}/{}.png'.format(folder, filename))
+    plt.savefig('{}/{}.png'.format(filepath, filename))

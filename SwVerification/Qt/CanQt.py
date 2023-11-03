@@ -56,7 +56,7 @@ class CanWindow(QWidget):
         self.ui_can.line_Rx_Rate.textChanged.connect(self.func_line_Rx_Rate)
         self.ui_can.line_Rx_Rate.returnPressed.connect(self.func_line_Rx_Rate)
         if len(canBus.lst_dev) != 0:
-            self.ui_can.line_dbc_path.setText(Configure.set[self.dbc_dev]['DBC_file_path'])
+            self.ui_can.line_dbc_path.setText(canBus.devs[self.dbc_dev].db_path)
 
         self._update_status()
 

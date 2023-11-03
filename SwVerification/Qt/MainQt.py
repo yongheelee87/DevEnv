@@ -111,8 +111,6 @@ class MainWindow(QMainWindow):
 
     def func_btn_configure(self):
         self.ui.stackedWidget.setCurrentWidget(self.config)  # SET PAGE
-        UIFunctions.resetStyle(self, "btn_configure")  # RESET ANOTHERS BUTTONS SELECTED
-        self.sender().setStyleSheet(UIFunctions.selectMenu(self.sender().styleSheet()))  # SELECT MENU
 
     # RESIZE EVENTS
     def resizeEvent(self, event):

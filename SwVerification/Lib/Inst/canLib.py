@@ -25,8 +25,7 @@ class CANDev:
         self.buffer = BufferedReader()  # CAN buffer type 선언
         self.notifier = None  # CAN message 전송을 위한 notifier 선언
         self.status = CAN_ERR
-        self.db_path = self.config['DBC_file_path']
-
+        self.db_path = self._get_dbc(config=self.config)
         self.db = database.load_file(self.db_path)  # path of .dbc file; CAN DBC 불러오기
         self.connect_dev(bus_type=self.config['bus_type'],
                          ch=self.config['channel'],
@@ -53,6 +52,7 @@ class CANDev:
                 self.status = CAN_DEV
             except CanError:
                 self.status = CAN_ERR
+
     def msg_init(self):
         self.rx.msg_dict.clear()
 
@@ -75,7 +75,7 @@ class CANDev:
         :return: dict rx data consisting of signals and values
         '''
         rx_data = dict()
-        can_id = self._get_msg_id(frame_name)
+        can_id = self.get_msg_id(frame_name)
         if can_id in self.rx.msg_dict.keys():
             rx_raw_data = self.rx.msg_dict[can_id].data  # 데이터 변이 방지
             rx_data = self.db.decode_message(can_id, rx_raw_data, decode_choices=decode_on)
@@ -88,7 +88,7 @@ class CANDev:
         :return: dict rx data consisting of signals and values
         '''
         rx_data = dict()
-        can_id = self._get_msg_id(frame_name)
+        can_id = self.get_msg_id(frame_name)
         if can_id in self.rx.msg_dict.keys():
             message = self.rx.msg_dict[can_id]  # 데이터 변이 방지
             if self.event_time != message.timestamp:
@@ -197,12 +197,20 @@ class CANDev:
     def get_msg_name(self, id):
         return self.db.get_message_by_frame_id(id).name  # 해당 CAN message frame name 정보 가져오기
 
+    def get_msg_id(self, frame_name: str):
+        return self.db.get_message_by_name(frame_name).frame_id  # 해당 CAN message frame id 정보 가져오기
+
     def _stop_overlap_msg(self, frame_name: str):
         if frame_name in self.tx_period.keys():
             self.tx_period[frame_name].stop()
 
-    def _get_msg_id(self, frame_name: str):
-        return self.db.get_message_by_name(frame_name).frame_id  # 해당 CAN message frame id 정보 가져오기
+    def _get_dbc(self, config):
+        db_path = config['DBC_file_path']
+        if db_path == 'git':
+            ref_path = os.path.join(Configure.set['system']['git_path'], 'References', 'DB')
+            lst_db = [os.path.join(ref_path, file) for file in os.listdir(ref_path) if '.dbc' in file and config.name in file]
+            db_path = lst_db[0]
+        return db_path
 
 
 # CAN RX Msg Thread로 받기

@@ -118,9 +118,9 @@ def export_csv_dataframe(df, file_path: str, filename: str):
     df.to_csv(file_path + "\\" + filename + ".csv", index=False)
 
 
-def load_csv_list(file_path: str, filename: str):
+def load_csv_list(file_path: str):
     csv_lst = []
-    with open(file_path + "\\" + filename + ".csv", 'r', newline='') as f:
+    with open(file_path, 'r', newline='') as f:
         reader = csv.reader(f)
         for row in reader:
             csv_lst.append(row)
@@ -134,14 +134,15 @@ def export_csv_list(file_path: str, filename: str, lists: list):
         write.writerows(lists)
 
 
-def update_path_py(py_path, output_path):
+def update_script_py(py_path: str, output_path: str, title: str):
     new_lines = []
-    raw_output = to_raw(output_path)
     with open(to_raw(py_path), "r+", encoding='utf-8') as file:
         lines = file.readlines()
         for line in lines:
             if "OUTPUT_PATH = " in line:
-                line = "OUTPUT_PATH = " + "r'{}'".format(raw_output) + '\n'
+                line = "OUTPUT_PATH = " + "r'{}'".format(output_path) + '\n'
+            if 'title = [' in line:
+                line = "title = [" + "r'{}'".format(title) + "]" + '\n'
             new_lines.append(line)
     new_line = ''.join(new_lines)
     return new_line

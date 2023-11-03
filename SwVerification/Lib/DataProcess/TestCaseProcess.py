@@ -9,7 +9,7 @@ SW_TC_NAME = r'SwTC_'
 SW_TC_SUM_NAME = r"SwTC_Sum_"
 SW_TC_RES_NAME = r"SwTC_Res_"
 RESULT_FILE_PATH = os.path.join(os.getcwd(), 'data', 'result')
-
+TIME_LIMIT = 60
 
 class TestProcess:
     """
@@ -89,19 +89,19 @@ class TestProcess:
         func_name_3digit = SW_TC_NAME + tc_num.zfill(3)
         csv_tc_file_3digit = os.path.join(export_path, func_name_3digit + '.csv')
 
-        while elapse_time < 60:  # 60초 초과시
+        while elapse_time < TIME_LIMIT:  # 60초 초과시
             if os.path.isfile(csv_tc_file) is True:
                 # 파일 Access가 가능한지 확인
                 try:
                     # Result 위치 변경(가장 아래)시 수정 필요
-                    lst_tc = load_csv_list(export_path, func_name)
+                    lst_tc = load_csv_list(csv_tc_file)
                 except PermissionError:
                     pass
             elif os.path.isfile(csv_tc_file_3digit) is True:
                 # 파일 Access가 가능한지 확인
                 try:
                     # Result 위치 변경(가장 아래)시 수정 필요
-                    lst_tc = load_csv_list(export_path, func_name_3digit)
+                    lst_tc = load_csv_list(csv_tc_file_3digit)
                 except PermissionError:
                     pass
 
@@ -110,7 +110,7 @@ class TestProcess:
                 break
 
             elapse_time = int((time.time_ns() - start) * 0.000000001)
-            if elapse_time > 60:
+            if elapse_time > TIME_LIMIT:
                 sys.exit('NO CSV File')
 
         tc_pass_state = lst_tc[-1][-1].replace(' ', '')  # Pass Fail 받아오기
@@ -128,8 +128,7 @@ class TestProcess:
 
         return ret
 
-    def _export_test_sum(self, time_var: str, date_before: str, date_after: str, elapsed_time: str, tc_num: list,
-                         res: list):
+    def _export_test_sum(self, time_var: str, date_before: str, date_after: str, elapsed_time: str, tc_num: list, res: list):
         '''
         :param time_var:
         :param date_before:
@@ -144,8 +143,7 @@ class TestProcess:
         result_pass = result_col[result_col['Result'] == 'Pass']
         result_removed = result_col[result_col['Result'] == 'Removed']
         result_skip = result_col[result_col['Result'] == 'Skip']
-        result_fail = result_col[
-            (result_col['Result'] != 'Pass') & (result_col['Result'] != 'Removed') & (result_col['Result'] != 'Skip')]
+        result_fail = result_col[(result_col['Result'] != 'Pass') & (result_col['Result'] != 'Removed') & (result_col['Result'] != 'Skip')]
         fail_amt = len(result_fail)
 
         if fail_amt != 0:
@@ -184,7 +182,7 @@ class TestProcess:
             cmm_path = os.path.join(self.script_path, script_name)
             t32.cd_do(cmm_path + ' ' + str(export_path))
         elif '.py' in script_name:  # python 파일일 경우
-            exec(update_path_py(os.path.join(self.script_path, script_name), export_path))
+            exec(update_script_py(py_path=os.path.join(self.script_path, script_name), output_path=export_path, title='SwTC_{}'.format(test_num)))
         else:  # 파일이 없을 경우
             df_empty = pd.DataFrame([['Result', 'Skip']], columns=[SW_TC_NAME + test_num, ''])
             export_csv_dataframe(df_empty, export_path, SW_TC_NAME + test_num)
