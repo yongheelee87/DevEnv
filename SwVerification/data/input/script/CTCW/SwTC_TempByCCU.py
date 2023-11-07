@@ -3,7 +3,7 @@ import time
 
 from Lib.Inst.Trace32Lib import *
 from Lib.Inst.canLib import *
-from Lib.Common.graphDisplay import *
+from Lib.Common import *
 
 OUTPUT_PATH = ''
 

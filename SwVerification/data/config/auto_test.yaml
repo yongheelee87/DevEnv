@@ -1,5 +1,9 @@
  # Project and Test code Mapping file
  # Project: Test codes
  
- CTCW: [SwTC_TempByCCU, SwTC_TempByIVI]
- SWA: [SwTC_OnOff, SwTC_CloseCmd]
+ CTCW:
+   SwTC_TempByCCU: CTCW 온도 상하한치 게산 기능 (CCU)
+   SwTC_TempByIVI: CTCW 온도 상하한치 게산 기능 (IVI)
+ SWA:
+   SwTC_OnOff: SWA 적용 On/Off 판단 기능
+   SwTC_CloseCmd: SWA CLOSE 기능

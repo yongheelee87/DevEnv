@@ -1,6 +1,6 @@
 import time
 from telnetlib import Telnet
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 class TelnetClient:
     def __init__(self, config_sys):

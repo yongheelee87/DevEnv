@@ -1,6 +1,6 @@
 from templates import *
 from Lib.Inst.Trace32Lib import *
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 
 class Trace32Window(QWidget):

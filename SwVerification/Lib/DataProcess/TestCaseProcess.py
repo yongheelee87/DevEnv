@@ -2,7 +2,7 @@ import yaml
 import sys
 import time
 from Lib.Inst.Trace32Lib import *
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 TOTAL_RESULT_FILE = 'Total_TESTCASE'
 SW_TC_NAME = r'SwTC_'

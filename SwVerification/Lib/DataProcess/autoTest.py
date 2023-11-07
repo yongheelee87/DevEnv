@@ -2,7 +2,7 @@ import yaml
 import time
 from Lib.Inst.Trace32Lib import *
 from Lib.Inst.canLib import *
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 RESULT_FILE_PATH = os.path.join(os.getcwd(), 'data', 'result')
 
@@ -16,9 +16,27 @@ class AutoTest:
         self.script_path = None  # Test script path
         self.result_path = None  # Result Path to be exported
 
-    def test(self, project: str):
+    def run(self):
+        print(".... SW TEST Automation Test Start! Please Do not try additional command until it completes ....\n")
+        self.map_dict = self._update_test_map()
+        self.result_path = os.path.join(RESULT_FILE_PATH, time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time())))
+        isdir_and_make(self.result_path)
+
+        total_res = dict()
+        for pjt in self.map_dict.keys():
+            total_res[pjt] = self.test_module(pjt)
+
+        make_home_HTML(data=total_res, export_path=self.result_path)
+        self.stop()
+
+    def stop(self):
+        print(".... SW TEST Automation Test completed ....\n")
+        time.sleep(1)
+
+    def test_module(self, project: str):
         self.script_path = os.path.join('data', 'input', 'script', project)
-        print(".... Module: {} ....\n\nTest Script: {}\n".format(project, self.map_dict[project]))
+        project_tc = self.map_dict[project]  # 모듈 별 TEST CASE
+        print(".... Module: {} ....\n\nTest Script: {}\n".format(project, list(project_tc.keys())))
 
         start_time = time.time()  # 시작 시간 저장
         time_start = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(time.time()))
@@ -26,33 +44,21 @@ class AutoTest:
         export_path = os.path.join(self.result_path, project)
         isdir_and_make(export_path)
 
-        results = [self._run_test_case(test_script, export_path) for test_script in self.map_dict[project]]
+        res_tc = dict()
+        for test_script in project_tc.keys():
+            res_tc[project_tc[test_script]] = self._run_test_case(test_script, export_path)
 
         self._export_test_sum(file_path=export_path,
                               time_start=time_start,
                               elapsed_time=time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)),  # 경과 시간 저장
                               lst_tc=self.map_dict[project],
                               res=results)
-
-    def run(self):
-        print(".... SW TEST Automation Test Start! Please Do not try additional command until it completes ....\n")
-        self.map_dict = self._update_test_map()
-        self.result_path = os.path.join(RESULT_FILE_PATH, time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time())))
-        isdir_and_make(self.result_path)
-
-        for pjt in self.map_dict.keys():
-            self.test(pjt)
-
-        self.stop()
-
-    def stop(self):
-        print(".... SW TEST Automation Test completed ....\n")
-        time.sleep(1)
+        return res_tc
 
     def _update_test_map(self):
         dict_auto = dict()
         if os.path.exists(self.map_path):
-            with open(self.map_path) as f:
+            with open(self.map_path, encoding="utf-8-sig") as f:
                 dict_auto = yaml.load(f, Loader=yaml.FullLoader)
         return dict_auto
 
@@ -70,8 +76,6 @@ class AutoTest:
             if os.path.isfile(csv_tc_file) is False:
                 exec(update_script_py(py_path=script_file, output_path=export_path, title=test_script))  # TestCase Function 실행
             ret = self._check_tc_pass_state(tc_res_file=csv_tc_file)
-            if ret == 'Fail':  # Fail일 경우에는 Fail Test Script 반환
-                ret = test_script
         else:
             ret = 'Skip'
 
@@ -94,35 +98,40 @@ class AutoTest:
                 pass
         return tc_pass_state
 
-    def _export_test_sum(self, file_path: str, time_start: str, elapsed_time: str, lst_tc: list, res: list):
+    def _export_test_sum(self, file_path: str, time_start: str, elapsed_time: str, project: str, res_dict: dict):
         '''
         :param file_path:
         :param time_start:
         :param elapsed_time: elapsed time for test
-        :param lst_tc: a list of test cases
-        :param res: a list of test result
+        :param project: project name
+        :param res_dict: a dict of test result
         '''
+
         time_end = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(time.time()))
+
         len_pass = 0
         len_skip = 0
         len_fail = 0
         fail_case = ''
-        for tc_result in res:
-            if tc_result == 'Pass':
+        for tc_name in res_dict.keys():
+            if res_dict[tc_name] == 'Pass':
                 len_pass += 1
-            elif tc_result == 'Skip':
+            elif res_dict[tc_name] == 'Skip':
                 len_skip += 1
             else:
                 len_fail += 1
-                fail_case = ', {}'.format(tc_result)
+                fail_case = ', {}'.format(tc_name)
 
         if len_fail == 0:
             fail_case = 'Nothing'
 
+        lst_tc = list(res_dict.keys())
+        tc_names = ', '.join(lst_tc)  # 한글 버전
         ind = ["Date_Start", "Date_End", "Elapsed_Time", "TestCase_Names", "TestCase_Amt", "Pass_Amt", "Skip_Amt", "Fail_Amt", "Fail_Case"]
-        con = [[time_start], [time_end], [elapsed_time], [lst_tc], [len(lst_tc)], [len_pass], [len_skip], [len_fail], [fail_case]]
+        con = [[time_start], [time_end], [elapsed_time], [tc_names], [len(lst_tc)], [len_pass], [len_skip], [len_fail], [fail_case]]
         df_tc_sum = pd.DataFrame(con, columns=["Value"], index=ind)
-        df_tc_sum.to_csv(file_path + "\\" + "Summary_{}.csv".format(os.path.basename(file_path)), encoding='cp1252')
+        df_tc_sum.to_csv(file_path + "\\" + "Summary_{}.csv".format(os.path.basename(file_path)), encoding='utf-8-sig')
+        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(file_path), dict_tc=self.map_dict[project], export_path=file_path)  # 최종 결과물 HTML로 산출
 
     def _get_inst_status(self):
         lst_inst_data = []

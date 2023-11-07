@@ -6,7 +6,7 @@ from . TestCaseQt import *
 from . InstQt import *
 from . ConfigureQt import *
 
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 
 class QTextEditLogger(logging.Handler):

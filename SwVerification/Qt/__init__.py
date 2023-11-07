@@ -10,7 +10,7 @@
 #
 # ///////////////////////////////////////////////////////////////
 from templates import *
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 # Qt Window
 from . MainQt import MainWindow

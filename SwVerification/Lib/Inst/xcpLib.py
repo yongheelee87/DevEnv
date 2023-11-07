@@ -1,6 +1,6 @@
 import time
 from can import Message
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 
 class XcpVar:

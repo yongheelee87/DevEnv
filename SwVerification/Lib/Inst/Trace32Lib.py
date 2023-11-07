@@ -3,7 +3,7 @@ import subprocess  # module to create an additional process
 import time  # time module
 import lauterbach.trace32.rcl as trace32
 from lauterbach.trace32.rcl import CommandError
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 SYSTEM_DOWN = 0
 SYSTEM_READY = 2

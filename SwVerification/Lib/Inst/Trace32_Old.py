@@ -2,7 +2,7 @@ from ctypes import *  # module for C data types
 import enum  # module for C data types
 import subprocess  # module to create an additional process
 import time  # time module
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 # file path
 t32api_path = config_built_in['TRACE32']['api_path']

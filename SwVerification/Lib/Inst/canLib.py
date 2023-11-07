@@ -1,7 +1,7 @@
 from cantools import database
 from can import interface, Notifier, BufferedReader, Message, CanError
 from threading import Thread
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 CAN_IN_USE = 0
 CAN_DEV = 1
