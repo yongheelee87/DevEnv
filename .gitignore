@@ -1,7 +1,9 @@
 *.pyc
+*.zip
 *.xml
 *.png
 *.log
 *.tif
+**/data/config/
 **/.idea
 **/result
