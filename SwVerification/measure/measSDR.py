@@ -1,10 +1,6 @@
-import datetime
 from enum import Enum, auto
-import threading
-import openpyxl
-
-from Lib.Inst.visaLib import *
-from Lib.Inst.telnetLib import *
+import datetime
+from threading import Thread
 from Lib.Inst import *
 
 # Command

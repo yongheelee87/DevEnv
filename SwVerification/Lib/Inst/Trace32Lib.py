@@ -23,7 +23,7 @@ class Trace32:
 
         if 'TRACE32' in self.config.keys():
             self.connect_dev()  # 연결 시도
-            if self.config['TRACE32']['auto_start'] is True:  # Auto Start 설정시
+            if self.config['TRACE32']['auto_open'] is True:  # Auto Start 설정시
                 if check_task_open(name="t32mppc.exe") is False:  # Trace32 Process 현재 작동 되지 않을 경우
                     self.open_exe(t32api_path=self.config['TRACE32']['api_path'])  # T32 exe 실행
                     '''

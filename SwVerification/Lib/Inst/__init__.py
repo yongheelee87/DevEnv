@@ -22,6 +22,10 @@ from . Trace32Lib import *
 canBus = CANBus(config_sys=Configure.set)  # CAN BUS 연결; 전역 변수로 사용
 t32 = Trace32(config_sys=Configure.set)  # TRACE32 연결; 전역 변수로 사용
 
+'''
+visa = VisaDev(config_sys=Configure.set)  # ViSA 연결; 전역 변수로 사용
+telnet = TelnetClient(config_sys=Configure.set)  # Telnet 연결; 전역 변수로 사용
+'''
 
 def get_inst_status() -> pd.DataFrame:
     lst_inst_data = []

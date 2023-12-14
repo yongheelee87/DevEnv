@@ -1,7 +1,5 @@
 import datetime
-
-from Lib.Inst.visaLib import *
-from Lib.Inst.telnetLib import *
+from threading import Thread
 from Lib.Inst import *
 
 

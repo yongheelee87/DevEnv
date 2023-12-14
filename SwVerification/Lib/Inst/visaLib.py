@@ -133,5 +133,4 @@ class VisaDev:
         return lst_dev
 
 
-visa = VisaDev(config_sys=Configure.set)  # ViSA 연결; 전역 변수로 사용
 # This is a new line that ends the file

@@ -113,5 +113,4 @@ class TelnetClient:
         self.msg_write(f'IL.CMDU {servo_torque}')
 
 
-telnet = TelnetClient(config_sys=Configure.set)  # Telnet 연결; 전역 변수로 사용
 # This is a new line that ends the file

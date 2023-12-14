@@ -273,7 +273,7 @@ class CANBus:
 
     def _find_can(self):
         lst_can = []
-        for i in self.config.keys()[1:]:
+        for i in list(self.config.keys())[1:]:
             if 'can' in self.config[i]['type']:
                 lst_can.append(i)
         return lst_can
