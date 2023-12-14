@@ -5,7 +5,7 @@ import openpyxl
 
 from Lib.Inst.visaLib import *
 from Lib.Inst.telnetLib import *
-from Lib.Inst.canLib import *
+from Lib.Inst import *
 
 # Command
 CMD_LIST = ['CMD', 'Time[sec]', 'Env_Val', 'Servo_Speed', 'Alpha_AngleCh1', 'outMotReqCh1', 'stMotOffReqCh1', 'stMotCtrlTarCh1',

@@ -13,7 +13,7 @@ class TelnetClient:
         self.device = None
         self.status = False
 
-        if 'TELNET' in self.config.sections():
+        if 'TELNET' in self.config.keys():
             self.connect_dev(self.config['TELNET']['host'], self.config['TELNET']['port'])
 
         '''
@@ -37,10 +37,10 @@ class TelnetClient:
         try:
             self.device = Telnet(host, int(port))
             self.status = True
-            logging_print("Success: CONNECT DEVICE {}:{}\n".format(host, port))
+            print("Success: CONNECT DEVICE {}:{}\n".format(host, port))
         except (OSError, ConnectionRefusedError):
             self.status = False
-            logging_print(
+            print(
                 '[INFO] Telnet is NOT CONNECTED with HOST\nIF YOU WANT TO USE telnet, CHECK IF THERE IS PC with Ethernet\n')
 
     def msg_read(self):

@@ -1,11 +1,8 @@
-
 from . CanQt import CanWindow
 from . Trace32Qt import Trace32Window
 
 from templates import *
-from Lib.Inst.Trace32Lib import *
-from Lib.Inst.canLib import *
-from Lib.Inst.visaLib import *
+from Lib.Inst import *
 
 
 class InstWindow(QWidget):
@@ -48,7 +45,7 @@ class InstWindow(QWidget):
         # 테이블 위젯 값 쓰기
         self.ui_inst.tbl_inst_status.clear()
         # Select Dataframe
-        self.df_inst = self._get_inst_status()
+        self.df_inst = get_inst_status()  # Instruments status 가져오기
         logging_print("Current Test Environment\n{}\n".format(self.df_inst))
         # Table Contents
         self.ui_inst.tbl_inst_status.setColumnCount(len(self.df_inst.columns))
@@ -59,15 +56,3 @@ class InstWindow(QWidget):
             for c in range(len(self.df_inst.columns)):
                 self.ui_inst.tbl_inst_status.setItem(r, c, QTableWidgetItem(str(self.df_inst.iloc[r][c])))
         self.ui_inst.tbl_inst_status.resizeColumnsToContents()
-
-    def _get_inst_status(self):
-        lst_inst_data = []
-        lst_inst = [i for i in Configure.set.sections() if 'system' not in i and 'XCP' not in i]
-        for inst in lst_inst:
-            if Configure.set[inst]['type'] == 'T32':
-                lst_inst_data.append([inst, t32.status])
-            elif Configure.set[inst]['type'] == 'can':
-                lst_inst_data.append([inst, False if canBus.devs[inst].status == CAN_ERR else True])
-            else:
-                lst_inst_data.append([inst, visa.status[inst]])
-        return pd.DataFrame(lst_inst_data, columns=['Name', 'Connect'])

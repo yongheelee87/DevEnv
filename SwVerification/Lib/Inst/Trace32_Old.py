@@ -39,7 +39,7 @@ def t32_open_exe():
     else:
         print("ERR: Trace32 NOT Init\n")
         t32api.T32_Exit()
-    logging_print('Success: OPEN Trace32\n')
+    print('Success: OPEN Trace32\n')
 
 
 def t32_initialization():
@@ -57,10 +57,10 @@ def t32_run_cmd(run_cmd):
     if t32_initialization() == OK:
         t32api.T32_Cmd(cmd_in.encode())
         wait_until_command_ends()
-        logging_print('Success: Run Cmd {}\n'.format(run_cmd))
+        print('Success: Run Cmd {}\n'.format(run_cmd))
     else:
         t32api.T32_Stop()
-        logging_print('ERR: Run Cmd {}\n'.format(run_cmd))
+        print('ERR: Run Cmd {}\n'.format(run_cmd))
 
 
 def t32_go():
@@ -68,20 +68,20 @@ def t32_go():
         t32api.T32_Cmd(b'Go')
         wait_until_command_ends()
         time.sleep(2)
-        logging_print('Success: Trace32 Go\n')
+        print('Success: Trace32 Go\n')
     else:
         t32api.T32_Stop()
-        logging_print('ERR: Trace32 NOT Go\n')
+        print('ERR: Trace32 NOT Go\n')
 
 
 def t32_break():
     if t32_initialization() == OK:
         t32api.T32_Cmd(b'Break')
         wait_until_command_ends()
-        logging_print('Success: Trace32 Break\n')
+        print('Success: Trace32 Break\n')
     else:
         t32api.T32_Stop()
-        logging_print('ERR: Trace32 NOT Break\n')
+        print('ERR: Trace32 NOT Break\n')
 
 
 def t32_exit():
@@ -90,20 +90,20 @@ def t32_exit():
     ret = t32api.T32_Exit()
     if ret == 0:
         time.sleep(0.5)
-        logging_print('Success: Trace32 Connection End\n')
+        print('Success: Trace32 Connection End\n')
     else:
         time.sleep(0.5)
-        logging_print("ERR: Trace32 Connection NOT End\n")
+        print("ERR: Trace32 Connection NOT End\n")
 
 
 def t32_reset():
     if t32_initialization() == OK:
         t32api.T32_Cmd(b'System.ResetTarget')
         wait_until_command_ends()
-        logging_print('Success: Trace32 Reset\n')
+        print('Success: Trace32 Reset\n')
     else:
         t32api.T32_Stop()
-        logging_print('ERR: Trace32 NOT Reset\n')
+        print('ERR: Trace32 NOT Reset\n')
 
 
 def t32_reset_go():
@@ -113,30 +113,30 @@ def t32_reset_go():
         time.sleep(0.2)
         t32api.T32_Cmd(b'Go')
         time.sleep(0.2)
-        logging_print('Success: Trace32 Reset_GO\n')
+        print('Success: Trace32 Reset_GO\n')
     else:
         t32api.T32_Stop()
-        logging_print('ERR: Trace32 NOT Reset_GO\n')
+        print('ERR: Trace32 NOT Reset_GO\n')
 
 
 def t32_attach():
     if t32_initialization() == OK:
         t32api.T32_Cmd(b'SYStem.Mode.Attach')
         wait_until_command_ends()
-        logging_print('Success: Trace32 Attach\n')
+        print('Success: Trace32 Attach\n')
     else:
         t32api.T32_Stop()
-        logging_print('ERR: Trace32 NOT Attach\n')
+        print('ERR: Trace32 NOT Attach\n')
 
 
 def t32_no_debug():
     if t32_initialization() == OK:
         t32api.T32_Cmd(b'SYStem.Mode.NoDebug')
         wait_until_command_ends()
-        logging_print('Success: Trace32 NoDebug\n')
+        print('Success: Trace32 NoDebug\n')
     else:
         t32api.T32_Stop()
-        logging_print('ERR: Trace32 NOT NoDebug\n')
+        print('ERR: Trace32 NOT NoDebug\n')
 
 
 def wait_until_command_ends():

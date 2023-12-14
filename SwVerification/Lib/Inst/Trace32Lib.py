@@ -21,18 +21,16 @@ class Trace32:
         self.device = None  # Trace device 선언
         self.status = False  # status 선언
 
-        if 'TRACE32' in self.config.sections():
-            state_auto = True if check_process_open('TRACE32 PowerView') is False and self.config['TRACE32']['auto_start'] == 'True' else False
-            if state_auto is True:
-                self.open_exe(t32api_path=self.config['TRACE32']['api_path'])  # T32 exe 실행
-
-            self.connect_dev()  # 연결
-
-            if state_auto is True:
-                self.cd_do(self.config['TRACE32']['window_cmm'])
-                self.cd_do(self.config['TRACE32']['flash_cmm'])
-                time.sleep(2)
-                self.cmd('Go')
+        if 'TRACE32' in self.config.keys():
+            self.connect_dev()  # 연결 시도
+            if self.config['TRACE32']['auto_start'] is True:  # Auto Start 설정시
+                if check_task_open(name="t32mppc.exe") is False:  # Trace32 Process 현재 작동 되지 않을 경우
+                    self.open_exe(t32api_path=self.config['TRACE32']['api_path'])  # T32 exe 실행
+                    '''
+                    SubProcess에서 이전 작업으로 Trace32가 작동되어 있을 경우 Trace32 already is occupied by other GUI
+                    config.t32에서 CONNECTIONMODE=AUTOCONNECT 설정 확인 후 CPU상태에 따라 4~7초의 Auto Connection 시간 필요
+                    '''
+                    self.wait_until_connect(timeout=12)
 
     def connect_dev(self):
         '''
@@ -41,16 +39,16 @@ class Trace32:
         try:
             self.device = trace32.connect(node='localhost', port=20001, protocol="TCP", packlen=1024, timeout=10.0)
             self.status = True
-            logging_print('Success: TRACE32 CONNECTION\n')
+            print('Success: TRACE32 CONNECTION\n')
         except ConnectionRefusedError:
             self.status = False
-            logging_print('Error: TRACE32 CONNECTION\nCHECK IF TRACE32 POWERVIEW IS OPENED AND RETRY THE CONNECTION\n')
+            print('Error: TRACE32 CONNECTION\nCHECK IF TRACE32 POWERVIEW IS OPENED AND RETRY THE CONNECTION\n')
 
     def check_status(self):
         if self.status:
-            logging_print('Success: TRACE32 CONNECTION\n')
+            print('Success: TRACE32 CONNECTION\n')
         else:
-            logging_print('[INFO] TRACE32 is NOT CONNECTED with HOST\nIF YOU WANT TO USE TRACE32, CHECK IF TRACE32 POWERVIEW IS OPENED AND RETRY THE CONNECTION\n')
+            print('[INFO] TRACE32 is NOT CONNECTED with HOST\nIF YOU WANT TO USE TRACE32, CHECK IF TRACE32 POWERVIEW IS OPENED AND RETRY THE CONNECTION\n')
 
     def open_exe(self, t32api_path: str):
         '''
@@ -60,7 +58,22 @@ class Trace32:
         os.startfile(t32_exe)
         # Wait until the TRACE32 instance is started
         time.sleep(3)
-        logging_print('Success: OPEN Trace32\n')
+        print('Success: OPEN Trace32\n')
+
+    def flash_binary(self):
+        self.cd_do(self.config['TRACE32']['flash_cmm'])
+        time.sleep(2)
+        self.cmd('Go')
+        time.sleep(3)
+
+    def wait_until_connect(self, timeout: int):
+        start = time.time_ns()
+        elapsed_time = 0
+        while elapsed_time < timeout:  # Timeout
+            self.connect_dev()  # 연결
+            if self.status is True:
+                break
+            elapsed_time = int((time.time_ns() - start) * 0.000000001)
 
     def cmd(self, str_cmd: str, time_out: int = 2):
         '''
@@ -145,5 +158,4 @@ class Trace32:
         return self.device.breakpoint.enable(address=self.device.symbol.query_by_name(name=name).address)
 
 
-t32 = Trace32(config_sys=Configure.set)  # TRACE32 연결; 전역 변수로 사용
 # This is a new line that ends the file

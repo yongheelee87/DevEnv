@@ -4,33 +4,28 @@ import pandas as pd
 import pygetwindow as gw
 import os  # module for paths and directories
 import csv
-import configparser
+import yaml
 import struct
 
 
-class SysConfig:
-    def __init__(self, path):
-        self.path = path
-        self.set = configparser.ConfigParser()
-        self.set.read(self.path, encoding='utf-8')
-
-    def update(self):
-        self.set.read(self.path, encoding='utf-8')
-
-
-Configure = SysConfig(path='./data/config/config_sys.ini')  # Configuration 전역변수 선언
-
-
-def to_raw(string: str):
+def to_raw(string: str) -> str:
+    '''
+    :param string:
+    :return: raw string
+    '''
     return r'{}'.format(string)
 
 
-def to_hex_str(integerVariable: int):
+def to_hex_str(integerVariable: int) -> str:
+    '''
+    :param integerVariable:
+    :return: sting hex number
+    '''
     strHex = "0x%0.2X" % integerVariable
     return strHex
 
 
-def float_to_hex(f: float):
+def float_to_hex(f: float) -> hex:
     '''
     :param f: float input value
     :return: hex str
@@ -38,7 +33,7 @@ def float_to_hex(f: float):
     return hex(struct.unpack('<I', struct.pack('<f', f))[0])
 
 
-def hex_to_float(h: str):
+def hex_to_float(h: str) -> float:
     '''
     :param h: hex str
     :return: float value
@@ -46,7 +41,11 @@ def hex_to_float(h: str):
     return struct.unpack('<f', struct.pack('i', int(h, 16)))[0]
 
 
-def to_hex_little_lst(in_val):
+def to_hex_little_lst(in_val: any) -> list:
+    '''
+    :param in_val: input value
+    :return: list of bytes
+    '''
     str_val = in_val if isinstance(in_val, str) else str(in_val)
     if '.' in str_val:
         str_val = str(float_to_hex(float(str_val)))
@@ -62,13 +61,17 @@ def bytearray_to_hex(arr):
 
 def isdir_and_make(dir_name: str):
     if not (os.path.isdir(dir_name)):
-        os.mkdir(dir_name)
+        os.makedirs(name=dir_name, exist_ok=True)
         print("Success: Create {}\n".format(dir_name))
     else:
         print("Success: Access {}\n".format(dir_name))
 
 
-def check_process_open(keyword: str):
+def check_process_open(keyword: str) -> bool:
+    '''
+    :param keyword: window keyword
+    :return: True = Open, False = Not open
+    '''
     to_do_process = gw.getWindowsWithTitle(keyword)
     # print(to_do_process)
     num_of_process = len(to_do_process)
@@ -79,6 +82,9 @@ def check_process_open(keyword: str):
 
 
 def to_do_process_close(keyword: str):
+    '''
+    :param keyword:
+    '''
     to_do_process = gw.getWindowsWithTitle(keyword)
     num_of_process = len(to_do_process)
     if num_of_process == 0:
@@ -109,7 +115,7 @@ def open_path(path: str):
     print("Success: Open {}\n".format(path))
 
 
-def load_csv_dataframe(file_path: str, filename: str):
+def load_csv_dataframe(file_path: str, filename: str) -> pd.DataFrame:
     df = pd.read_csv(file_path + "\\" + filename + ".csv", dtype=object, encoding='cp1252')
     return df
 
@@ -118,7 +124,11 @@ def export_csv_dataframe(df, file_path: str, filename: str):
     df.to_csv(file_path + "\\" + filename + ".csv", index=False)
 
 
-def load_csv_list(file_path: str):
+def load_csv_list(file_path: str) -> list:
+    '''
+    :param file_path: fila path to load
+    :return: csv list
+    '''
     csv_lst = []
     with open(file_path, 'r', newline='') as f:
         reader = csv.reader(f)
@@ -134,21 +144,18 @@ def export_csv_list(file_path: str, filename: str, lists: list):
         write.writerows(lists)
 
 
-def update_script_py(py_path: str, output_path: str, title: str):
-    new_lines = []
-    with open(to_raw(py_path), "r+", encoding='utf-8') as file:
-        lines = file.readlines()
-        for line in lines:
-            if "OUTPUT_PATH = " in line:
-                line = "OUTPUT_PATH = " + "r'{}'".format(output_path) + '\n'
-            if 'title = [' in line:
-                line = "title = [" + "r'{}'".format(title) + "]" + '\n'
-            new_lines.append(line)
-    new_line = ''.join(new_lines)
-    return new_line
+def find_str_inx(lines: str, start_str: str, end_str: str) -> (int, int):
+    start = lines.find(start_str)
+    end = lines.find(end_str) + len(end_str)
+    return start, end
 
 
-def check_same_value(var, value):
+def check_same_value(var: any, value: any) -> bool:
+    '''
+    :param var: control value
+    :param value: compare value
+    :return: True=same, False=Not Same
+    '''
     ret = False
     if type(var) == type(value):
         check_available = True
@@ -169,21 +176,21 @@ def check_same_value(var, value):
     return ret
 
 
-def check_value_in_margin(var, value, percentage: float):
+def check_value_in_margin(var: any, value: any, percentage: float) -> bool:
     ret = False
     if abs(float(value) * (1 - percentage)) <= abs(float(var)) <= abs(float(value) * (1 + percentage)):
         ret = True
     return ret
 
 
-def check_value_in_margin_value(input, expected_result, margin):
+def check_value_in_margin_value(input: any, expected_result: any, margin: any) -> bool:
     ret = False
     if (expected_result - margin) <= float(input) <= (expected_result + margin):
         ret = True
     return ret
 
 
-def column_naming(data):
+def column_naming(data) -> pd.DataFrame:
     temp = pd.DataFrame(data)
     col_len = len(temp.columns)
     col_name = ['ret', 'Test_Result']
@@ -197,27 +204,11 @@ def column_naming(data):
     return ret
 
 
-def data_mean_std_min_max(data):
-    mean = data.mean()
-    std = data.std()
-    minvalue = data.min()
-    maxvalue = data.max()
-    return mean, std, minvalue, maxvalue
-
-
-def data_col_mean_std_min_max(data, col_name):
-    mean = data[col_name].mean()
-    std = data[col_name].std()
-    minvalue = data[col_name].min()
-    maxvalue = data[col_name].max()
-    return mean, std, minvalue, maxvalue
-
-
-def get_sqrt(df, col1, col2):
+def get_sqrt(df: pd.DataFrame, col1: str, col2: str):
     return (df[col1] ** 2 + df[col2] ** 2) ** (1 / 2)
 
 
-def get_window_with_loop(title, cnt_limit):
+def get_window_with_loop(title: str, cnt_limit: int):
     cnt = 0
     win_temp = None
     while cnt < cnt_limit:
@@ -225,11 +216,37 @@ def get_window_with_loop(title, cnt_limit):
         win_list = [ti for ti in titles if title in ti]
         if len(win_list) != 0:
             win_temp = gw.getWindowsWithTitle(win_list[0])[0]
-            logging_print("Success: Get WINDOW {}\n".format(title))
+            print("Success: Get WINDOW {}\n".format(title))
             break
         cnt += 1
     return win_temp
 
+
+def check_front_space(string: str) -> int:
+    # counter
+    count = 0
+
+    # loop for search each index
+    for i in range(0, len(string)):
+        # check each char
+        # is blank or not
+        if string[i] == " ":
+            count += 1
+        elif string[i] == "#":
+            pass
+        else:
+            break
+    return count
+
+
+def check_task_open(name: str) -> bool:
+    res_open = False
+    r = os.popen('tasklist /v').read().strip().split('\n')  # Tasklist 받기
+    for i in range(len(r)):
+        if name in r[i]:
+            res_open = True
+    print("The task {} Connection: {}\n".format(name, res_open))
+    return res_open
 
 def logging_initialize():
     if os.path.isfile("./data/result/Debug.log"):

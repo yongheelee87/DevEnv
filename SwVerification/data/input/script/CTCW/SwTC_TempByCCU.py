@@ -1,8 +1,7 @@
 from threading import Thread
 import time
 
-from Lib.Inst.Trace32Lib import *
-from Lib.Inst.canLib import *
+from Lib.Inst import *
 from Lib.Common import *
 
 OUTPUT_PATH = ''

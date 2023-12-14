@@ -50,7 +50,7 @@ class XcpProtocol:
                 addr = self.df_symbol.loc[sym].values[0]
             else:
                 addr = '0x00000000'
-                logging_print("Error: Get address of symbol [{}]\nThere is no symbol information in map\n".format(sym))
+                print("Error: Get address of symbol [{}]\nThere is no symbol information in map\n".format(sym))
         return addr
 
     def connect(self, bus):
@@ -86,7 +86,7 @@ class XcpProtocol:
             self.can.send(can_message, timeout=None)
             XcpVar.status = False
         else:
-            logging_print("Error: XCP MAP FILE IS NOT FOUND AND PLEASE RE-CHECK CONFIGURE AND FILE\n")
+            print("Error: XCP MAP FILE IS NOT FOUND AND PLEASE RE-CHECK CONFIGURE AND FILE\n")
 
     def send_msg_read(self, addr_hex: str):
         '''
@@ -102,4 +102,4 @@ class XcpProtocol:
             self.can.send(can_message, timeout=None)
             XcpVar.status = False
         else:
-            logging_print("Error: XCP MAP FILE IS NOT FOUND AND PLEASE RE-CHECK CONFIGURE AND FILE\n")
+            print("Error: XCP MAP FILE IS NOT FOUND AND PLEASE RE-CHECK CONFIGURE AND FILE\n")

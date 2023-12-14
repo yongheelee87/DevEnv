@@ -1,5 +1,5 @@
 import time
-from Lib.Inst.Trace32Lib import *
+from Lib.Inst import *
 
 
 OUTPUT_PATH = ''

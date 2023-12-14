@@ -1,7 +1,5 @@
 from templates import *
-from Lib.Inst.Trace32Lib import *
-from Lib.Inst.canLib import *
-from Lib.Inst.visaLib import *
+from Lib.Inst import *
 
 
 class ConfigureWindow(QWidget):

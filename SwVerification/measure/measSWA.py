@@ -2,7 +2,7 @@ import datetime
 
 from Lib.Inst.visaLib import *
 from Lib.Inst.telnetLib import *
-from Lib.Inst.canLib import *
+from Lib.Inst import *
 
 
 class MeasSWA:
@@ -35,7 +35,7 @@ class MeasSWA:
 
     def load_script(self, testEnv):
         self.testEnv = testEnv
-        logging_print("Load Test Environment:\n{}".format(self.testEnv))
+        print("Load Test Environment:\n{}".format(self.testEnv))
 
     def stop(self):
         self.meas_state = False

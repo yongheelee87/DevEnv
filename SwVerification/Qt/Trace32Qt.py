@@ -1,5 +1,5 @@
 from templates import *
-from Lib.Inst.Trace32Lib import *
+from Lib.Inst import *
 from Lib.Common import *
 
 

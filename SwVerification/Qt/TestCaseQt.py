@@ -1,7 +1,6 @@
 from templates import *
 import re
-from PyQt5.QtCore import QThread
-from Lib.DataProcess.TestCaseProcess import *
+from Lib.DataProcess import *
 
 
 class TestCaseWindow(QWidget):
@@ -13,11 +12,11 @@ class TestCaseWindow(QWidget):
         self.ui_tc.setupUi(self)
         self.project = Configure.set['system']['project'].strip()
 
-        self.swTest = TestProcess(self.project)
+        self.swTest = AutoTest(test_yaml='./data/config/test_map.yaml')
         self.connectBtnInit()
 
         self.testcase_num_str = []
-        self.dic_test_mode = dict()
+        self.dic_test_mode = {}
 
         self.connectCBoxInit()  # dic_test_mode가 먼저 선언 필요
 
@@ -50,7 +49,7 @@ class TestCaseWindow(QWidget):
         self.project = self.ui_tc.cbox_project.currentText().strip()
         self._update_map_script()
         self._update_map_mode()
-        self.test_th.test_model = self.swTest
+        self.test_th.update_model(model=self.swTest)
 
     def func_btn_apply(self):
         configure_str = self.ui_tc.pText_map_test.toPlainText()
@@ -68,22 +67,23 @@ class TestCaseWindow(QWidget):
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Project_CSV(self):
-        open_path('./data/result/Total_TESTCASE.csv')
+        open_path('Deleted Function')
 
     def func_btn_Map_Mode(self):
-        open_path(self.swTest.map_mode_path)
+        open_path(os.path.join('data', 'input', 'script', self.project, 'set', 'map_test_mode.yaml'))
 
     def func_btn_testcase(self):
         self._update_testcase()  # Line에 기입된 Case Number 정렬하기
         if self.testcase_num_str:
-            self.test_th.tc_num = self.testcase_num_str
+            self.swTest.ui_ON = True
+            self.swTest.update_test_case(pjt=self.project, test_num=self.testcase_num_str)
+            self.test_th.update_model(model=self.swTest)
             self.test_th.start()
 
     def func_btn_testmode(self):
         self._update_map_mode()
         test_mode = str(self.ui_tc.cbox_Test_mode.currentText().strip())
         test_cases = self.dic_test_mode[test_mode]
-        self.test_th.tc_num = list(map(str, test_cases))
         self.test_th.start()
 
     def _get_project(self):
@@ -112,17 +112,15 @@ class TestCaseWindow(QWidget):
                 self.testcase_num_str.append(v)
 
     def _update_map_script(self):
-        self.swTest.script_path = os.path.join(self.swTest.main_path, 'data', 'input', 'script', self.project)
-        self.swTest.map_script_path = '{}/set/map_script_sw_test.yaml'.format(self.swTest.script_path)
-        with open(self.swTest.map_script_path, 'r', encoding='utf-8') as f:
+        self.swTest.script_path = os.path.join('data', 'input', 'script', self.project)
+        with open('{}/set/map_script_sw_test.yaml'.format(self.swTest.script_path), 'r', encoding='utf-8') as f:
             f_lines = f.readlines()
             map_test = "".join(f_lines)
         self.ui_tc.pText_map_test.setPlainText(map_test)
 
     def _update_map_mode(self):
         self.ui_tc.cbox_Test_mode.clear()
-        self.swTest.map_mode_path = '{}/set/map_test_mode.yaml'.format(self.swTest.script_path)
-        self.dic_test_mode = self.swTest.update_map_mode()
+        self.dic_test_mode = self.swTest.update_map_mode(self.project)
         self.ui_tc.cbox_Test_mode.addItems(list(self.dic_test_mode.keys()))
 
 
@@ -131,13 +129,15 @@ class TestThread(QThread):
 
     def __init__(self, test_model):
         super().__init__()
-        self.test_model = test_model
-        self.tc_num = None
+        self.test_meas = test_model
 
     def run(self):
-        self.test_model.start(self.tc_num)
+        self.test_meas.run()
 
     def stop(self):
-        self.test_model.stop()
+        self.test_meas.stop()
         self.terminate()
         self.wait(2)
+
+    def update_model(self, model):
+        self.test_meas = model

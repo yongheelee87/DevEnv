@@ -1,10 +1,10 @@
 import logging
 from templates import *
 # Qt Window
-from . MeasureQt import *
-from . TestCaseQt import *
-from . InstQt import *
-from . ConfigureQt import *
+from . ConfigureQt import ConfigureWindow
+from . InstQt import InstWindow
+from . MeasureQt import MeasureWindow
+from . TestCaseQt import TestCaseWindow
 
 from Lib.Common import *
 

@@ -18,14 +18,14 @@ class CANDev:
     main test class for bus and message
     """
 
-    def __init__(self, config_can):
+    def __init__(self, name: str, config_can):
         self.config = config_can  # CAN Config 파일 Class
 
         self.bus = None  # CAN bus 선언
         self.buffer = BufferedReader()  # CAN buffer type 선언
         self.notifier = None  # CAN message 전송을 위한 notifier 선언
         self.status = CAN_ERR
-        self.db_path = self._get_dbc(config=self.config)
+        self.db_path = self._get_dbc(name=name, config=self.config)
         self.db = database.load_file(self.db_path)  # path of .dbc file; CAN DBC 불러오기
         self.connect_dev(bus_type=self.config['bus_type'],
                          ch=self.config['channel'],
@@ -40,23 +40,24 @@ class CANDev:
         self.tx_period = dict()  # CAN tx period data 선언; 메모리 보관
         self.event_time = 0  # CAN event Time 저장
 
-    def connect_dev(self, bus_type, ch, bit_rate, data_rate, app_type):
+    def connect_dev(self, bus_type: str, ch: str or int, bit_rate: int, data_rate: int, app_type: str):
         try:
             can_message = Message(arbitration_id=0, data=[0x00], is_extended_id=False, is_fd=True)  # 의미 없는 데이터 전송
             self.bus.send(can_message, timeout=0.2)  # 일정타임이상의 Timeout설정으로 전달이 안정적임
             self.status = CAN_IN_USE
-        except:
+        except AttributeError:
             try:
-                self.bus = interface.Bus(bustype=bus_type, channel=ch, bitrate=bit_rate, app_name=app_type, data_bitrate=data_rate, fd=True)
+                self.bus = interface.Bus(bustype=bus_type, channel=ch, bitrate=bit_rate, app_name=app_type,
+                                         data_bitrate=data_rate, fd=True)
                 self.notifier = Notifier(self.bus, [_get_message, self.buffer])
                 self.status = CAN_DEV
             except CanError:
                 self.status = CAN_ERR
 
     def msg_init(self):
-        self.rx.msg_dict.clear()
+        self.rx.msg_dict.clear()  # 메세지 초기화
 
-    def msg_read_id(self, can_id: int, decode_on: bool = True):
+    def msg_read_id(self, can_id: int, decode_on: bool = True) -> dict:
         '''
         :param can_id: can id (ex.0x14A)
         :param decode_on: True = decoded return value False = raw value
@@ -68,7 +69,7 @@ class CANDev:
             rx_data = self.db.decode_message(can_id, rx_raw_data, decode_choices=decode_on)
         return rx_data
 
-    def msg_read_name(self, frame_name: str, decode_on: bool = True):
+    def msg_read_name(self, frame_name: str, decode_on: bool = True) -> dict:
         '''
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
         :param decode_on: True = decoded return value False = raw value
@@ -81,7 +82,7 @@ class CANDev:
             rx_data = self.db.decode_message(can_id, rx_raw_data, decode_choices=decode_on)
         return rx_data
 
-    def msg_read_event(self, frame_name: str, decode_on: bool = True):
+    def msg_read_event(self, frame_name: str, decode_on: bool = True) -> dict:
         '''
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
         :param decode_on: True = decoded return value False = raw value
@@ -190,25 +191,24 @@ class CANDev:
 
             if len(self.tx_data) != 0:
                 self.tx_data.clear()
-            print("Success: STOP WRITE CAN MESSAGE\n")
         except CanError:
             print("Error: STOP WRITE CAN MESSAGE\n")
 
-    def get_msg_name(self, id):
+    def get_msg_name(self, id: int) -> str:
         return self.db.get_message_by_frame_id(id).name  # 해당 CAN message frame name 정보 가져오기
 
-    def get_msg_id(self, frame_name: str):
+    def get_msg_id(self, frame_name: str) -> int:
         return self.db.get_message_by_name(frame_name).frame_id  # 해당 CAN message frame id 정보 가져오기
 
     def _stop_overlap_msg(self, frame_name: str):
         if frame_name in self.tx_period.keys():
             self.tx_period[frame_name].stop()
 
-    def _get_dbc(self, config):
+    def _get_dbc(self, name: str, config) -> str:
         db_path = config['DBC_file_path']
         if db_path == 'git':
             ref_path = os.path.join(Configure.set['system']['git_path'], 'References', 'DB')
-            lst_db = [os.path.join(ref_path, file) for file in os.listdir(ref_path) if '.dbc' in file and config.name in file]
+            lst_db = [os.path.join(ref_path, file) for file in os.listdir(ref_path) if '.dbc' in file and name in file]
             db_path = lst_db[0]
         return db_path
 
@@ -241,9 +241,9 @@ class CANBus:
 
         self.lst_dev = self._find_can()
         for dev in self.lst_dev:
-            self.devs[dev] = CANDev(config_can=self.config[dev])  # CAN BUS 연결; 전역 변수로 사용
+            self.devs[dev] = CANDev(name=dev, config_can=self.config[dev])  # CAN BUS 연결; 전역 변수로 사용
 
-    def check_status(self):
+    def check_status(self) -> list:
         lst_fail_dev = []
         lst_connect_dev = []
         for dev in self.lst_dev:
@@ -253,10 +253,10 @@ class CANBus:
                 lst_connect_dev.append(dev)
 
         if lst_connect_dev:
-            logging_print("{} CAN STATUS: CONNECT CAN DEVICE\n".format(lst_connect_dev))
+            print("{} CAN STATUS: CONNECT CAN DEVICE\n".format(lst_connect_dev))
 
         if lst_fail_dev:
-            logging_print('{} CAN is NOT CONNECTED with HOST\nIF YOU WANT TO USE CAN, CHECK IF THERE IS CAN DEVICE IN HARDWARE MANAGER\n'.format(lst_fail_dev))
+            print('{} CAN is NOT CONNECTED with HOST\nIF YOU WANT TO USE CAN, CHECK IF THERE IS CAN DEVICE IN HARDWARE MANAGER\n'.format(lst_fail_dev))
 
         return lst_fail_dev
 
@@ -273,11 +273,10 @@ class CANBus:
 
     def _find_can(self):
         lst_can = []
-        for i in self.config.sections()[1:]:
+        for i in self.config.keys()[1:]:
             if 'can' in self.config[i]['type']:
                 lst_can.append(i)
         return lst_can
 
 
-canBus = CANBus(config_sys=Configure.set)  # CAN BUS 연결; 전역 변수로 사용
 # This is a new line that ends the file

@@ -41,16 +41,16 @@ class VisaDev:
                         if Configure.set[dev]['ID'] in dev_name:
                             self.resource[dev] = res
                             self.status[dev] = True
-                            logging_print("Success: find device {}\n".format(dev_name))
+                            print("Success: find device {}\n".format(dev_name))
                             break
                     except Exception as e:
-                        logging_print('Error: connect {} with {}\n'.format(rm_list[i], e))
+                        print('Error: connect {} with {}\n'.format(rm_list[i], e))
                 if self.status[dev] is False:
-                    logging_print("Error: find device {}\n".format(dev))
+                    print("Error: find device {}\n".format(dev))
             else:
-                logging_print("Error: there is no connected device {}\n".format(dev))
+                print("Error: there is no connected device {}\n".format(dev))
         except VisaIOError as e:
-            logging_print("Error: connect {} device with {}\n".format(dev, e))
+            print("Error: connect {} device with {}\n".format(dev, e))
 
     def write(self, dev, cmd):
         '''
@@ -121,13 +121,13 @@ class VisaDev:
         opc = self.resource[dev].query("*OPC?")
         if '1' in opc:
             self.resource[dev].write("*RST")
-            logging_print('Success: COMMAND RESET\n')
+            print('Success: COMMAND RESET\n')
         else:
-            logging_print('Error: COMMAND RESET\n')
+            print('Error: COMMAND RESET\n')
 
     def _find_device(self):
         lst_dev = []
-        for i in self.config.sections()[1:]:
+        for i in self.config.keys()[1:]:
             if 'visa' in self.config[i]['type']:
                 lst_dev.append(i)
         return lst_dev
