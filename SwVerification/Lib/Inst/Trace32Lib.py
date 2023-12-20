@@ -1,6 +1,7 @@
 import os
 import subprocess  # module to create an additional process
 import time  # time module
+from threading import Thread
 import lauterbach.trace32.rcl as trace32
 from lauterbach.trace32.rcl import CommandError
 from Lib.Common import *
@@ -31,6 +32,9 @@ class Trace32:
                     config.t32에서 CONNECTIONMODE=AUTOCONNECT 설정 확인 후 CPU상태에 따라 4~7초의 Auto Connection 시간 필요
                     '''
                     self.wait_until_connect(timeout=12)
+            # Measure Data Thread 설정
+            self.rx = T32RXThread(dev=self.device)  # TRACE32 RX 시그널 Thread 설정
+            self.rx.start()  # TRACE32 RX 시그널 THREAD 동작
 
     def connect_dev(self):
         '''
@@ -122,12 +126,14 @@ class Trace32:
         self.cmd('System.ResetTarget')
 
     def reset_go(self):
+        self.rx.stop_log()
         self.cmd('System.ResetTarget')
         start = time.time_ns()
         elapse_time = 0
         while elapse_time < 5:  # 5초 초과시
             self.cmd('Go')
             if self._get_state() == RUNNING:
+                self.rx.resume()
                 break
             elapse_time = int((time.time_ns() - start) * 0.000000001)
 
@@ -157,5 +163,48 @@ class Trace32:
     def enable_break(self, name):
         return self.device.breakpoint.enable(address=self.device.symbol.query_by_name(name=name).address)
 
+    def msg_init(self):
+        self.rx.msg_dict.clear()  # 메세지 초기화
+
+    def get_symbol_data(self, sym: str) -> int:
+        '''
+        :param sym: symbol variable
+        :return: t32 symbol data from dict
+        '''
+        ret_data = None
+        if sym in self.rx.msg_dict.keys():  # 데이터 저장이 되어 있을 경우
+            ret_data = int(self.rx.msg_dict[sym])
+        return ret_data
+
+    def re_init(self):
+        self.rx.stop_log()
+        time.sleep(0.5)
+        self.reset_go()
+        self.rx.msg_dict = {}  # 메세지 초기화
+        self.rx.resume()
+
+
+class T32RXThread(Thread):
+    """ T32RXThread(parent: Thread) """
+
+    def __init__(self, dev):
+        super().__init__()
+        self.dev = dev
+        self.vars = []
+        self.update_flag = False
+        self.msg_dict = {}
+
+    def run(self):
+        while True:
+            if self.update_flag is True:
+                for var in self.vars:  # for문이 비워 있을때는 실행 안함
+                    self.msg_dict[var] = self.dev.variable.read(var).value
+            time.sleep(0.001)
+
+    def stop_log(self):
+        self.update_flag = False
+
+    def resume(self):
+        self.update_flag = True
 
 # This is a new line that ends the file

@@ -1,6 +1,16 @@
 import pandas as pd
 
 
+def find_out_signals_for_col(out_sigs: list) -> (list, list):
+    cols = []
+    t32_out = []
+    for sig in out_sigs:
+        cols.append('Out: {}'.format(sig[2]))
+        if 'T32' in sig[0]:
+            t32_out.append(sig[-1])
+    return cols, t32_out
+
+
 def judge_final_result(df_result: pd.DataFrame, expected_outs: list, num_match: int, meas_log: list, out_col: list):
     final_result = 'Pass'  # Final result to be recorded
     fail_cases = []

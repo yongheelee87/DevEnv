@@ -1,7 +1,7 @@
 from Lib.Inst import *
 from Lib.Common.basicFunction import *
 
-log_txt = """
+log_thread_body = """
 class LogThread(Thread):
     def __init__(self, can_bus):
         super().__init__()
@@ -23,6 +23,50 @@ class LogThread(Thread):
             time.sleep(self.sample_rate)
 """
 
+tc_main_body = """
+# Initialize all variables
+canBus.stop_all_period_msg()
+
+t32.rx.vars = lst_t32_out  # define T32 rx variable
+
+t32.re_init()
+time.sleep(0.5)
+
+# Measure Data Thread 설정
+log_th = LogThread(can_bus=canBus)
+log_th.start()
+log_th.log_state = True  # log start
+
+for i in input_data:
+    if i[2] != 255:
+{write_msg}
+    else:
+        canBus.stop_all_period_msg()
+        i[2] = None
+        log_th.in_data = i[2:]
+        t32.re_init()
+        time.sleep(1)
+
+    log_th.step = int(i[0])
+    log_th.in_data = i[2:]
+
+    time.sleep(i[1])
+
+log_th.log_state = False  # log stop
+
+for log_lst in log_th.log_lst:
+    outcome.append(log_lst)
+
+df_log = pd.DataFrame(log_th.log_lst, columns=total_col)
+signal_step_graph(df=df_log.copy(), x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
+
+# Result judgement logic
+NUM_OF_MATCH = 0  # define criteria for matching rows
+outcome = judge_final_result(df_result=df_log[['Step'] + out_col], expected_outs=expected_data, num_match=NUM_OF_MATCH, meas_log=outcome.copy(), out_col=out_col)
+
+export_csv_list(OUTPUT_PATH, title[0], outcome)
+"""
+
 
 def update_py(py_path: str, output_path: str, title: str) -> (str, pd.DataFrame):
     codes, use_csv = parse_script_py(py_path, output_path, title)
@@ -39,9 +83,10 @@ def update_py(py_path: str, output_path: str, title: str) -> (str, pd.DataFrame)
         codes = codes.replace('NUM_OF_MATCH = 0', 'NUM_OF_MATCH = {}'.format(num_match))  # match 갯수 적용
 
         lst_condition = [['# Data Begin', '# Data End', 'input_data = {}\nexpected_data = {}'.format(in_data, out_data)],
-                         ['# CAN signal Begin', '# CAN signal End', 'can_in_sigs = {}\ncan_out_sigs = {}'.format(str(inputs), str(outputs))],
-                         ['# LogThread Begin', '# LogThread End', log_txt.format(len_in=len(in_col)-2, sample_rate=sample_rate, read_msg=_get_msg_read(outputs))],
-                         ['# CAN Input Begin', '# CAN Input End', _get_msg_write(inputs)]]
+                         ['# Dev signal List Begin', '# Dev signal List End', 'dev_in_sigs = {}\ndev_out_sigs = {}'.format(str(inputs), str(outputs))],
+                         ['# LogThread Begin', '# LogThread End', log_thread_body.format(len_in=len(in_col) - 2, sample_rate=sample_rate, read_msg=_get_msg_read(outputs))],
+                         ['# Dev Input Begin', '# Dev Input End', _get_msg_write(inputs)],
+                         ['# TC main Begin', '# TC main End', tc_main_body.format(write_msg=_get_msg_write(inputs))]]
 
         for con in lst_condition:
             codes = apply_csv_code(lines=codes, s_str=con[0], e_str=con[1], new_str=con[2])
@@ -103,7 +148,7 @@ def _get_msg_in_out(df: pd.DataFrame) -> (list, list, list, list):
     lst_in = []
     lst_out = []
     for col in cols[2:]:
-        temp = col.split(', ')
+        temp = [t.strip() for t in col.split(', ')]  # get dev, signal
         if '[OUT]' in temp[0]:  # In case of Output
             col_out.append(col)  # Insert Output variable
             temp[0] = temp[0].replace('[OUT]', '')
@@ -113,6 +158,8 @@ def _get_msg_in_out(df: pd.DataFrame) -> (list, list, list, list):
                     if 'ms' in i:
                         if int(i.replace('ms', '')) <= 0:
                             temp[-1] = 'Event'
+            else:  # In case of Trace32
+                temp = [temp[0], '', temp[-1]]  # Index 2를 변수로 설정 - Dev, '', symbol
             lst_out.append(temp)
         else:  # In case of Input
             col_in.append(col)  # Insert Input variable
@@ -141,28 +188,33 @@ def _get_msg_read(lst_output: list) -> str:
     lst_line = []
     used_lines = {}
     for str_out in lst_output:
-        if 'Event' in str_out[-1]:
-            dev_line = "self.can.devs['{dev}'].msg_read_event('{frame}', decode_on=False)".format(dev=str_out[0], frame=str_out[1])
+        if 'T32' in str_out[0]:
+            line = "                out_data.append(t32.get_symbol_data(sym='{var}'))".format(var=str_out[-1])  # int형 return값 받기
         else:
-            dev_line = "self.can.devs['{dev}'].msg_read_name('{frame}', decode_on=False)".format(dev=str_out[0], frame=str_out[1])
-
-        used = False
-        for used_line in used_lines.keys():
-            if used_line == dev_line:
-                used = True
-
-        if used is False:
-            msg_var = 'msg_{}'.format(idx)
-            used_lines[dev_line] = msg_var
-            idx += 1
             if 'Event' in str_out[-1]:
-                line = ("                {var} = self.can.devs['{dev}'].msg_read_event('{frame}', decode_on=False)\n"
-                        "                out_data.append({var}['{sig}'] if {var} else None)").format(var=msg_var, dev=str_out[0], frame=str_out[1], sig=str_out[2])
+                dev_line = "self.can.devs['{dev}'].msg_read_event('{frame}', decode_on=False)".format(dev=str_out[0], frame=str_out[1])
             else:
-                line = ("                {var} = self.can.devs['{dev}'].msg_read_name('{frame}', decode_on=False)\n"
+                dev_line = "self.can.devs['{dev}'].msg_read_name('{frame}', decode_on=False)".format(dev=str_out[0], frame=str_out[1])
+
+            used = False
+            for used_line in used_lines.keys():
+                if used_line == dev_line:
+                    used = True
+
+            if used is False:
+                msg_var = 'msg_{}'.format(idx)
+                used_lines[dev_line] = msg_var
+                idx += 1
+                if 'Event' in str_out[-1]:
+                    line = (
+                        "                {var} = self.can.devs['{dev}'].msg_read_event('{frame}', decode_on=False)\n"
                         "                out_data.append({var}['{sig}'] if {var} else None)").format(var=msg_var, dev=str_out[0], frame=str_out[1], sig=str_out[2])
-        else:
-            msg_var = used_lines[dev_line]
-            line = "                out_data.append({var}['{sig}'] if {var} else None)".format(var=msg_var, dev=str_out[0], frame=str_out[1], sig=str_out[2])
+                else:
+                    line = ("                {var} = self.can.devs['{dev}'].msg_read_name('{frame}', decode_on=False)\n"
+                            "                out_data.append({var}['{sig}'] if {var} else None)").format(var=msg_var, dev=str_out[0], frame=str_out[1], sig=str_out[2])
+            else:
+                msg_var = used_lines[dev_line]
+                line = "                out_data.append({var}['{sig}'] if {var} else None)".format(var=msg_var, dev=str_out[0], frame=str_out[1], sig=str_out[2])
+
         lst_line.append(line)
     return '\n'.join(lst_line)

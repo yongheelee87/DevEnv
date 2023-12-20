@@ -42,10 +42,6 @@ time.sleep(0.5)
 if lst_t32_out:   # T32 Output 있다면
     t32.rx.vars = lst_t32_out  # define T32 rx variable
 
-canBus.devs['HS-RGW_T1'].msg_period_write('CC_01_200ms', 'CC_ACSetSta', 1, 0.2)  # 냉동기 작동
-canBus.devs['FD_C'].msg_write('CCU_CCS_01_00ms', 'SetCargoWrngValue', 3, 0.2)  # NVM 초기화 값
-time.sleep(1)
-
 # Measure Data Thread 설정
 log_th = LogThread(can_bus=canBus)
 log_th.start()
@@ -61,7 +57,6 @@ for i in input_data:
         i[2] = None
         log_th.in_data = i[2:]
         t32.re_init()
-        canBus.devs['HS-RGW_T1'].msg_period_write('CC_01_200ms', 'CC_ACSetSta', 1, 0.2)  # 냉동기 작동
         time.sleep(1)
 
     log_th.step = int(i[0])
