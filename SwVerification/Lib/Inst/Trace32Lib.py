@@ -79,7 +79,7 @@ class Trace32:
                 break
             elapsed_time = int((time.time_ns() - start) * 0.000000001)
 
-    def cmd(self, str_cmd: str, time_out: int = 2):
+    def cmd(self, str_cmd: str, time_out: int = 10):
         '''
         :param str_cmd: refer to Trace32 general_ref.pdf
         :param time_out: integer number of time out

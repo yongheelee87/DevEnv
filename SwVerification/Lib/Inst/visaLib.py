@@ -59,7 +59,7 @@ class VisaDev:
         '''
         self.resource[dev].write(cmd)
 
-    def read(self, dev, cmd):
+    def read(self, dev, cmd) -> str:
         '''
         :param dev: device name defined in the dict
         :param cmd: command via VISA. refer to specification of the device
@@ -67,7 +67,7 @@ class VisaDev:
         '''
         return self.resource[dev].query(cmd)
 
-    def get_set_volt_curr(self, dev):
+    def get_set_volt_curr(self, dev) -> (str, str):
         '''
         :param dev: device name defined in the dict
         :return: source voltage, source current
@@ -98,14 +98,14 @@ class VisaDev:
         except VisaIOError:
             print('Error: SET OUTPUT {}\n'.format(str(mode)))
 
-    def meas_volt_curr(self, dev):
+    def meas_volt_curr(self, dev) -> (str, str):
         '''
         :param dev: device name defined in the dict
         :return: measured voltage, measured current
         '''
         return self.resource[dev].query(":MEAS:VOLT?"), self.resource[dev].query(":MEAS:CURR?")
 
-    def fetch_volt_curr(self, dev):
+    def fetch_volt_curr(self, dev) -> (str, str):
         '''
         :param dev: device name defined in the dict
         :return: fetched voltage, fetched current
@@ -125,7 +125,7 @@ class VisaDev:
         else:
             print('Error: COMMAND RESET\n')
 
-    def _find_device(self):
+    def _find_device(self) -> list:
         lst_dev = []
         for i in self.config.keys()[1:]:
             if 'visa' in self.config[i]['type']:

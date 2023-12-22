@@ -13,7 +13,7 @@ import pandas as pd
 
 # basic library
 from . canLib import *
-from . Trace32Lib import *
+from . trace32Lib import *
 # from . visaLib import *
 # from . xcpLib import *
 # from . telnetLib import *

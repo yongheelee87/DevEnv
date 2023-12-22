@@ -84,7 +84,7 @@ class AutoTest:
         res_tc = {}
         self.tc_script = {}  # Initialize for each module
         for idx, test_script in enumerate(project_tc.keys()):
-            print('Running {}.py ({}/{})'.format(test_script, idx+1, num_tc))
+            print('Running {} ({}/{})'.format(test_script, idx+1, num_tc))
             res_tc[project_tc[test_script]] = self._run_test_case(test_script, export_path)
             if 'Fail' in res_tc[project_tc[test_script]]:
                 print('Result: Fail')
@@ -132,19 +132,19 @@ class AutoTest:
         :param export_path: path to export result
         :return: test result
         '''
-        script_file = os.path.join(self.script_path, test_script + '.py')  # 실행할 테스트 코드
+        script_file = os.path.join(self.script_path, test_script + '.py')  # 실행할 테스트 python 코드
+        csv_file = os.path.join(self.script_path, test_script + '.csv')  # 실행할 테스트 csv 파일
         csv_res_file = os.path.join(export_path, test_script + '.csv')  # 생성된 결과 파일
 
-        if os.path.isfile(script_file) is True:
+        if os.path.isfile(script_file) is False and os.path.isfile(csv_file) is False:  # py파일과 csv파일이 없을 경우
+            ret = 'Skip'
+        else:
             if os.path.isfile(csv_res_file) is False:
                 py_lines, df_tc = update_py(py_path=script_file, output_path=export_path, title=test_script)  # python testcase code update
                 if df_tc is not None:
                     self.tc_script[test_script] = df_tc
                 exec(py_lines)  # python TestCase Function 실행
             ret = self._check_tc_pass_state(tc_res_file=csv_res_file)
-        else:
-            ret = 'Skip'
-
         return ret
     
     def _check_tc_pass_state(self, tc_res_file: str) -> str:

@@ -1,5 +1,38 @@
+import os.path
+
 from Lib.Inst import *
 from Lib.Common.basicFunction import *
+
+tc_head_body = """
+# USE CSV INTERFACE
+from threading import Thread
+import time
+from Lib.Inst import *
+
+
+OUTPUT_PATH = ''
+title = []
+outcome = [title]
+
+# Data Begin
+# Data End
+
+# Dev signal List Begin
+# Dev signal List End
+
+out_col, lst_t32_out = find_out_signals_for_col(dev_out_sigs)
+total_col = ['Step', 'Elapsed_Time'] + ['In: {}'.format(sig[2]) for sig in dev_in_sigs] + out_col
+outcome.append(total_col)
+
+final_result = 'Pass'  # Final result to be recorded
+
+
+# LogThread Begin
+# LogThread End
+
+# TC main Begin
+# TC main End
+"""
 
 log_thread_body = """
 class LogThread(Thread):
@@ -97,17 +130,21 @@ def update_py(py_path: str, output_path: str, title: str) -> (str, pd.DataFrame)
 def parse_script_py(py_path: str, output_path: str, title: str) -> (str, str):
     new_lines = []
     csv_interface = False
-    with open(to_raw(py_path), "r+", encoding='utf-8') as file:
-        lines = file.readlines()
-        if '# USE CSV INTERFACE' in lines[0]:
-            csv_interface = True
+    if os.path.isfile(py_path) is True:
+        with open(to_raw(py_path), "r+", encoding='utf-8') as file:
+            lines = file.readlines()
+    else:
+        lines = tc_head_body.splitlines(True)[1:]
 
-        for line in lines:
-            if "OUTPUT_PATH = " in line:
-                line = "OUTPUT_PATH = " + "r'{}'".format(output_path) + '\n'
-            if 'title = [' in line:
-                line = "title = [" + "r'{}'".format(title) + "]" + '\n'
-            new_lines.append(line)
+    if '# USE CSV INTERFACE' in lines[0]:
+        csv_interface = True
+
+    for line in lines:
+        if "OUTPUT_PATH = " in line:
+            line = "OUTPUT_PATH = " + "r'{}'".format(output_path) + '\n'
+        if 'title = [' in line:
+            line = "title = [" + "r'{}'".format(title) + "]" + '\n'
+        new_lines.append(line)
     new_line = ''.join(new_lines)
     return new_line, csv_interface
 

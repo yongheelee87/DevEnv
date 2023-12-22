@@ -6,6 +6,7 @@ CTCW:
    SwTC_TempByIVI: CTCW 온도 상하한치 게산 기능 (IVI)
 SWA:
    SwTC_OnOff: SWA 적용 On/Off 판단 기능
+   SwTC_USMOnOff: SWA USM On/Off 판단 기능
    SwTC_CloseCmd: SWA CLOSE 기능
 CDW:
    SwTC_OnOff: CDW USM On/Off 판단 기능
