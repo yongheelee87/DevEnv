@@ -104,7 +104,8 @@ class AutoTest:
 
         # Todo unicode 에러 발생
         with open(path, encoding="utf-8") as f:
-            lines = f.readlines()[2:]
+            raw_lines = f.readlines()
+            lines = raw_lines[2:] if '# Project' in raw_lines[0] else raw_lines
             lst_total = []
             lst_auto = []
             for line in lines:

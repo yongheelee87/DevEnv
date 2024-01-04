@@ -24,9 +24,6 @@ out_col, lst_t32_out = find_out_signals_for_col(dev_out_sigs)
 total_col = ['Step', 'Elapsed_Time'] + ['In: {}'.format(sig[2]) for sig in dev_in_sigs] + out_col
 outcome.append(total_col)
 
-final_result = 'Pass'  # Final result to be recorded
-
-
 # LogThread Begin
 # LogThread End
 
@@ -113,8 +110,6 @@ def update_py(py_path: str, output_path: str, title: str) -> (str, pd.DataFrame)
         in_col, out_col, inputs, outputs = _get_msg_in_out(df=df_tc)
         in_data = str(df_tc[in_col].values.tolist()).replace('nan', 'None')
         out_data = str(df_tc[out_col].values.tolist()).replace('nan', 'None')
-        codes = codes.replace('NUM_OF_MATCH = 0', 'NUM_OF_MATCH = {}'.format(num_match))  # match 갯수 적용
-
         lst_condition = [['# Data Begin', '# Data End', 'input_data = {}\nexpected_data = {}'.format(in_data, out_data)],
                          ['# Dev signal List Begin', '# Dev signal List End', 'dev_in_sigs = {}\ndev_out_sigs = {}'.format(str(inputs), str(outputs))],
                          ['# LogThread Begin', '# LogThread End', log_thread_body.format(len_in=len(in_col) - 2, sample_rate=sample_rate, read_msg=_get_msg_read(outputs))],
@@ -123,6 +118,7 @@ def update_py(py_path: str, output_path: str, title: str) -> (str, pd.DataFrame)
 
         for con in lst_condition:
             codes = apply_csv_code(lines=codes, s_str=con[0], e_str=con[1], new_str=con[2])
+        codes = codes.replace('NUM_OF_MATCH = 0', 'NUM_OF_MATCH = {}'.format(num_match))  # match 갯수 적용
         df_tc_raw.replace('', 'None').replace('255', 'Reset')
     return codes, df_tc_raw
 

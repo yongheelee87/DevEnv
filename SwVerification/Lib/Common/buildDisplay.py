@@ -22,8 +22,8 @@ def signal_step_graph(df: pd.DataFrame, x_col: str, filepath: str, filename: str
     df.fillna(0, inplace=True)
 
     # 그래프 코드
-    colors = ['rosybrown', 'lightcoral', 'darkgreen', 'lime', 'lightseagreen', 'teal', 'aqua', 'cadetblue', 'steelblue', 'slategray', 'purple', 'magenta', 'crimson', 'navy', 'lightsteelblue',
-              'salmon', 'peru', 'saddlebrown', 'sandybrown', 'red', 'olive', 'yellow', 'darkred', 'deeppink', 'indigo', 'mediumorchid', 'darkorange', 'tan', 'dodgerblue', 'cyan', 'forestgreen']
+    colors = ['rosybrown', 'lightcoral', 'darkgreen', 'lime', 'lightseagreen', 'teal', 'olive', 'cadetblue', 'steelblue', 'slategray', 'purple', 'magenta', 'crimson', 'navy', 'deeppink',
+              'salmon', 'peru', 'saddlebrown', 'sandybrown', 'red', 'aqua', 'yellow', 'darkred', 'indigo', 'mediumorchid', 'darkorange', 'tan', 'dodgerblue', 'cyan', 'forestgreen', 'lightsteelblue']
     fig = plt.figure(figsize=(26, 26))
     axs = fig.add_gridspec(len(data_col), hspace=0.1).subplots(sharex=True, sharey=False)
 
