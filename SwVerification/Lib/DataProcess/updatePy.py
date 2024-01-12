@@ -68,14 +68,21 @@ log_th.start()
 log_th.log_state = True  # log start
 
 for i in input_data:
-    if i[2] != 255:
-{write_msg}
-    else:
-        canBus.stop_all_period_msg()
+    if i[2] == 255:
+        log_th.step = int(i[0])
         i[2] = None
         log_th.in_data = i[2:]
+
+        canBus.stop_all_period_msg()
         t32.re_init()
-        time.sleep(1)
+    elif i[2] == 254:
+        log_th.step = int(i[0])
+        i[2] = None
+        log_th.in_data = i[2:]
+
+        canBus.stop_all_period_msg()
+    else:
+{write_msg}
 
     log_th.step = int(i[0])
     log_th.in_data = i[2:]
