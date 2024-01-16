@@ -67,8 +67,10 @@ class Trace32:
     def flash_binary(self):
         self.cd_do(self.config['TRACE32']['flash_cmm'])
         time.sleep(2)
-        self.cmd('Go')
+        '''
+        self.cmd('Go')   
         time.sleep(3)
+        '''
 
     def wait_until_connect(self, timeout: int):
         start = time.time_ns()
