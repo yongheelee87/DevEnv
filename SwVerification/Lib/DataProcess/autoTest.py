@@ -20,6 +20,7 @@ class AutoTest:
         self.version = None
         self.project = None
         self.tc_script = {}
+        self.num_lines = 0
         self.test_case = []
 
     def run(self):
@@ -83,6 +84,7 @@ class AutoTest:
 
         res_tc = {}
         self.tc_script = {}  # Initialize for each module
+        self.num_lines = 0
         for idx, test_script in enumerate(project_tc.keys()):
             print('Running {} ({}/{})'.format(test_script, idx+1, num_tc))
             res_tc[project_tc[test_script]] = self._run_test_case(test_script, export_path)
@@ -144,6 +146,7 @@ class AutoTest:
                 py_lines, df_tc = update_py(py_path=script_file, output_path=export_path, title=test_script)  # python testcase code update
                 if df_tc is not None:
                     self.tc_script[test_script] = df_tc
+                    self.num_lines += len(df_tc)
                 exec(py_lines)  # python TestCase Function 실행
             ret = self._check_tc_pass_state(tc_res_file=csv_res_file)
         return ret
@@ -201,8 +204,8 @@ class AutoTest:
 
         lst_tc = list(res_dict.keys())
         tc_names = ', '.join(lst_tc)  # 한글 버전
-        ind = ["Date_Start", "Date_End", "Elapsed_Time", "TestCase_Names", "TestCase_Amt", "Pass_Amt", "Skip_Amt", "Fail_Amt", "Fail_Case"]
-        con = [time_start, time_end, elapsed_time, tc_names, len(lst_tc), len_pass, len_skip, len_fail, fail_case]
+        ind = ["Date_Start", "Date_End", "Elapsed_Time", "TestCase_Names", "TestCase_Amt", "Pass_Amt", "Skip_Amt", "Fail_Amt", "Fail_Case", "Steps"]
+        con = [time_start, time_end, elapsed_time, tc_names, len(lst_tc), len_pass, len_skip, len_fail, fail_case, self.num_lines]
         df_tc_sum = pd.DataFrame(con, columns=["Value"], index=ind)
         df_tc_sum.to_csv(file_path + "\\" + "Summary_{}.csv".format(os.path.basename(file_path)), encoding='utf-8-sig')
         df_ver = self.version.set_index(keys='Module')
