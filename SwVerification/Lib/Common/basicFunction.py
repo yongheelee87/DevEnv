@@ -126,14 +126,20 @@ def export_csv_dataframe(df, file_path: str, filename: str):
 
 def load_csv_list(file_path: str) -> list:
     '''
-    :param file_path: fila path to load
+    :param file_path: file path to load
     :return: csv list
     '''
     csv_lst = []
-    with open(file_path, 'r', newline='') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            csv_lst.append(row)
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                csv_lst.append(row)
+    except UnicodeDecodeError:
+        with open(file_path, 'r', encoding='cp949') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                csv_lst.append(row)
     return csv_lst
 
 

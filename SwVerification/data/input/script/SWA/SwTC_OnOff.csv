@@ -1,4 +1,5 @@
 ﻿Sample_Rate,0.05,,,,,,,
+Judge Type,same time,,,,,,,
 Num of Match,1,,,,,,,
 ,,,,,,,,
 Step,Scenario,Time[sec],"HS_M, IVI_USM_E_01, IVI_SWASet","FD_P2, VCU_01_10ms, VCU_GearPosSta","FD_C, CLU_01_20ms, CLU_DisSpdVal_KPH","[OUT]HS_B1, PBVDC_02_200ms, CgDrWAL_OptTyp","[OUT]HS_B1, PBVDC_02_200ms, SWA_USMSta","[OUT]HS_B1, PBVDC_01_00ms, SmtCgDrClsCmd"

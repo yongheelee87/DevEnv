@@ -85,7 +85,8 @@ df_log = pd.DataFrame(log_th.log_lst, columns=total_col)
 signal_step_graph(df=df_log.copy(), x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
 
 # Result judgement logic
+JUDGE_TYPE = "same"  # define type to judge data
 NUM_OF_MATCH = 0  # define criteria for matching rows
-outcome = judge_final_result(df_result=df_log[['Step'] + out_col], expected_outs=expected_data, num_match=NUM_OF_MATCH, meas_log=outcome.copy(), out_col=out_col)
+outcome = judge_final_result(df_result=df_log[['Step'] + out_col], expected_outs=expected_data, num_match=NUM_OF_MATCH, meas_log=outcome.copy(), out_col=out_col, judge=JUDGE_TYPE)
 
 export_csv_list(OUTPUT_PATH, title[0], outcome)

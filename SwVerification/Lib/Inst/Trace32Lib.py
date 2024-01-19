@@ -4,6 +4,7 @@ import time  # time module
 from threading import Thread
 import lauterbach.trace32.rcl as trace32
 from lauterbach.trace32.rcl import CommandError
+from lauterbach.trace32.rcl._rc._error import ApiConnectionTimeoutError
 from Lib.Common import *
 
 SYSTEM_DOWN = 0
@@ -31,7 +32,8 @@ class Trace32:
                     SubProcess에서 이전 작업으로 Trace32가 작동되어 있을 경우 Trace32 already is occupied by other GUI
                     config.t32에서 CONNECTIONMODE=AUTOCONNECT 설정 확인 후 CPU상태에 따라 4~7초의 Auto Connection 시간 필요
                     '''
-                    self.wait_until_connect(timeout=12)
+                    self.wait_until_connect(timeout=12)  # Auto copnnectin 7초를 넘는 충분한 시간 할당
+                    
             # Measure Data Thread 설정
             self.rx = T32RXThread(dev=self.device)  # TRACE32 RX 시그널 Thread 설정
             self.rx.start()  # TRACE32 RX 시그널 THREAD 동작
@@ -65,14 +67,23 @@ class Trace32:
         print('Success: OPEN Trace32\n')
 
     def flash_binary(self):
-        self.cd_do(self.config['TRACE32']['flash_cmm'])
+        run_cmd = self.config['TRACE32']['flash_cmm']
+        if os.path.exists(run_cmd.split()[0]):
+            try:
+                self.device.cmd("CD.DO " + run_cmd)
+            except ApiConnectionTimeoutError:
+                self.wait_until_connect(timeout=10)
+                self.device.cmd("CD.DO " + run_cmd)
+        else:
+            print('Error: No file {}\n'.format(run_cmd))
+
         time.sleep(2)
-        '''
-        self.cmd('Go')   
-        time.sleep(3)
-        '''
+        self.reset_go()
 
     def wait_until_connect(self, timeout: int):
+        '''
+        :param timeout: integer number of time out
+        '''
         start = time.time_ns()
         elapsed_time = 0
         while elapsed_time < timeout:  # Timeout
@@ -128,19 +139,14 @@ class Trace32:
         self.cmd('System.ResetTarget')
 
     def reset_go(self):
-        self.rx.stop_log()
         self.cmd('System.ResetTarget')
         start = time.time_ns()
         elapse_time = 0
         while elapse_time < 5:  # 5초 초과시
             self.cmd('Go')
             if self._get_state() == RUNNING:
-                self.rx.resume()
                 break
             elapse_time = int((time.time_ns() - start) * 0.000000001)
-
-    def _get_state(self):
-        return int.from_bytes(self.device.get_state(), "big")
 
     def _wait_until_command_ends(self, timeout: int):
         start = time.time_ns()
@@ -149,6 +155,9 @@ class Trace32:
             rc = self.device.library.t32_getpracticestate()  # _get_practice_state()
             if rc == 0: break
             elapse_time = int((time.time_ns() - start) * 0.000000001)
+
+    def _get_state(self):
+        return int.from_bytes(self.device.get_state(), "big")
 
     def get_break_lst(self):
         return [self.device.symbol.query_by_address(address=i.address).name for i in self.device.breakpoint.list()]

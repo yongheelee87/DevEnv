@@ -1,4 +1,5 @@
 ﻿Sample_Rate,0.01,,,,,,
+Judge Type,same time,,,,,,
 Num of Match,1,,,,,,
 ,,,,,,,
 Step,Scenario,Time[sec],"HS-RGW_T1, CC_01_200ms, CC_ACSetSta","HS_M, IVI_USM_E_01, IVI_ACTempWrngValCtrl","[OUT]HS_B1, PBVDC_02_200ms, CgDrWAL_OptTyp","[OUT]HS_B1, PBVDC_02_200ms, SWA_USMSta","[OUT]HS_B1, PBVDC_01_00ms, SmtCgDrClsCmd"

@@ -98,8 +98,9 @@ df_log = pd.DataFrame(log_th.log_lst, columns=total_col)
 signal_step_graph(df=df_log.copy(), x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
 
 # Result judgement logic
+JUDGE_TYPE = "same"  # define type to judge data
 NUM_OF_MATCH = 0  # define criteria for matching rows
-outcome = judge_final_result(df_result=df_log[['Step'] + out_col], expected_outs=expected_data, num_match=NUM_OF_MATCH, meas_log=outcome.copy(), out_col=out_col)
+outcome = judge_final_result(df_result=df_log[['Step'] + out_col], expected_outs=expected_data, num_match=NUM_OF_MATCH, meas_log=outcome.copy(), out_col=out_col, judge=JUDGE_TYPE)
 
 export_csv_list(OUTPUT_PATH, title[0], outcome)
 """
@@ -111,8 +112,9 @@ def update_py(py_path: str, output_path: str, title: str) -> (str, pd.DataFrame)
     if use_csv is True:
         lst_df = load_csv_list(file_path=py_path.replace('.py', '.csv'))
         sample_rate = lst_df[0][1]
-        num_match = lst_df[1][1]
-        df_tc_raw = pd.DataFrame(lst_df[4:], columns=lst_df[3])
+        judge_type = lst_df[1][1]
+        num_match = lst_df[2][1]
+        df_tc_raw = pd.DataFrame(lst_df[5:], columns=lst_df[4])
         df_tc = df_tc_raw.drop(['Scenario'], axis=1).apply(pd.to_numeric)
         in_col, out_col, inputs, outputs = _get_msg_in_out(df=df_tc)
         in_data = str(df_tc[in_col].values.tolist()).replace('nan', 'None')
@@ -125,6 +127,7 @@ def update_py(py_path: str, output_path: str, title: str) -> (str, pd.DataFrame)
 
         for con in lst_condition:
             codes = apply_csv_code(lines=codes, s_str=con[0], e_str=con[1], new_str=con[2])
+        codes = codes.replace('JUDGE_TYPE = "same"', 'JUDGE_TYPE = "{}}"'.format(judge_type))  # judge type 적용
         codes = codes.replace('NUM_OF_MATCH = 0', 'NUM_OF_MATCH = {}'.format(num_match))  # match 갯수 적용
         df_tc_raw.replace('', 'None').replace('255', 'Reset')
     return codes, df_tc_raw
