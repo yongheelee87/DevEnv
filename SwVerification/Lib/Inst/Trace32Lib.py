@@ -66,8 +66,7 @@ class Trace32:
         time.sleep(3)
         print('Success: OPEN Trace32\n')
 
-    def flash_binary(self):
-        run_cmd = self.config['TRACE32']['flash_cmm']
+    def flash_binary(self, run_cmd):
         if os.path.exists(run_cmd.split()[0]):
             try:
                 self.device.cmd("CD.DO " + run_cmd)
@@ -77,8 +76,17 @@ class Trace32:
         else:
             print('Error: No file {}\n'.format(run_cmd))
 
-        time.sleep(2)
-        self.reset_go()
+        start = time.time_ns()
+        elapse_time = 0
+        ready_cnt = 0
+        while elapse_time < 10:  # 10초 초과시
+            if self._get_state() == SYSTEM_READY:
+                ready_cnt += 1
+                if ready_cnt >= 10:
+                    break
+            elapse_time = int((time.time_ns() - start) * 0.000000001)
+            time.sleep(0.5)
+        self.cmd('Go')
 
     def wait_until_connect(self, timeout: int):
         '''

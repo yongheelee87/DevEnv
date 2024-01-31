@@ -22,4 +22,8 @@ class CheckEnv:
             isdir_and_make(self.path)
             with open(self.file, "w") as f:
                 f.write('PASS')
-            t32.flash_binary()  # 새로 flash
+            t32.flash_binary(run_cmd=Configure.set['TRACE32']['flash_cmm'])  # 새로 flash
+        else:
+            print("Error: Device Connect is not completed. Please check the connection with devices")
+            # 에러로 인한 프로그램 종료
+            os._exit(0)
