@@ -42,8 +42,8 @@ def signal_step_graph(df: pd.DataFrame, x_col: str, filepath: str, filename: str
         if step_debug is True:
             step_location = []
             for idx, step_time in enumerate(step_dict.values()):
-                idx = idx - 20 if idx >= 20 else idx
-                axs[i].axvspan(step_time[0], step_time[1], alpha=0.1, color=plt.cm.tab20(idx))
+                color_idx = idx % 20
+                axs[i].axvspan(step_time[0], step_time[1], alpha=0.1, color=plt.cm.tab20(color_idx))
                 step_location.append(np.mean(step_time))
 
             if i == 0:

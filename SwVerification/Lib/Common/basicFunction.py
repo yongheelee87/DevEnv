@@ -55,6 +55,19 @@ def to_hex_little_lst(in_val: any) -> list:
     return list(bytes.fromhex(hex_str))[::-1]
 
 
+def to_hex_big_lst(in_val: any) -> list:
+    '''
+    :param in_val: input value
+    :return: list of bytes
+    '''
+    str_val = in_val if isinstance(in_val, str) else str(in_val)
+    if '.' in str_val:
+        str_val = str(float_to_hex(float(str_val)))
+    hex_str = to_hex_str(int(str_val, 0)).replace('0x', '')
+    if (len(hex_str) % 2) != 0:
+        hex_str = '0' + hex_str
+    return list(bytes.fromhex(hex_str))
+
 def bytearray_to_hex(arr):
     return '0x' + ''.join('{:02x}'.format(x) for x in arr)
 

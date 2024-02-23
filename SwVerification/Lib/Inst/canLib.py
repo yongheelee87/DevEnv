@@ -179,6 +179,19 @@ class CANDev:
             except:
                 print("Error: WRITE CAN MESSAGE {}\n".format(frame_name))
 
+    def raw_msg_write(self, frame_id: int, msg_data: list, time_out: float = 0.02, is_extended: bool = False):
+        '''
+        :param frame_id:
+        :param msg_data:
+        :param time_out:
+        :param is_extended:
+        '''
+        try:
+            can_message = Message(arbitration_id=frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
+            self.bus.send(can_message, timeout=time_out)  # 일정타임이상의 Timeout설정으로 전달이 안정적임
+        except:
+            print("Error: WRITE CAN MESSAGE {}\n".format(frame_id))
+
     def msg_stop_period_write(self):
         '''
         Stop all currently active periodic messages

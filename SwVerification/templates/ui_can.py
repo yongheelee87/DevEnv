@@ -963,6 +963,7 @@ class Ui_can(object):
         self.btn_Read_CAN_Period_Sig.setText(QCoreApplication.translate("can", u"READ PERIOD SIG", None))
         self.pText_cmd.setPlainText(QCoreApplication.translate("can", u"W: Write Msg (Dev, Frame, Signal, Value, Sec)\n"
 "WP: Write Period Msg (Dev, Frame, Signal, Value, Sec)\n"
+"WR: Write Raw Msg (Dev, Frame, Data)\n"
 "R: Read Msg (Dev, Frame, Signal)\n"
 "T: Time Delay (ex. T: 0.2)\n"
 "Option: Display Option", None))

@@ -142,6 +142,11 @@ class CanWindow(QWidget):
                     else:
                         canBus.devs[dev].msg_period_write(lst_cmd[1].strip(), lst_cmd[2].strip(), float(lst_cmd[3].strip()), float(lst_cmd[4].strip()), True)
                     read_msg += 'Write Period Msg {}\n'.format(lst_cmd)
+                elif 'WR:' in cmd[:3]:
+                    lst_cmd = cmd[3:].strip().replace("'", '').split(",")
+                    dev = lst_cmd[0].strip()
+                    canBus.devs[dev].raw_msg_write(int(lst_cmd[1].strip(), 16), to_hex_big_lst(lst_cmd[2].strip()))
+                    read_msg += 'Write Raw Msg {}\n'.format(lst_cmd)
                 elif 'R:' in cmd[:2]:
                     lst_cmd = cmd[2:].strip().replace("'", '').split(",")
                     dev = lst_cmd[0].strip()
@@ -189,6 +194,7 @@ class CanWindow(QWidget):
         if self.ui_can.pText_cmd.toPlainText().replace('\n', '') == 'Option':
             self.ui_can.pText_cmd.setPlainText('W: Write Msg (Dev, Frame, Signal, Value, Sec)\n'
                                                'WP: Write Period Msg (Dev, Frame, Signal, Value, Sec)\n'
+                                               'WR: Write Raw Msg (Dev, Frame, Data)\n'
                                                'R: Read Msg (Dev, Frame, Signal)\n'
                                                'T: Time Delay (ex. T: 0.2)\n'
                                                'Option: Display Option')

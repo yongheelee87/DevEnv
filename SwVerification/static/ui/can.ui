@@ -1189,6 +1189,7 @@ background-color: rgb(52, 59, 72);</string>
                                <property name="plainText">
                                 <string>W: Write Msg (Dev, Frame, Signal, Value, Sec)
 WP: Write Period Msg (Dev, Frame, Signal, Value, Sec)
+WR: Write Raw Msg (Dev, Frame, Data)
 R: Read Msg (Dev, Frame, Signal)
 T: Time Delay (ex. T: 0.2)
 Option: Display Option</string>
