@@ -27,6 +27,7 @@ class CANDev:
         self.status = CAN_ERR
         self.db_path = self._get_dbc(name=name, config=self.config)
         self.db = database.load_file(self.db_path)  # path of .dbc file; CAN DBC 불러오기
+        self.sig_val = self._get_decode_val(self.db_path)  # dictionary to decode value
         self.connect_dev(bus_type=self.config['bus_type'],
                          ch=self.config['channel'],
                          app_type=self.config['app_type'],
@@ -224,6 +225,21 @@ class CANDev:
             lst_db = [os.path.join(ref_path, file) for file in os.listdir(ref_path) if '.dbc' in file and name in file]
             db_path = lst_db[0]
         return db_path
+
+    def _get_decode_val(self, db_path: str) -> dict:
+        dict_decode_val = {}
+        with open(db_path, "r", encoding="utf8", errors='ignore') as f:
+            raw_lines = f.readlines()
+            for x in raw_lines:
+                if 'VAL_' in x[:4]:
+                    temp = [i.strip() for i in x[5:].split('"')]
+                    temp_head = temp[0::2][0].split() + temp[0::2][1:]
+                    sig_name = temp_head[1]
+                    dict_val = {}
+                    for val, decode in zip(temp_head[2:], temp[1::2]):
+                        dict_val[int(val)] = decode
+                    dict_decode_val[sig_name] = dict_val
+        return dict_decode_val
 
 
 # CAN RX Msg Thread로 받기

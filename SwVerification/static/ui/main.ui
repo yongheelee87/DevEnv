@@ -968,6 +968,44 @@ Button */
                  </widget>
                 </item>
                 <item>
+                 <widget class="QPushButton" name="btn_blf_analysis">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>45</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                    <weight>50</weight>
+                    <italic>false</italic>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-image: url(:/icons/icons/cil-chart-line.png);
+</string>
+                  </property>
+                  <property name="text">
+                   <string>BLF Analysis</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QPushButton" name="btn_instrument">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1909,7 +1947,7 @@ p, li { white-space: pre-wrap; }
                        <item>
                         <widget class="QLabel" name="label_home">
                          <property name="text">
-                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SW Verification&lt;/p&gt;&lt;p&gt;1. TestCase&lt;/p&gt;&lt;p&gt;2. Measurement&lt;/p&gt;&lt;p&gt;3. Instrument&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SW Verification&lt;/p&gt;&lt;p&gt;1. TestCase&lt;/p&gt;&lt;p&gt;2. Measurement&lt;/p&gt;&lt;p&gt;3. BLF Analysis&lt;/p&gt;&lt;p&gt;4. Instrument&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>

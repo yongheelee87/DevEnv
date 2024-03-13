@@ -699,6 +699,19 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_measure)
 
+        self.btn_blf_analysis = QPushButton(self.topMenu)
+        self.btn_blf_analysis.setObjectName(u"btn_blf_analysis")
+        sizePolicy.setHeightForWidth(self.btn_blf_analysis.sizePolicy().hasHeightForWidth())
+        self.btn_blf_analysis.setSizePolicy(sizePolicy)
+        self.btn_blf_analysis.setMinimumSize(QSize(0, 45))
+        self.btn_blf_analysis.setFont(font)
+        self.btn_blf_analysis.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_blf_analysis.setLayoutDirection(Qt.LeftToRight)
+        self.btn_blf_analysis.setStyleSheet(u"background-image: url(:/icons/icons/cil-chart-line.png);\n"
+"")
+
+        self.verticalLayout_8.addWidget(self.btn_blf_analysis)
+
         self.btn_instrument = QPushButton(self.topMenu)
         self.btn_instrument.setObjectName(u"btn_instrument")
         sizePolicy.setHeightForWidth(self.btn_instrument.sizePolicy().hasHeightForWidth())
@@ -1222,6 +1235,7 @@ class Ui_MainWindow(object):
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_testcase.setText(QCoreApplication.translate("MainWindow", u"Test Case", None))
         self.btn_measure.setText(QCoreApplication.translate("MainWindow", u"Measure", None))
+        self.btn_blf_analysis.setText(QCoreApplication.translate("MainWindow", u"BLF Analysis", None))
         self.btn_instrument.setText(QCoreApplication.translate("MainWindow", u"Instrument", None))
         self.btn_exit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Setting", None))
@@ -1268,7 +1282,7 @@ class Ui_MainWindow(object):
         self.closeAppBtn.setToolTip(QCoreApplication.translate("MainWindow", u"Close", None))
 #endif // QT_CONFIG(tooltip)
         self.closeAppBtn.setText("")
-        self.label_home.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>SW Verification</p><p>1. TestCase</p><p>2. Measurement</p><p>3. Instrument</p></body></html>", None))
+        self.label_home.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>SW Verification</p><p>1. TestCase</p><p>2. Measurement</p><p>3. BLF Analysis</p><p>4. Instrument</p></body></html>", None))
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
         self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))

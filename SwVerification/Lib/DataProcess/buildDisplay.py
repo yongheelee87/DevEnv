@@ -1,14 +1,17 @@
 import pandas as pd
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import os
 import matplotlib.pyplot as plt
 
+from Lib.Inst import *
 
-def signal_step_graph(df: pd.DataFrame, x_col: str, filepath: str, filename: str, step_debug: bool = True):
+
+def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, filename: str, fill_zero: bool = True, step_debug: bool = True):
     plt.rcParams['axes.xmargin'] = 0
 
+    # maxT = df[x_col].max()
     df.set_index(x_col, drop=True, inplace=True)
     data_col = df.columns.tolist()
     # Step Column 제거
@@ -19,25 +22,44 @@ def signal_step_graph(df: pd.DataFrame, x_col: str, filepath: str, filename: str
 
         df.drop(labels='Step', axis=1, inplace=True)
         data_col.remove('Step')
-    df.fillna(0, inplace=True)
+
+    if fill_zero is True:
+        df.fillna(0, inplace=True)  # replace None with zero
 
     # 그래프 코드
-    colors = ['rosybrown', 'lightcoral', 'darkgreen', 'lime', 'lightseagreen', 'teal', 'olive', 'cadetblue', 'steelblue', 'slategray', 'purple', 'magenta', 'crimson', 'navy', 'deeppink',
-              'salmon', 'peru', 'saddlebrown', 'sandybrown', 'red', 'aqua', 'yellow', 'darkred', 'indigo', 'mediumorchid', 'darkorange', 'tan', 'dodgerblue', 'cyan', 'forestgreen', 'lightsteelblue']
     fig = plt.figure(figsize=(26, 26))
     axs = fig.add_gridspec(len(data_col), hspace=0.1).subplots(sharex=True, sharey=False)
 
-    for i in range(len(data_col)):
+    for i, signal in enumerate(data_col):
+        sig_color_idx = i % 20
         sig_name = data_col[i].replace('In: ', '').replace('Out: ', '')
-        x_data = df.index.values
-        y_data = df[data_col[i]]
-        axs[i].step(x_data, y_data, c=colors[i], label=sig_name, where='post', linewidth=3.0)
-        axs[i].set_ylabel(sig_name)
-        min_val = y_data.min()
-        if min_val < 0:
-            axs[i].set_ylim(bottom=min_val-1)
+        df_signal = df[[signal]].dropna(axis=0)
+        x_data = df_signal.index.values
+        y_data = df_signal.values
+
+        axs[i].step(x_data, y_data, 'o-', markersize=2, label=sig_name, c=plt.cm.tab20(sig_color_idx), where='post', linewidth=1.0)
+
+        if y_data.size == 0:
+            yticks_val = range(0, 2)
         else:
-            axs[i].set_ylim(bottom=0)
+            min_y = int(min(y_data))
+            max_y = int(max(y_data))
+            if max_y == 0:
+                yticks_val = range(min_y, max_y + 2)
+            else:
+                yticks_val = range(min_y, max_y + 1)
+        axs[i].set_yticks(yticks_val)
+        yticks_labels = []
+        for y_val in yticks_val:
+            if (sig_name == sigs[i][-1]) and (sigs[i][0] != 'T32'):
+                if y_val in canBus.devs[sigs[i][0]].sig_val[sig_name].keys():
+                    yticks_labels.append(canBus.devs[sigs[i][0]].sig_val[sig_name][y_val])
+                else:
+                    yticks_labels.append(f'{y_val}')
+            else:
+                yticks_labels.append(f'{y_val}')
+        axs[i].set_yticklabels(yticks_labels)
+        # axs[i].set_xlim(left=0, right=maxT)
 
         if step_debug is True:
             step_location = []
@@ -61,7 +83,9 @@ def signal_step_graph(df: pd.DataFrame, x_col: str, filepath: str, filename: str
         ax.legend(loc='upper right')
         ax.label_outer()
 
-    plt.savefig('{}/{}.png'.format(filepath, filename))
+    # plt.tight_layout(pad=0)
+    plt.savefig(f'{filepath}/{filename}.png', format='png')
+    # plt.savefig(f'{filepath}/{filename}.svg', format='svg')
     plt.cla()  # clear the current axes
     plt.clf()  # clear the current figure
     plt.close()  # closes the current figure
@@ -91,7 +115,7 @@ def make_pjt_HTML(df_sum, project: str, version: str, dict_tc: dict, tc_script: 
     </html>
     """
 
-    export_file = os.path.join(export_path, 'Result_{}.html'.format(project))
+    export_file = os.path.join(export_path, f'Result_{project}.html')
     with open(export_file, 'w') as html_file:
         html_file.write(html_text.format(title=project, ver=version, sum_body=_write_summary(df_sum), res_body=_write_tc_res_body(dict_tc, tc_script)))
 
@@ -110,21 +134,21 @@ def make_home_HTML(data: dict, export_path: str, df_ver: pd.DataFrame):
     for pjt in data.keys():
         pjt_data = data[pjt]
         lst_table.append('<tr>')
-        lst_table.append('<td rowspan={} style="padding: 15px;border: 1px solid #54585d;">{}</td>'.format(len(pjt_data), pjt))
+        lst_table.append(f'<td rowspan={len(pjt_data)} style="padding: 15px;border: 1px solid #54585d;">{pjt}</td>')
         module_tr_written = False
         for tc in pjt_data.keys():
             if module_tr_written:
                 lst_table.append('<tr>')
-            lst_table.append('<td rowspan=1 style="padding: 15px;border: 1px solid #54585d;">{}</td>'.format(tc))
+            lst_table.append(f'<td rowspan=1 style="padding: 15px;border: 1px solid #54585d;">{tc}</td>')
             tc_result = pjt_data[tc]
             if 'Fail' in tc_result:
                 lst_table.append('<td rowspan=1 style="background-color: #F1948A;padding: 15px;border: 1px solid #54585d;">Fail</td>')
             elif 'Pass' in tc_result:
                 lst_table.append('<td rowspan=1 style="background-color: #ABEBC6;padding: 15px;border: 1px solid #54585d;">Pass</td>')
             else:
-                lst_table.append('<td rowspan=1 style="padding: 15px;border: 1px solid #54585d;">{}</td>'.format(pjt_data[tc]))
+                lst_table.append(f'<td rowspan=1 style="padding: 15px;border: 1px solid #54585d;">{pjt_data[tc]}</td>')
             if module_tr_written is False:
-                lst_table.append('<td rowspan={len_row} style="padding: 15px;border: 1px solid #54585d;text-align: center"><a href="{project}/Result_{project}.html">{project}<br>{date}</a></td>'.format(len_row=len(pjt_data), project=pjt, date=test_date))
+                lst_table.append(f'<td rowspan={len(pjt_data)} style="padding: 15px;border: 1px solid #54585d;text-align: center"><a href="{pjt}/Result_{pjt}.html">{pjt}<br>{test_date}</a></td>')
                 module_tr_written = True
             lst_table.append('</tr>')
     sum_result = '\n'.join(lst_table)
@@ -153,7 +177,7 @@ def make_home_HTML(data: dict, export_path: str, df_ver: pd.DataFrame):
     </html>
     """
 
-    export_file = os.path.join(export_path, 'Result_{}.html'.format(test_date))
+    export_file = os.path.join(export_path, f'Result_{test_date}.html')
     with open(export_file, 'w') as html_file:
         html_file.write(html_text.format(title='EILS 테스트 결과', date=test_date, ver_body=_write_version(df_ver), sum_body=sum_result))
 
@@ -177,12 +201,14 @@ def _write_summary(df_sum: pd.DataFrame) -> str:
     for line in lst_html:
         if '<td' in line:
             if 'TestCase_Names' in new_html[-1]:
-                test_Cases = df_sum.loc['TestCase_Names', 'Value'].split(', ')
-                line = '<td style="border-bottom: 2px solid #54585d;text-align: right;padding-left: 30px;font-weight: 900;color: black;">{}</td>'.format('<br>'.join(test_Cases))
+                test_cases = df_sum.loc['TestCase_Names', 'Value'].split(', ')
+                html_test_cases = '<br>'.join(test_cases)
+                line = f'<td style="border-bottom: 2px solid #54585d;text-align: right;padding-left: 30px;font-weight: 900;color: black;">{html_test_cases}</td>'
             elif 'Fail_Case' in new_html[-1]:
                 fail_cases = df_sum.loc['Fail_Case', 'Value'].split(', ')
                 if 'Nothing' != fail_cases[0]:
-                    line = '<td style="border-bottom: 2px solid #54585d;text-align: right;padding-left: 30px;font-weight: 900;color: red;">{}</td>'.format('<br>'.join(fail_cases).replace(',', ', '))
+                    html_fail_cases = '<br>'.join(fail_cases).replace(',', ', ')
+                    line = f'<td style="border-bottom: 2px solid #54585d;text-align: right;padding-left: 30px;font-weight: 900;color: red;">{html_fail_cases}</td>'
                 else:
                     line = line.replace('<td>', '<td style="text-align: right;padding-left: 30px;">')
             else:
@@ -217,6 +243,7 @@ def _write_tc_res_body(dict_tc: dict, tc_script: dict) -> str:
 def _write_tc(df_script: pd.DataFrame) -> str:
     lst_html = df_script.to_html(border=None, index=False).split('\n')
     new_html = []
+    col_td = 0
     for line in lst_html:
         if 'class="dataframe"' in line:
             line = """<table class="dataframe" style="font-family: 'Nunito', sans-serif;border: none;border-collapse: collapse;font-size: 1.0em;color: black;margin: 10px 0 20px 40px;padding: 20px;">"""
@@ -231,11 +258,17 @@ def _write_tc(df_script: pd.DataFrame) -> str:
                     pixel_num = '90'
                 else:
                     pixel_num = str(int(max_length*5.5))
-                line = line.replace(', ', '<br>').replace('<th>', '<td style="background-color: #FCF3F2;border: 1px solid #c1c4c7;text-align: center;padding: 0 {num}px 0 {num}px;">'.format(num=pixel_num))
+                line = line.replace(', ', '<br>').replace('<th>', f'<td style="background-color: #FCF3F2;border: 1px solid #c1c4c7;text-align: center;padding: 0 {pixel_num}px 0 {pixel_num}px;">')
             else:
                 line = line.replace(', ', '<br>').replace('<th>', '<td style="background-color: #FCF3F2;border: 1px solid #c1c4c7;text-align: center;padding: 0 10px 0 10px;">')
         elif '<td>' in line:
-            line = line.replace('<td>', '<td style="border: 1px solid #c1c4c7;text-align: center;padding: 0 10px 0 10px;">')
+            if col_td != 1:
+                line = line.replace('<td>', '<td style="border: 1px solid #c1c4c7;text-align: center;padding: 0 10px 0 10px;">')
+            else:
+                line = line.replace('<td>', '<td style="border: 1px solid #c1c4c7;text-align: left;padding: 0 10px 0 10px;">')
+            col_td += 1
+        elif '<tr>' in line:
+            col_td = 0
         new_html.append(line)
     scr_html = '\n'.join(new_html)
     return scr_html

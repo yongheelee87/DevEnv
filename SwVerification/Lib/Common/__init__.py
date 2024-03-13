@@ -12,8 +12,6 @@
 
 # basic library
 from . basicFunction import *
-from . buildDisplay import *
-from . scriptFunction import *
 
 
 class SysConfig:

@@ -2,6 +2,7 @@
 from threading import Thread
 import time
 from Lib.Inst import *
+from Lib.DataProcess import *
 
 
 OUTPUT_PATH = ''
@@ -16,6 +17,7 @@ expected_data = []
 # Dev signal List Begin
 dev_in_sigs = []
 dev_out_sigs = []
+dev_all_sigs = []
 # Dev signal List End
 
 out_col, lst_t32_out = find_out_signals_for_col(dev_out_sigs)
@@ -82,7 +84,7 @@ for log_lst in log_th.log_lst:
     outcome.append(log_lst)
 
 df_log = pd.DataFrame(log_th.log_lst, columns=total_col)
-signal_step_graph(df=df_log.copy(), x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
+signal_step_graph(df=df_log.copy(), sigs=dev_all_sigs, x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
 
 # Result judgement logic
 JUDGE_TYPE = "same"  # define type to judge data

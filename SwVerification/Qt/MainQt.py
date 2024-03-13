@@ -5,6 +5,7 @@ from . ConfigureQt import ConfigureWindow
 from . InstQt import InstWindow
 from . MeasureQt import MeasureWindow
 from . TestCaseQt import TestCaseWindow
+from . BlfAnalysisQt import BlfAnalysisWindow
 
 from Lib.Common import *
 
@@ -39,6 +40,7 @@ class MainWindow(QMainWindow):
         # SET AS IMAGE AND DISPLAY WIDGETS
         self.testcase = TestCaseWindow()
         self.measure = MeasureWindow()
+        self.blf = BlfAnalysisWindow()
         self.inst = InstWindow()
         self.config = ConfigureWindow()
 
@@ -49,6 +51,7 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.addWidget(self.measure)
         self.ui.stackedWidget.addWidget(self.testcase)
         self.ui.stackedWidget.addWidget(self.inst)
+        self.ui.stackedWidget.addWidget(self.blf)
         self.ui.stackedWidget.addWidget(self.config)
         self.ui.stackedWidget.setCurrentWidget(self.ui.home)
         self.ui.btn_home.setStyleSheet(UIFunctions.selectMenu(self.ui.btn_home.styleSheet()))
@@ -63,6 +66,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_home.clicked.connect(self.func_btn_home)
         self.ui.btn_testcase.clicked.connect(self.func_btn_testcase)
         self.ui.btn_measure.clicked.connect(self.func_btn_measure)
+        self.ui.btn_blf_analysis.clicked.connect(self.func_btn_blf_analysis)
         self.ui.btn_instrument.clicked.connect(self.func_btn_instrument)
 
         # EXTRA LEFT BOX
@@ -106,6 +110,12 @@ class MainWindow(QMainWindow):
         # SHOW NEW PAGE
         self.ui.stackedWidget.setCurrentWidget(self.measure)  # SET PAGE
         UIFunctions.resetStyle(self, "btn_measure")  # RESET ANOTHERS BUTTONS SELECTED
+        self.sender().setStyleSheet(UIFunctions.selectMenu(self.sender().styleSheet()))  # SELECT MENU
+
+    def func_btn_blf_analysis(self):
+        # SHOW NEW PAGE
+        self.ui.stackedWidget.setCurrentWidget(self.blf)  # SET PAGE
+        UIFunctions.resetStyle(self, "btn_blf_analysis")  # RESET ANOTHERS BUTTONS SELECTED
         self.sender().setStyleSheet(UIFunctions.selectMenu(self.sender().styleSheet()))  # SELECT MENU
 
     def func_btn_instrument(self):

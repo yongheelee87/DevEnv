@@ -1,7 +1,7 @@
 # ///////////////////////////////////////////////////////////////
 #
 # BY: YONGHEE LEE
-# PROJECT MADE WITH: measurement with script command
+# PROJECT MADE WITH: BLF Analysis
 # V: 1.0.0
 #
 # This project can be used freely for all uses, as long as they maintain the
@@ -10,6 +10,5 @@
 #
 # ///////////////////////////////////////////////////////////////
 
-# data process library
-from . buildDisplay import *
-from . scriptFunction import *
+# application library
+from . blf_analysis import *

@@ -10,6 +10,6 @@
 #
 # ///////////////////////////////////////////////////////////////
 
-# data process library
-from . buildDisplay import *
-from . scriptFunction import *
+# basic library
+from . autoTest import *
+from . updatePy import *

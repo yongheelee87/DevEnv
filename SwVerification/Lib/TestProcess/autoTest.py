@@ -3,6 +3,7 @@ import yaml
 import time
 from Lib.Inst import *
 from Lib.Common import *
+from Lib.DataProcess import *
 from . updatePy import *
 
 RESULT_FILE_PATH = os.path.join(os.getcwd(), 'data', 'result')

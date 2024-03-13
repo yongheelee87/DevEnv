@@ -41,7 +41,7 @@ if __name__ == "__main__":
         check_env = CheckEnv()
         check_env.run()  # Check Environment 실행
     else:
-        from Lib.DataProcess import *
+        from Lib.TestProcess import *
         print("The program is named SW TEST Automation {}. It provides the functions for the measurement and automation with various devices\n".format(System.Ver))
 
         # 테스트 자동화 시행 클래스

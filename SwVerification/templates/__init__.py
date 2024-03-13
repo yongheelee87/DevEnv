@@ -25,6 +25,7 @@ from . ui_can import Ui_can
 from . ui_trace32 import Ui_trace32
 from . ui_cantrace import Ui_cantrace
 from . ui_configure import Ui_configure
+from . ui_blf_analysis import Ui_blf_analysis
 
 # APP SETTINGS
 from . app_settings import Settings

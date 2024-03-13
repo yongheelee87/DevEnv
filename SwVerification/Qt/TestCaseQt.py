@@ -1,6 +1,6 @@
 from templates import *
 import re
-from Lib.DataProcess import *
+from Lib.TestProcess import *
 
 
 class TestCaseWindow(QWidget):

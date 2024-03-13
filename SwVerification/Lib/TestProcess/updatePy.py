@@ -1,13 +1,14 @@
 import os.path
 
 from Lib.Inst import *
-from Lib.Common.basicFunction import *
+from Lib.Common import *
 
 tc_head_body = """
 # USE CSV INTERFACE
 from threading import Thread
 import time
 from Lib.Inst import *
+from Lib.DataProcess import *
 
 
 OUTPUT_PATH = ''
@@ -95,7 +96,7 @@ for log_lst in log_th.log_lst:
     outcome.append(log_lst)
 
 df_log = pd.DataFrame(log_th.log_lst, columns=total_col)
-signal_step_graph(df=df_log.copy(), x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
+signal_step_graph(df=df_log.copy(), sigs=dev_all_sigs, x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
 
 # Result judgement logic
 JUDGE_TYPE = "same"  # define type to judge data
@@ -116,11 +117,11 @@ def update_py(py_path: str, output_path: str, title: str) -> (str, pd.DataFrame)
         num_match = lst_df[2][1]
         df_tc_raw = pd.DataFrame(lst_df[5:], columns=lst_df[4])
         df_tc = df_tc_raw.drop(['Scenario'], axis=1).apply(pd.to_numeric)
-        in_col, out_col, inputs, outputs = _get_msg_in_out(df=df_tc)
+        in_col, out_col, inputs, outputs, total = _get_msg_in_out(df=df_tc)
         in_data = str(df_tc[in_col].values.tolist()).replace('nan', 'None')
         out_data = str(df_tc[out_col].values.tolist()).replace('nan', 'None')
         lst_condition = [['# Data Begin', '# Data End', 'input_data = {}\nexpected_data = {}'.format(in_data, out_data)],
-                         ['# Dev signal List Begin', '# Dev signal List End', 'dev_in_sigs = {}\ndev_out_sigs = {}'.format(str(inputs), str(outputs))],
+                         ['# Dev signal List Begin', '# Dev signal List End', 'dev_in_sigs = {}\ndev_out_sigs = {}\ndev_all_sigs = {}'.format(str(inputs), str(outputs), str(total))],
                          ['# LogThread Begin', '# LogThread End', log_thread_body.format(len_in=len(in_col) - 2, sample_rate=sample_rate, read_msg=_get_msg_read(outputs))],
                          ['# Dev Input Begin', '# Dev Input End', _get_msg_write(inputs)],
                          ['# TC main Begin', '# TC main End', tc_main_body.format(write_msg=_get_msg_write(inputs))]]
@@ -184,7 +185,7 @@ def _get_msg_write(lst_input: list) -> str:
     return '\n'.join(lst_line)
 
 
-def _get_msg_in_out(df: pd.DataFrame) -> (list, list, list, list):
+def _get_msg_in_out(df: pd.DataFrame) -> (list, list, list, list, list):
     cols = df.columns.tolist()
     col_in = cols[:2]  # Step, Time
     col_out = cols[:1]  # Step
@@ -223,7 +224,8 @@ def _get_msg_in_out(df: pd.DataFrame) -> (list, list, list, list):
                             else:
                                 temp += ['Period', str(float(i.replace('ms', '')) / 1000)]
             lst_in.append(temp)
-    return col_in, col_out, lst_in, lst_out
+    lst_total = [msg[:3] for msg in lst_in + lst_out]  # combine all msg
+    return col_in, col_out, lst_in, lst_out, lst_total
 
 
 def _get_msg_read(lst_output: list) -> str:

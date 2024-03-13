@@ -2,7 +2,7 @@
 from threading import Thread
 import time
 from Lib.Inst import *
-
+from Lib.DataProcess import *
 
 OUTPUT_PATH = ''
 title = []
@@ -16,6 +16,7 @@ expected_data = []
 # Dev signal List Begin
 dev_in_sigs = []
 dev_out_sigs = []
+dev_all_sigs = []
 # Dev signal List End
 
 out_col, lst_t32_out = find_out_signals_for_col(dev_out_sigs)

@@ -3,6 +3,7 @@ import time
 
 from Lib.Inst import *
 from Lib.Common import *
+from Lib.DataProcess import *
 
 OUTPUT_PATH = ''
 
@@ -18,6 +19,7 @@ dev_in_sigs = [['HS-RGW_T1', 'CC_01_200ms', 'ACSetSta', 0.2],
                ['HS_M', 'IVI_USM_E_01', 'IVI_ACUSMReset', 0.5]]
 dev_out_sigs = [['HS_M', 'PBVDC_04_200ms_1', 'ACTempWrngSta'],
                ['HS_M', 'PBVDC_04_200ms_1', 'ACTempWrngVal']]
+dev_all_sigs = [msg[:3] for msg in dev_in_sigs + dev_out_sigs]
 
 in_col = ['In: {}'.format(sig[2]) for sig in dev_in_sigs]
 out_col = ['Out: {}'.format(sig[2]) for sig in dev_out_sigs]
@@ -92,7 +94,8 @@ log_th.log_state = False
 for log_lst in log_th.log_lst:
     outcome.append(log_lst)
 
-signal_step_graph(data=log_th.log_lst, col=total_col, x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
+df_log = pd.DataFrame(log_th.log_lst, columns=total_col)
+signal_step_graph(df=df_log.copy(), sigs=dev_all_sigs, x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
 
 outcome.append(['Result', final_result])
 
