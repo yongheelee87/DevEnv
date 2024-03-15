@@ -18,7 +18,7 @@ def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, f
     step_dict = {}
     if data_col[0] == 'Step':
         for step, group in df.groupby(['Step']):
-            step_dict[step[0]] = (group.index.values[0], group.index.values[-1])
+            step_dict[int(step[0])] = (group.index.values[0], group.index.values[-1])
 
         df.drop(labels='Step', axis=1, inplace=True)
         data_col.remove('Step')
@@ -225,17 +225,20 @@ def _write_summary(df_sum: pd.DataFrame) -> str:
 def _write_tc_res_body(dict_tc: dict, tc_script: dict) -> str:
     tc_res_html = ''
     for tc in dict_tc.keys():
+        sub_title = dict_tc[tc]
+        img_src = tc + '.png'
         if tc_script and tc_script[tc] is not None:
-            tc_res_body = """
+            tc_str_script = _write_tc(tc_script[tc])
+            tc_res_body = f"""
             <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">{sub_title}</h3>
             {tc_str_script}
             <img src="{img_src}" width="1400" height="1400" style="width: 1400px; height: 1150px; object-fit:cover;margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
-            """.format(sub_title=dict_tc[tc], tc_str_script=_write_tc(tc_script[tc]), img_src=tc + '.png')
+            """
         else:
-            tc_res_body = """
+            tc_res_body = f"""
             <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">{sub_title}</h3>
             <img src="{img_src}" width="1400" height="1400" style="width: 1400px; height: 1150px; object-fit:cover;margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
-            """.format(sub_title=dict_tc[tc], img_src=tc + '.png')
+            """
         tc_res_html += tc_res_body
     return tc_res_html
 

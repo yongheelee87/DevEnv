@@ -1,0 +1,6 @@
+﻿CHANNEL: {0: HS_B1, 1: HS_M}
+SIGNALS:
+- [HS_B1, Frame01, Signal1]
+- [HS_B1, Frame02, Signal2]
+- [HS_M, Frame03, Signal3]
+- [HS_M, Frame04, Signal4]

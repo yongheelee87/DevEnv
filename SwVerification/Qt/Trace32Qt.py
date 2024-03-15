@@ -39,7 +39,7 @@ class Trace32Window(QWidget):
         input_dbc_file = cmm_name[0]
         if input_dbc_file:
             self.ui_t32.line_cmm_path.setText(input_dbc_file)
-            t32.cmd("CD.DO " + input_dbc_file)
+            t32.cmd(f"CD.DO {input_dbc_file}")
 
     def func_btn_send(self):
         try:
@@ -52,12 +52,12 @@ class Trace32Window(QWidget):
                     str_value = lst_cmd[1].strip()
                     value = float(str_value) if '.' in str_value else int(str_value)
                     t32.write_symbol(symbol=lst_cmd[0].strip(), value=value)
-                    read_msg += 'Write Msg {}\n'.format(lst_cmd)
+                    read_msg += f'Write Msg {lst_cmd}\n'
                 elif 'R:' in cmd[:2]:
                     val = t32.read_symbol(symbol=cmd[2:].strip())
                     if val is None:
                         val = 'None'
-                    read_msg += ('Read Msg: {}\n'.format(str(val)))
+                    read_msg += f'Read Msg: {str(val)}\n'
                 elif 'T:' in cmd[:2]:
                     time.sleep(float(cmd[2:].strip()))
             self.ui_t32.pText_monitor.setPlainText(read_msg)

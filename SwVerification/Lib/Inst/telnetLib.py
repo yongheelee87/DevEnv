@@ -37,11 +37,10 @@ class TelnetClient:
         try:
             self.device = Telnet(host, int(port))
             self.status = True
-            print("Success: CONNECT DEVICE {}:{}\n".format(host, port))
+            print(f"Success: CONNECT DEVICE {host}:{port}\n")
         except (OSError, ConnectionRefusedError):
             self.status = False
-            print(
-                '[INFO] Telnet is NOT CONNECTED with HOST\nIF YOU WANT TO USE telnet, CHECK IF THERE IS PC with Ethernet\n')
+            print('[INFO] Telnet is NOT CONNECTED with HOST\nIF YOU WANT TO USE telnet, CHECK IF THERE IS PC with Ethernet\n')
 
     def msg_read(self):
         '''
@@ -54,10 +53,10 @@ class TelnetClient:
         '''
         :param command: command via Telnet. refer to specification of the device
         '''
-        command = (command + '\r\n').encode()
+        command = f'{command}\r\n'.encode()
         self.device.write(command)
         time.sleep(0.1)
-        print("Success: WRITE TELNET MESSAGE {}\n".format(command))
+        print(f"Success: WRITE TELNET MESSAGE {command}\n")
 
     def query(self, command):
         '''
@@ -67,7 +66,7 @@ class TelnetClient:
         self.msg_write(command)
         time.sleep(0.1)
         response = self.msg_read().decode()
-        print("Success: READ TELNET MESSAGE {}\n".format(response))
+        print(f"Success: READ TELNET MESSAGE {response}\n")
         return response
 
     '''

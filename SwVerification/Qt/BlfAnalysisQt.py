@@ -18,14 +18,33 @@ class BlfAnalysisWindow(QWidget):
         self.connectBtnInit()
 
         self.blf_path = ''
+        self.cfg_path = ''
 
     def backgroundInit(self):
-        self._update_tbl_from_df()
+        self._update_ch_tbl(dict_ch_dev=self.blf.get_ch_dev())
 
     def connectBtnInit(self):
-        self.ui_blf.btn_blf_load.clicked.connect(self.func_btn_blf_load)
         self.ui_blf.btn_Result_Folder.clicked.connect(self.func_btn_Result_Folder)
         self.ui_blf.btn_Run_Analysis.clicked.connect(self.func_btn_Run_Analysis)
+        self.ui_blf.btn_cfg_save.clicked.connect(self.func_btn_cfg_save)
+        self.ui_blf.btn_cfg_load.clicked.connect(self.func_btn_cfg_load)
+        self.ui_blf.btn_blf_load.clicked.connect(self.func_btn_blf_load)
+
+    def func_btn_cfg_save(self):
+        cfg = {'CHANNEL': self._extract_channel(), 'SIGNALS': self._read_signals()}
+        with open(self.ui_blf.line_cfg_path.text(), 'w', encoding="utf-8-sig") as f:
+            yaml.dump(cfg, f, default_flow_style=None)
+
+    def func_btn_cfg_load(self):
+        cfg_name = QFileDialog.getOpenFileName(self, 'Open File', './data/config/blf', 'cfg File(*.yaml);; All File(*)')
+        input_cfg_file = cfg_name[0]
+        if input_cfg_file:
+            self.ui_blf.line_cfg_path.setText(input_cfg_file)
+            self.cfg_path = input_cfg_file
+            with open(self.cfg_path, encoding="utf-8-sig") as f:
+                cfg_yaml = yaml.load(f, Loader=yaml.SafeLoader)
+                self._update_ch_tbl(dict_ch_dev=cfg_yaml['CHANNEL'])
+                self._update_signal_txt(lst_sigs=cfg_yaml['SIGNALS'])
 
     def func_btn_blf_load(self):
         blf_name = QFileDialog.getOpenFileName(self, 'Open File', './', 'blf File(*.blf);; All File(*)')
@@ -42,22 +61,26 @@ class BlfAnalysisWindow(QWidget):
     def func_btn_Result_Folder(self):
         open_path('./data/result/')
 
-    def _update_tbl_from_df(self):
+    def _update_ch_tbl(self, dict_ch_dev: dict):
         # 테이블 위젯 값 쓰기
         self.ui_blf.tbl_ch_device.clear()
-        # Select Dataframe
-        df_ch_dev = self.blf.get_ch_dev()
         # Table Contents
-        self.ui_blf.tbl_ch_device.setColumnCount(len(df_ch_dev.columns))
-        self.ui_blf.tbl_ch_device.setHorizontalHeaderLabels(df_ch_dev.columns.tolist())
-        self.ui_blf.tbl_ch_device.setRowCount(len(df_ch_dev.index))
+        self.ui_blf.tbl_ch_device.setColumnCount(2)
+        self.ui_blf.tbl_ch_device.setHorizontalHeaderLabels(['CH', 'DEV'])
+        self.ui_blf.tbl_ch_device.setRowCount(len(dict_ch_dev))
 
-        for r in range(len(df_ch_dev.index)):
-            for c in range(len(df_ch_dev.columns)):
-                self.ui_blf.tbl_ch_device.setItem(r, c, QTableWidgetItem(str(df_ch_dev.iloc[r][c])))
+        for r, (k, v) in enumerate(dict_ch_dev.items()):
+            self.ui_blf.tbl_ch_device.setItem(r, 0, QTableWidgetItem(str(k)))
+            self.ui_blf.tbl_ch_device.setItem(r, 1, QTableWidgetItem(str(v)))
         self.ui_blf.tbl_ch_device.resizeColumnsToContents()
 
-    def _read_signals(self):
+    def _update_signal_txt(self, lst_sigs: list):
+        # 테이블 위젯 값 쓰기
+        self.ui_blf.pText_signal.clear()
+        # Text Contents
+        self.ui_blf.pText_signal.setPlainText('\n'.join(', '.join(map(str, i)) for i in lst_sigs))
+
+    def _read_signals(self) -> list:
         lst_sigs_str = self.ui_blf.pText_signal.toPlainText().split("\n")
         lst_sigs = []
         for sig_str in lst_sigs_str:
@@ -68,7 +91,7 @@ class BlfAnalysisWindow(QWidget):
             lst_sigs.append(temp)
         return lst_sigs
 
-    def _extract_channel(self):
+    def _extract_channel(self) -> dict:
         dict_ch_dev = {}
         for r in range(self.ui_blf.tbl_ch_device.rowCount()):
             if self.ui_blf.tbl_ch_device.item(r, 0).text() != '':

@@ -13,7 +13,7 @@ def to_raw(string: str) -> str:
     :param string:
     :return: raw string
     '''
-    return r'{}'.format(string)
+    return fr'{string}'
 
 
 def to_hex_str(integerVariable: int) -> str:
@@ -51,7 +51,7 @@ def to_hex_little_lst(in_val: any) -> list:
         str_val = str(float_to_hex(float(str_val)))
     hex_str = to_hex_str(int(str_val, 0)).replace('0x', '')
     if (len(hex_str) % 2) != 0:
-        hex_str = '0' + hex_str
+        hex_str = f'0{hex_str}'
     return list(bytes.fromhex(hex_str))[::-1]
 
 
@@ -65,19 +65,20 @@ def to_hex_big_lst(in_val: any) -> list:
         str_val = str(float_to_hex(float(str_val)))
     hex_str = to_hex_str(int(str_val, 0)).replace('0x', '')
     if (len(hex_str) % 2) != 0:
-        hex_str = '0' + hex_str
+        hex_str = f'0{hex_str}'
     return list(bytes.fromhex(hex_str))
 
+
 def bytearray_to_hex(arr):
-    return '0x' + ''.join('{:02x}'.format(x) for x in arr)
+    return '0x' + ''.join(f'{x:02x}' for x in arr)
 
 
 def isdir_and_make(dir_name: str):
     if not (os.path.isdir(dir_name)):
         os.makedirs(name=dir_name, exist_ok=True)
-        print("Success: Create {}\n".format(dir_name))
+        print(f"Success: Create {dir_name}\n")
     else:
-        print("Success: Access {}\n".format(dir_name))
+        print(f"Success: Access {dir_name}\n")
 
 
 def check_process_open(keyword: str) -> bool:
@@ -108,11 +109,11 @@ def to_do_process_close(keyword: str):
 
 
 def isfile_and_pass(file_path: str, file_name: str):
-    if not os.path.isfile(file_path + '\\' + file_name):
-        print("Error: Access {}\n".format(file_name))
+    if not os.path.isfile(f'{file_path}/{file_name}'):
+        print(f"Error: Access {file_name}\n")
         pass
     else:
-        print("Success: Access {}\n".format(file_name))
+        print(f"Success: Access {file_name}\n")
 
 
 def isfile_and_remove(file: str):
@@ -125,16 +126,15 @@ def isfile_and_remove(file: str):
 def open_path(path: str):
     path = os.path.realpath(path)
     os.startfile(path)
-    print("Success: Open {}\n".format(path))
+    print(f"Success: Open {path}\n")
 
 
 def load_csv_dataframe(file_path: str, filename: str) -> pd.DataFrame:
-    df = pd.read_csv(file_path + "\\" + filename + ".csv", dtype=object, encoding='cp1252')
-    return df
+    return pd.read_csv(f'{file_path}/{filename}.csv', dtype=object, encoding='cp1252')
 
 
 def export_csv_dataframe(df, file_path: str, filename: str):
-    df.to_csv(file_path + "\\" + filename + ".csv", index=False)
+    df.to_csv(f'{file_path}/{filename}.csv', index=False)
 
 
 def load_csv_list(file_path: str) -> list:
@@ -157,7 +157,7 @@ def load_csv_list(file_path: str) -> list:
 
 
 def export_csv_list(file_path: str, filename: str, lists: list):
-    with open(file_path + "\\" + filename + ".csv", 'w', newline='', encoding='utf-8') as f:
+    with open(f'{file_path}/{filename}.csv', 'w', newline='', encoding='utf-8') as f:
         # using csv.writer method from CSV package
         write = csv.writer(f)
         write.writerows(lists)
@@ -228,16 +228,14 @@ def get_sqrt(df: pd.DataFrame, col1: str, col2: str):
 
 
 def get_window_with_loop(title: str, cnt_limit: int):
-    cnt = 0
     win_temp = None
-    while cnt < cnt_limit:
+    for _ in range(cnt_limit):
         titles = gw.getAllTitles()
         win_list = [ti for ti in titles if title in ti]
         if len(win_list) != 0:
             win_temp = gw.getWindowsWithTitle(win_list[0])[0]
-            print("Success: Get WINDOW {}\n".format(title))
+            print(f"Success: Get WINDOW {title}\n")
             break
-        cnt += 1
     return win_temp
 
 
@@ -264,7 +262,7 @@ def check_task_open(name: str) -> bool:
     for i in range(len(r)):
         if name in r[i]:
             res_open = True
-    print("The task {} Connection: {}\n".format(name, res_open))
+    print(f"The task {name} Connection: {res_open}\n")
     return res_open
 
 def logging_initialize():

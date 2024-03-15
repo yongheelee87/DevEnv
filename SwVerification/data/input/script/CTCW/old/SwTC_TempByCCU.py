@@ -19,8 +19,8 @@ dev_in_sigs = [['HS-RGW_T1', 'CC_01_200ms', 'ACSetSta', 0.2],
 dev_out_sigs = [['HS_M', 'PBVDC_04_200ms_1', 'ACTempWrngSta'],
                ['HS_M', 'PBVDC_04_200ms_1', 'ACTempWrngVal']]
 
-in_col = ['In: {}'.format(sig[2]) for sig in dev_in_sigs]
-out_col = ['Out: {}'.format(sig[2]) for sig in dev_out_sigs]
+in_col = [f'In: {sig[2]}' for sig in dev_in_sigs]
+out_col = [f'Out: {sig[2]}' for sig in dev_out_sigs]
 data_col = in_col + out_col
 total_col = ['Elapsed_Time'] + data_col
 outcome.append(total_col)

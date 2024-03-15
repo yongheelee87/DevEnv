@@ -17,7 +17,7 @@ class CheckEnv:
         print("*** Check Environment for Test")
         print("************************************************************\n")
 
-        false_cnt = self.inst_status.count(False)
+        false_cnt = self.inst_status.count('Not Connected')
         if false_cnt == 0:
             isdir_and_make(self.path)
             with open(self.file, "w") as f:

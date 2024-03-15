@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>878</width>
-    <height>856</height>
+    <width>997</width>
+    <height>698</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -499,7 +499,7 @@ Button */
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout">
+                 <layout class="QVBoxLayout" name="verticalLayout_7">
                   <item>
                    <widget class="QFrame" name="row_1">
                     <property name="sizePolicy">
@@ -786,7 +786,134 @@ border: 1px solid black;</string>
                           <property name="frameShadow">
                            <enum>QFrame::Raised</enum>
                           </property>
-                          <layout class="QVBoxLayout" name="verticalLayout_8">
+                          <layout class="QVBoxLayout" name="verticalLayout">
+                           <property name="leftMargin">
+                            <number>9</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>9</number>
+                           </property>
+                           <property name="bottomMargin">
+                            <number>9</number>
+                           </property>
+                           <item>
+                            <layout class="QGridLayout" name="gridLayout_3">
+                             <item row="1" column="0" colspan="2">
+                              <widget class="QLabel" name="label_path_descript_2">
+                               <property name="styleSheet">
+                                <string notr="true">color: rgb(113, 126, 149);</string>
+                               </property>
+                               <property name="lineWidth">
+                                <number>1</number>
+                               </property>
+                               <property name="text">
+                                <string>Please Open and Load the Configuration with a path.</string>
+                               </property>
+                               <property name="alignment">
+                                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                               </property>
+                              </widget>
+                             </item>
+                             <item row="0" column="0">
+                              <widget class="QLineEdit" name="line_cfg_path">
+                               <property name="minimumSize">
+                                <size>
+                                 <width>0</width>
+                                 <height>40</height>
+                                </size>
+                               </property>
+                               <property name="styleSheet">
+                                <string notr="true">background-color: rgb(33, 37, 43);</string>
+                               </property>
+                               <property name="text">
+                                <string/>
+                               </property>
+                               <property name="placeholderText">
+                                <string>Configuration File Path</string>
+                               </property>
+                              </widget>
+                             </item>
+                             <item row="0" column="1">
+                              <widget class="QPushButton" name="btn_cfg_save">
+                               <property name="sizePolicy">
+                                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                 <horstretch>0</horstretch>
+                                 <verstretch>0</verstretch>
+                                </sizepolicy>
+                               </property>
+                               <property name="minimumSize">
+                                <size>
+                                 <width>150</width>
+                                 <height>40</height>
+                                </size>
+                               </property>
+                               <property name="font">
+                                <font>
+                                 <family>Segoe UI</family>
+                                 <pointsize>11</pointsize>
+                                 <weight>50</weight>
+                                 <italic>false</italic>
+                                 <bold>false</bold>
+                                </font>
+                               </property>
+                               <property name="cursor">
+                                <cursorShape>PointingHandCursor</cursorShape>
+                               </property>
+                               <property name="styleSheet">
+                                <string notr="true">background-color: rgb(52, 59, 72);</string>
+                               </property>
+                               <property name="text">
+                                <string>Save Cfg</string>
+                               </property>
+                               <property name="icon">
+                                <iconset resource="resources.qrc">
+                                 <normaloff>:/icons/icons/cil-save.png</normaloff>:/icons/icons/cil-save.png</iconset>
+                               </property>
+                              </widget>
+                             </item>
+                             <item row="0" column="2">
+                              <widget class="QPushButton" name="btn_cfg_load">
+                               <property name="sizePolicy">
+                                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                 <horstretch>0</horstretch>
+                                 <verstretch>0</verstretch>
+                                </sizepolicy>
+                               </property>
+                               <property name="minimumSize">
+                                <size>
+                                 <width>150</width>
+                                 <height>40</height>
+                                </size>
+                               </property>
+                               <property name="font">
+                                <font>
+                                 <family>Segoe UI</family>
+                                 <pointsize>11</pointsize>
+                                 <weight>50</weight>
+                                 <italic>false</italic>
+                                 <bold>false</bold>
+                                </font>
+                               </property>
+                               <property name="cursor">
+                                <cursorShape>PointingHandCursor</cursorShape>
+                               </property>
+                               <property name="styleSheet">
+                                <string notr="true">background-color: rgb(52, 59, 72);</string>
+                               </property>
+                               <property name="text">
+                                <string>Load Cfg</string>
+                               </property>
+                               <property name="icon">
+                                <iconset resource="resources.qrc">
+                                 <normaloff>:/icons/icons/cil-folder-open.png</normaloff>:/icons/icons/cil-folder-open.png</iconset>
+                               </property>
+                              </widget>
+                             </item>
+                            </layout>
+                           </item>
                            <item>
                             <layout class="QGridLayout" name="gridLayout_2">
                              <item row="1" column="0" colspan="2">
@@ -798,7 +925,7 @@ border: 1px solid black;</string>
                                 <number>1</number>
                                </property>
                                <property name="text">
-                                <string>Please Open and Load the script with a path.</string>
+                                <string>Please Open and Load the BLF file with a path.</string>
                                </property>
                                <property name="alignment">
                                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -820,7 +947,7 @@ border: 1px solid black;</string>
                                 <string/>
                                </property>
                                <property name="placeholderText">
-                                <string>BLF Path</string>
+                                <string>BLF File Path</string>
                                </property>
                               </widget>
                              </item>
@@ -854,7 +981,7 @@ border: 1px solid black;</string>
                                 <string notr="true">background-color: rgb(52, 59, 72);</string>
                                </property>
                                <property name="text">
-                                <string>Load</string>
+                                <string>Load BLF</string>
                                </property>
                                <property name="icon">
                                 <iconset resource="resources.qrc">
@@ -867,15 +994,69 @@ border: 1px solid black;</string>
                           </layout>
                          </widget>
                         </item>
+                       </layout>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QFrame" name="row_3">
+                    <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_11">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QFrame" name="frame_div_content_2">
+                       <property name="frameShape">
+                        <enum>QFrame::StyledPanel</enum>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_12">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
                         <item>
-                         <widget class="QFrame" name="frame_content_wid_3">
+                         <widget class="QFrame" name="frame_content_wid_5">
                           <property name="frameShape">
                            <enum>QFrame::StyledPanel</enum>
                           </property>
                           <property name="frameShadow">
                            <enum>QFrame::Raised</enum>
                           </property>
-                          <layout class="QHBoxLayout" name="horizontalLayout_2">
+                          <layout class="QHBoxLayout" name="horizontalLayout_3">
                            <item>
                             <widget class="QFrame" name="frame_table_2">
                              <property name="maximumSize">
@@ -890,7 +1071,7 @@ border: 1px solid black;</string>
                              <property name="frameShadow">
                               <enum>QFrame::Raised</enum>
                              </property>
-                             <layout class="QVBoxLayout" name="verticalLayout_7">
+                             <layout class="QVBoxLayout" name="verticalLayout_14">
                               <property name="leftMargin">
                                <number>0</number>
                               </property>
@@ -959,6 +1140,9 @@ QTableCornerButton::section {
                                 <attribute name="horizontalHeaderCascadingSectionResizes">
                                  <bool>false</bool>
                                 </attribute>
+                                <attribute name="horizontalHeaderMinimumSectionSize">
+                                 <number>38</number>
+                                </attribute>
                                 <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
                                  <bool>false</bool>
                                 </attribute>
@@ -967,6 +1151,12 @@ QTableCornerButton::section {
                                 </attribute>
                                 <attribute name="verticalHeaderVisible">
                                  <bool>false</bool>
+                                </attribute>
+                                <attribute name="verticalHeaderMinimumSectionSize">
+                                 <number>28</number>
+                                </attribute>
+                                <attribute name="verticalHeaderDefaultSectionSize">
+                                 <number>30</number>
                                 </attribute>
                                </widget>
                               </item>
@@ -981,7 +1171,7 @@ QTableCornerButton::section {
                              <property name="frameShadow">
                               <enum>QFrame::Raised</enum>
                              </property>
-                             <layout class="QVBoxLayout" name="verticalLayout_10">
+                             <layout class="QVBoxLayout" name="verticalLayout_15">
                               <property name="leftMargin">
                                <number>0</number>
                               </property>

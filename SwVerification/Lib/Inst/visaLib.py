@@ -41,16 +41,16 @@ class VisaDev:
                         if Configure.set[dev]['ID'] in dev_name:
                             self.resource[dev] = res
                             self.status[dev] = True
-                            print("Success: find device {}\n".format(dev_name))
+                            print(f"Success: find device {dev_name}\n")
                             break
                     except Exception as e:
-                        print('Error: connect {} with {}\n'.format(rm_list[i], e))
+                        print(f'Error: connect {rm_list[i]} with {e}\n')
                 if self.status[dev] is False:
-                    print("Error: find device {}\n".format(dev))
+                    print(f"Error: find device {dev}\n")
             else:
-                print("Error: there is no connected device {}\n".format(dev))
+                print(f"Error: there is no connected device {dev}\n")
         except VisaIOError as e:
-            print("Error: connect {} device with {}\n".format(dev, e))
+            print(f"Error: connect {dev} device with {e}\n")
 
     def write(self, dev, cmd):
         '''
@@ -81,11 +81,11 @@ class VisaDev:
         :param curr: Input current
         '''
         try:
-            self.resource[dev].write(":SOUR:VOLT {}".format(str(volt)))
-            self.resource[dev].write(":SOUR:CURR {}".format(str(curr)))
-            print('Success: SET VOLTAGE {}V AND CURRENT {}A\n'.format(str(volt), str(curr)))
+            self.resource[dev].write(f":SOUR:VOLT {str(volt)}")
+            self.resource[dev].write(f":SOUR:CURR {str(curr)}")
+            print(f'Success: SET VOLTAGE {str(volt)}V AND CURRENT {str(curr)}A\n')
         except VisaIOError:
-            print('Error: SET VOLTAGE {}V AND CURRENT {}A\n'.format(str(volt), str(curr)))
+            print(f'Error: SET VOLTAGE {str(volt)}V AND CURRENT {str(curr)}A\n')
 
     def output(self, dev, mode):
         '''
@@ -93,10 +93,10 @@ class VisaDev:
         :param mode: device output mode
         '''
         try:
-            self.resource[dev].write("OUTPut {}".format(str(mode)))
-            print('Success: SET OUTPUT {}\n'.format(str(mode)))
+            self.resource[dev].write(f"OUTPut {str(mode)}")
+            print(f'Success: SET OUTPUT {str(mode)}\n')
         except VisaIOError:
-            print('Error: SET OUTPUT {}\n'.format(str(mode)))
+            print(f'Error: SET OUTPUT {str(mode)}\n')
 
     def meas_volt_curr(self, dev) -> (str, str):
         '''

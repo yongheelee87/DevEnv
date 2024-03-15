@@ -5,7 +5,7 @@ def find_out_signals_for_col(out_sigs: list) -> (list, list):
     cols = []
     t32_out = []
     for sig in out_sigs:
-        cols.append('Out: {}'.format(sig[2]))
+        cols.append(f'Out: {sig[2]}')
         if 'T32' in sig[0]:
             t32_out.append(sig[-1])
     return cols, t32_out
@@ -25,7 +25,7 @@ def judge_final_result(df_result: pd.DataFrame, expected_outs: list, num_match: 
 
             if len(df_match) < num_match:  # If length of matching rows is less than the number to be configured, it leads to fail
                 fail_step = str(int(expected[0]))
-                fail_cases.append([fail_step, 'Fail Case', 'Step_{}'.format(fail_step), 'Expected Output'] + ['{}={}'.format(var, val) for var, val in zip(out_col, expected[1:])])
+                fail_cases.append([fail_step, 'Fail Case', f'Step_{fail_step}', 'Expected Output'] + [f'{var}={val}' for var, val in zip(out_col, expected[1:])])
     else:
         for expected in expected_outs:  # Step increment
             df_res = df_result.copy()  # define the dataframe to store matching rows, memory protection
@@ -38,14 +38,15 @@ def judge_final_result(df_result: pd.DataFrame, expected_outs: list, num_match: 
                         step_pass = False
             if step_pass is False:
                 fail_step = str(int(expected[0]))
-                fail_cases.append([fail_step, 'Fail Case', 'Step_{}'.format(fail_step), 'Expected Output'] + ['{}={}'.format(var, val)for var, val in zip(out_col, expected[1:])])
+                fail_cases.append([fail_step, 'Fail Case', f'Step_{fail_step}', 'Expected Output'] + [f'{var}={val}' for var, val in zip(out_col, expected[1:])])
 
     if fail_cases:
         final_result = 'Fail'  # Final result would be fail
         for idx, fail_case in enumerate(fail_cases):
             meas_log.insert(idx+1, fail_case[1:])
-            final_result += ',{}'.format(fail_case[0])  # the final result should be written with fail steps
-        print('*** {}'.format(final_result.replace(',', ', ').replace('Fail', 'Fail Step:')))
+            final_result += f',{fail_case[0]}'  # the final result should be written with fail steps
+        final_result_str = final_result.replace(',', ', ').replace('Fail', 'Fail Step:')
+        print(f'*** {final_result_str}')
 
     meas_log.append(['Result', final_result])
     return meas_log

@@ -21,8 +21,8 @@ dev_out_sigs = [['HS_M', 'PBVDC_04_200ms_1', 'ACTempWrngSta'],
                ['HS_M', 'PBVDC_04_200ms_1', 'ACTempWrngVal']]
 dev_all_sigs = [msg[:3] for msg in dev_in_sigs + dev_out_sigs]
 
-in_col = ['In: {}'.format(sig[2]) for sig in dev_in_sigs]
-out_col = ['Out: {}'.format(sig[2]) for sig in dev_out_sigs]
+in_col = [f'In: {sig[2]}' for sig in dev_in_sigs]
+out_col = [f'Out: {sig[2]}' for sig in dev_out_sigs]
 data_col = in_col + out_col
 total_col = ['Elapsed_Time'] + data_col
 outcome.append(total_col)
@@ -94,7 +94,7 @@ log_th.log_state = False
 for log_lst in log_th.log_lst:
     outcome.append(log_lst)
 
-df_log = pd.DataFrame(log_th.log_lst, columns=total_col)
+df_log = pd.DataFrame(np.array(log_th.log_lst, dtype=np.float32), columns=total_col)
 signal_step_graph(df=df_log.copy(), sigs=dev_all_sigs, x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
 
 outcome.append(['Result', final_result])

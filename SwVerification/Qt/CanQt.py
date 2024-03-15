@@ -111,7 +111,7 @@ class CanWindow(QWidget):
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Read_CAN_Period_Sig(self):
-        logging_print("Activated CAN Period Signal: {}\n".format(canBus.get_all_period_msg()))
+        logging_print(f"Activated CAN Period Signal: {canBus.get_all_period_msg()}\n")
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Stop_CAN_Period(self):
@@ -133,7 +133,7 @@ class CanWindow(QWidget):
                         canBus.devs[dev].msg_period_write(lst_cmd[1].strip(), lst_cmd[2].strip(), float(lst_cmd[3].strip()), float(lst_cmd[4].strip()))
                     else:
                         canBus.devs[dev].msg_period_write(lst_cmd[1].strip(), lst_cmd[2].strip(), float(lst_cmd[3].strip()), float(lst_cmd[4].strip()), True)
-                    read_msg += 'Write Msg {}\n'.format(lst_cmd)
+                    read_msg += f'Write Msg {lst_cmd}\n'
                 elif 'WP:' in cmd[:3]:
                     lst_cmd = cmd[3:].strip().replace("'", '').split(",")
                     dev = lst_cmd[0].strip()
@@ -141,12 +141,12 @@ class CanWindow(QWidget):
                         canBus.devs[dev].msg_period_write(lst_cmd[1].strip(), lst_cmd[2].strip(), float(lst_cmd[3].strip()), float(lst_cmd[4].strip()))
                     else:
                         canBus.devs[dev].msg_period_write(lst_cmd[1].strip(), lst_cmd[2].strip(), float(lst_cmd[3].strip()), float(lst_cmd[4].strip()), True)
-                    read_msg += 'Write Period Msg {}\n'.format(lst_cmd)
+                    read_msg += f'Write Period Msg {lst_cmd}\n'
                 elif 'WR:' in cmd[:3]:
                     lst_cmd = cmd[3:].strip().replace("'", '').split(",")
                     dev = lst_cmd[0].strip()
                     canBus.devs[dev].raw_msg_write(int(lst_cmd[1].strip(), 16), to_hex_big_lst(lst_cmd[2].strip()))
-                    read_msg += 'Write Raw Msg {}\n'.format(lst_cmd)
+                    read_msg += f'Write Raw Msg {lst_cmd}\n'
                 elif 'R:' in cmd[:2]:
                     lst_cmd = cmd[2:].strip().replace("'", '').split(",")
                     dev = lst_cmd[0].strip()
@@ -172,7 +172,7 @@ class CanWindow(QWidget):
             pre_location = self.ui_can.pText_monitor.verticalScrollBar().value()
             self.ui_can.pText_monitor.setPlainText(str_can_rx_data)
             self.ui_can.pText_monitor.verticalScrollBar().setValue(pre_location)
-            # print("Success: READ CAN MESSAGE: {}\n".format(can_rx_data))
+            # print(f"Success: READ CAN MESSAGE: {can_rx_data}\n")
         else:
             self.ui_can.pText_monitor.setPlainText("Error: READ CAN MESSAGE")
             # print("Error: READ CAN MESSAGE\n")
@@ -207,6 +207,6 @@ class CanWindow(QWidget):
             self.ui_can.line_connect_status.setStyleSheet("color:black;font-weight:600;background-color: %s;border: 1px solid transparent;" % "#42f566")
         else:
             fail_devs = ', '.join(lst_fail_dev)
-            self.ui_can.line_connect_status.setText('Not Connected: {}'.format(fail_devs))
+            self.ui_can.line_connect_status.setText(f'Not Connected: {fail_devs}')
             self.ui_can.line_connect_status.setStyleSheet("color:white;font-weight:600;background-color: %s;border: 1px solid transparent;" % "rgba(255, 0, 0, 0.70)")
 

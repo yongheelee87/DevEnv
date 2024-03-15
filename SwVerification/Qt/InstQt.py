@@ -46,7 +46,7 @@ class InstWindow(QWidget):
         self.ui_inst.tbl_inst_status.clear()
         # Select Dataframe
         self.df_inst = get_inst_status()  # Instruments status 가져오기
-        logging_print("Current Test Environment\n{}\n".format(self.df_inst))
+        logging_print(f"Current Test Environment\n{self.df_inst}\n")
         # Table Contents
         self.ui_inst.tbl_inst_status.setColumnCount(len(self.df_inst.columns))
         self.ui_inst.tbl_inst_status.setHorizontalHeaderLabels(self.df_inst.columns.tolist())

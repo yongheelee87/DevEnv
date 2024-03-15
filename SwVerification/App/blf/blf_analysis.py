@@ -14,13 +14,12 @@ class BlfAnalysis:
         self.dict_blf = {}
         self.maxT = 0
 
-    def get_ch_dev(self):
-        lst_ch_dev = [[i, dev] for i, dev in enumerate(canBus.lst_dev)]
-        return pd.DataFrame(lst_ch_dev, columns=['CH', 'DEV'])
+    def get_ch_dev(self) -> dict:
+        return {i: dev for i, dev in enumerate(canBus.lst_dev)}
 
     def read_blf(self, blf_path: str, dic_channel: dict, sigs: list):
         log = list(BLFReader(blf_path))
-        log_output = {}
+        log_output = []
         for msg in log:
             time_secs = msg.timestamp - log[0].timestamp
             if msg.channel in dic_channel.keys():
@@ -41,9 +40,9 @@ class BlfAnalysis:
                 frame_type = 'Data'
 
             if msg.is_extended_id:
-                can_id = '0x{:08X}'.format(msg.arbitration_id)
+                can_id = f'0x{msg.arbitration_id:08X}'
             else:
-                can_id = '0x{:03X}'.format(msg.arbitration_id)
+                can_id = f'0x{msg.arbitration_id:03X}'
 
             try:
                 frame_name = canBus.devs[device_ch].get_msg_name(int(msg.arbitration_id))
@@ -52,7 +51,7 @@ class BlfAnalysis:
 
             data = ''
             for byte in msg.data:
-                data = data + '{:02X}'.format(byte) + ' '
+                data = f'{data}{byte:02X} '
 
             if frame_name != 'Not Defined':
                 try:
@@ -94,7 +93,7 @@ class BlfAnalysis:
                 if y_val in canBus.devs[dev_name].sig_val[sig_name].keys():
                     yticks_labels.append(canBus.devs[dev_name].sig_val[sig_name][y_val])
                 else:
-                    yticks_labels.append('{}(RAW)'.format(y_val))
+                    yticks_labels.append(f'{y_val}(RAW)')
             axs[i].set_yticklabels(yticks_labels)
             axs[i].set_xlim(left=0, right=self.maxT + 1)
 
@@ -107,7 +106,7 @@ class BlfAnalysis:
                 ax.label_outer()
 
             plt.show()
-            # plt.savefig('{}/{}.png'.format(filepath, filename))
+            # plt.savefig(f'{filepath}/{filename}.png')
             # plt.cla()  # clear the current axes
             # plt.clf()  # clear the current figure
             # plt.close()  # closes the current figure

@@ -19,7 +19,7 @@ dev_out_sigs = []
 # Dev signal List End
 
 out_col, lst_t32_out = find_out_signals_for_col(dev_out_sigs)
-total_col = ['Step', 'Elapsed_Time'] + ['In: {}'.format(sig[2]) for sig in dev_in_sigs] + out_col
+total_col = ['Step', 'Elapsed_Time'] + [f'In: {sig[2]}' for sig in dev_in_sigs] + out_col
 outcome.append(total_col)
 
 final_result = 'Pass'  # Final result to be recorded
@@ -74,7 +74,7 @@ log_th.log_state = False  # log stop
 for log_lst in log_th.log_lst:
     outcome.append(log_lst)
 
-df_log = pd.DataFrame(log_th.log_lst, columns=total_col)
+df_log = pd.DataFrame(np.array(log_th.log_lst, dtype=np.float32), columns=total_col)
 signal_step_graph(df=df_log.copy(), x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
 
 # Result judgement logic

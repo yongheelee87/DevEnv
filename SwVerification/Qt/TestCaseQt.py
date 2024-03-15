@@ -53,13 +53,13 @@ class TestCaseWindow(QWidget):
 
     def func_btn_apply(self):
         configure_str = self.ui_tc.pText_map_test.toPlainText()
-        with open('./data/input/script/{}/set/map_script_sw_test.yaml'.format(self.project), 'w', encoding='utf-8') as f:
+        with open(f'./data/input/script/{self.project}/set/map_script_sw_test.yaml', 'w', encoding='utf-8') as f:
             f.write(configure_str)
 
         logging_print('[INFO] The map script is modified as seen in the display\n')
 
     def func_btn_Script_Folder(self):
-        open_path('./data/input/script/{}'.format(self.project))
+        open_path(f'./data/input/script/{self.project}')
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Result_Folder(self):
@@ -113,7 +113,7 @@ class TestCaseWindow(QWidget):
 
     def _update_map_script(self):
         self.swTest.script_path = os.path.join('data', 'input', 'script', self.project)
-        with open('{}/set/map_script_sw_test.yaml'.format(self.swTest.script_path), 'r', encoding='utf-8') as f:
+        with open(f'{self.swTest.script_path}/set/map_script_sw_test.yaml', 'r', encoding='utf-8') as f:
             f_lines = f.readlines()
             map_test = "".join(f_lines)
         self.ui_tc.pText_map_test.setPlainText(map_test)

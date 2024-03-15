@@ -29,7 +29,7 @@ class MeasCTCW:
 
     def load_script(self, testEnv):
         self.testEnv = testEnv
-        print("Load Test Environment:\n{}".format(self.testEnv))
+        print(f"Load Test Environment:\n{self.testEnv}")
 
     def stop(self):
         self.meas_state = False
@@ -58,7 +58,7 @@ class MeasCTCW:
         data_col = ['Time', 'Elapsed Time', 'Servo_Val', 'CAN_Val', 'dc_current', 'dc_voltage', 'current_p1',
                     'current_p2', 'current_p3']
         df_log = pd.DataFrame(self.log_lst, columns=data_col + self.can_col)
-        export_csv_dataframe(df_log, './data/result', 'result_{}'.format(datetime.datetime.now().strftime("%Y%m%d_%H%M%S")))
+        export_csv_dataframe(df_log, './data/result', f'result_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}')
         print("Success: Save Result Data\n")
 
     def run_cmd_process(self, index):

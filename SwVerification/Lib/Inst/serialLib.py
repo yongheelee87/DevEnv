@@ -12,7 +12,7 @@ def serial_Initialization(port_word, baud_rate, byte_size, time_out):
                 CP210_COM.append(port.description[st.start():st.start() + 4])
 
     ser = serial.Serial(CP210_COM[0], baudrate=baud_rate, bytesize=byte_size, parity='N', stopbits=1, timeout=time_out)
-    print('[INFO] {}\n'.format(ser))
+    print(f'[INFO] {ser}\n')
     if not ser.is_open:
         ser.open()
         print("SUCCESS: Connect HOST PC and POWER SUPPLY\n")

@@ -69,12 +69,12 @@ class Trace32:
     def flash_binary(self, run_cmd):
         if os.path.exists(run_cmd.split()[0]):
             try:
-                self.device.cmd("CD.DO " + run_cmd)
+                self.device.cmd(f"CD.DO {run_cmd}")
             except ApiConnectionTimeoutError:
                 self.wait_until_connect(timeout=10)
-                self.device.cmd("CD.DO " + run_cmd)
+                self.device.cmd(f"CD.DO {run_cmd}")
         else:
-            print('Error: No file {}\n'.format(run_cmd))
+            print(f'Error: No file {run_cmd}\n')
 
         start = time.time_ns()
         elapse_time = 0
@@ -109,16 +109,16 @@ class Trace32:
             self.device.cmd(str_cmd)
             self._wait_until_command_ends(timeout=time_out)
         except CommandError:
-            print('Error: Run Cmd {}\n'.format(str_cmd))
+            print(f'Error: Run Cmd {str_cmd}\n')
 
     def cd_do(self, run_cmd: str):
         '''
         :param run_cmd: commands including path
         '''
         if os.path.exists(run_cmd.split()[0]):
-            self.cmd("CD.DO " + run_cmd)
+            self.cmd(f"CD.DO {run_cmd}")
         else:
-            print('Error: No file {}\n'.format(run_cmd))
+            print(f'Error: No file {run_cmd}\n')
 
     def write_symbol(self, symbol: str, value: int or float):
         '''

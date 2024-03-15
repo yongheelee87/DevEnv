@@ -9,6 +9,7 @@
 # interface (GUI) can be modified without any implication.
 #
 # ///////////////////////////////////////////////////////////////
+import numpy as np
 import pandas as pd
 
 # basic library
@@ -32,9 +33,9 @@ def get_inst_status() -> pd.DataFrame:
     lst_inst = [i for i in Configure.set.keys() if 'system' not in i and 'XCP' not in i]
     for inst in lst_inst:
         if Configure.set[inst]['type'] == 'T32':
-            lst_inst_data.append([inst, t32.status])
+            lst_inst_data.append([inst, 'Not Connected' if t32.status is False else 'Connected'])
         elif Configure.set[inst]['type'] == 'can':
-            lst_inst_data.append([inst, False if canBus.devs[inst].status == CAN_ERR else True])
+            lst_inst_data.append([inst, 'Not Connected' if canBus.devs[inst].status == CAN_ERR else 'Connected'])
         else:
-            lst_inst_data.append([inst, visa.status[inst]])
-    return pd.DataFrame(lst_inst_data, columns=['Name', 'Connect'])
+            lst_inst_data.append([inst, 'Not Connected' if visa.status[inst] is False else 'Connected'])
+    return pd.DataFrame(np.array(lst_inst_data, dtype=object), columns=['Name', 'Connect'])

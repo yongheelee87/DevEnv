@@ -53,14 +53,14 @@ def t32_initialization():
 
 
 def t32_run_cmd(run_cmd):
-    cmd_in = "CD.DO " + run_cmd
+    cmd_in = f"CD.DO {run_cmd}"
     if t32_initialization() == OK:
         t32api.T32_Cmd(cmd_in.encode())
         wait_until_command_ends()
-        print('Success: Run Cmd {}\n'.format(run_cmd))
+        print(f'Success: Run Cmd {run_cmd}\n')
     else:
         t32api.T32_Stop()
-        print('ERR: Run Cmd {}\n'.format(run_cmd))
+        print(f'ERR: Run Cmd {run_cmd}\n')
 
 
 def t32_go():
@@ -147,9 +147,7 @@ def wait_until_command_ends():
 
 
 def write_value_via_cmd(symbol, value):
-    command_front_in = "v.set." + str(symbol) + "="
-    val_str = str(value)
-    command_in = command_front_in + val_str
+    command_in = f"v.set.{str(symbol)}={str(value)}"
     if t32api.T32_Attach(T32_DEV) == OK:
         t32api.T32_Cmd(command_in.encode())
         wait_until_command_ends()

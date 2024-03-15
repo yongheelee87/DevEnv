@@ -198,7 +198,7 @@ class MeasSDR:
             if time_diff.total_seconds() >= self.next_cmd_start_time:
                 self.cmd_running_state = CmdState.NEXT
         else:
-            print("Commmand in Progress: {}\n".format(cmd_dict['CMD']))
+            print(f"Commmand in Progress: {cmd_dict['CMD']}\n")
             if cmd_dict['CMD'] == 'MEASURE_START':
                 self.log_state = True
             elif cmd_dict['CMD'] == 'MEASURE_END':

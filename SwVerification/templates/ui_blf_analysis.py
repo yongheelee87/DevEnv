@@ -18,7 +18,7 @@ class Ui_blf_analysis(object):
     def setupUi(self, blf_analysis):
         if not blf_analysis.objectName():
             blf_analysis.setObjectName(u"blf_analysis")
-        blf_analysis.resize(878, 856)
+        blf_analysis.resize(997, 698)
         blf_analysis.setStyleSheet(u"/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
 "\n"
 "SET APP STYLESHEET - FULL STYLES HERE\n"
@@ -446,8 +446,8 @@ class Ui_blf_analysis(object):
         self.pagesContainer = QWidget(self.content)
         self.pagesContainer.setObjectName(u"pagesContainer")
         self.pagesContainer.setStyleSheet(u"")
-        self.verticalLayout = QVBoxLayout(self.pagesContainer)
-        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout_7 = QVBoxLayout(self.pagesContainer)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.row_1 = QFrame(self.pagesContainer)
         self.row_1.setObjectName(u"row_1")
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
@@ -563,7 +563,7 @@ class Ui_blf_analysis(object):
         self.verticalLayout_16.addWidget(self.frame_div_content_1)
 
 
-        self.verticalLayout.addWidget(self.row_1)
+        self.verticalLayout_7.addWidget(self.row_1)
 
         self.row_2 = QFrame(self.pagesContainer)
         self.row_2.setObjectName(u"row_2")
@@ -585,8 +585,55 @@ class Ui_blf_analysis(object):
         self.frame_content_wid_2.setObjectName(u"frame_content_wid_2")
         self.frame_content_wid_2.setFrameShape(QFrame.NoFrame)
         self.frame_content_wid_2.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_8 = QVBoxLayout(self.frame_content_wid_2)
-        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.verticalLayout = QVBoxLayout(self.frame_content_wid_2)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(9, 0, 9, 9)
+        self.gridLayout_3 = QGridLayout()
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.label_path_descript_2 = QLabel(self.frame_content_wid_2)
+        self.label_path_descript_2.setObjectName(u"label_path_descript_2")
+        self.label_path_descript_2.setStyleSheet(u"color: rgb(113, 126, 149);")
+        self.label_path_descript_2.setLineWidth(1)
+        self.label_path_descript_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.gridLayout_3.addWidget(self.label_path_descript_2, 1, 0, 1, 2)
+
+        self.line_cfg_path = QLineEdit(self.frame_content_wid_2)
+        self.line_cfg_path.setObjectName(u"line_cfg_path")
+        self.line_cfg_path.setMinimumSize(QSize(0, 40))
+        self.line_cfg_path.setStyleSheet(u"background-color: rgb(33, 37, 43);")
+
+        self.gridLayout_3.addWidget(self.line_cfg_path, 0, 0, 1, 1)
+
+        self.btn_cfg_save = QPushButton(self.frame_content_wid_2)
+        self.btn_cfg_save.setObjectName(u"btn_cfg_save")
+        sizePolicy.setHeightForWidth(self.btn_cfg_save.sizePolicy().hasHeightForWidth())
+        self.btn_cfg_save.setSizePolicy(sizePolicy)
+        self.btn_cfg_save.setMinimumSize(QSize(150, 40))
+        self.btn_cfg_save.setFont(font1)
+        self.btn_cfg_save.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_cfg_save.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+        icon2 = QIcon()
+        icon2.addFile(u":/icons/icons/cil-save.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btn_cfg_save.setIcon(icon2)
+
+        self.gridLayout_3.addWidget(self.btn_cfg_save, 0, 1, 1, 1)
+
+        self.btn_cfg_load = QPushButton(self.frame_content_wid_2)
+        self.btn_cfg_load.setObjectName(u"btn_cfg_load")
+        sizePolicy.setHeightForWidth(self.btn_cfg_load.sizePolicy().hasHeightForWidth())
+        self.btn_cfg_load.setSizePolicy(sizePolicy)
+        self.btn_cfg_load.setMinimumSize(QSize(150, 40))
+        self.btn_cfg_load.setFont(font1)
+        self.btn_cfg_load.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_cfg_load.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+        self.btn_cfg_load.setIcon(icon)
+
+        self.gridLayout_3.addWidget(self.btn_cfg_load, 0, 2, 1, 1)
+
+
+        self.verticalLayout.addLayout(self.gridLayout_3)
+
         self.gridLayout_2 = QGridLayout()
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.label_path_descript = QLabel(self.frame_content_wid_2)
@@ -617,31 +664,53 @@ class Ui_blf_analysis(object):
         self.gridLayout_2.addWidget(self.btn_blf_load, 0, 2, 1, 1)
 
 
-        self.verticalLayout_8.addLayout(self.gridLayout_2)
+        self.verticalLayout.addLayout(self.gridLayout_2)
 
 
         self.verticalLayout_5.addWidget(self.frame_content_wid_2)
 
-        self.frame_content_wid_3 = QFrame(self.frame_div_content)
-        self.frame_content_wid_3.setObjectName(u"frame_content_wid_3")
-        self.frame_content_wid_3.setFrameShape(QFrame.StyledPanel)
-        self.frame_content_wid_3.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_2 = QHBoxLayout(self.frame_content_wid_3)
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.frame_table_2 = QFrame(self.frame_content_wid_3)
+
+        self.verticalLayout_4.addWidget(self.frame_div_content)
+
+
+        self.verticalLayout_7.addWidget(self.row_2)
+
+        self.row_3 = QFrame(self.pagesContainer)
+        self.row_3.setObjectName(u"row_3")
+        self.row_3.setFrameShape(QFrame.StyledPanel)
+        self.row_3.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_11 = QVBoxLayout(self.row_3)
+        self.verticalLayout_11.setSpacing(0)
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.frame_div_content_2 = QFrame(self.row_3)
+        self.frame_div_content_2.setObjectName(u"frame_div_content_2")
+        self.frame_div_content_2.setFrameShape(QFrame.StyledPanel)
+        self.frame_div_content_2.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_12 = QVBoxLayout(self.frame_div_content_2)
+        self.verticalLayout_12.setSpacing(0)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
+        self.frame_content_wid_5 = QFrame(self.frame_div_content_2)
+        self.frame_content_wid_5.setObjectName(u"frame_content_wid_5")
+        self.frame_content_wid_5.setFrameShape(QFrame.StyledPanel)
+        self.frame_content_wid_5.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_3 = QHBoxLayout(self.frame_content_wid_5)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.frame_table_2 = QFrame(self.frame_content_wid_5)
         self.frame_table_2.setObjectName(u"frame_table_2")
         self.frame_table_2.setMaximumSize(QSize(220, 16777215))
         self.frame_table_2.setFrameShape(QFrame.StyledPanel)
         self.frame_table_2.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_7 = QVBoxLayout(self.frame_table_2)
-        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
-        self.verticalLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_14 = QVBoxLayout(self.frame_table_2)
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
         self.label_channel = QLabel(self.frame_table_2)
         self.label_channel.setObjectName(u"label_channel")
         self.label_channel.setFont(font1)
         self.label_channel.setStyleSheet(u"")
 
-        self.verticalLayout_7.addWidget(self.label_channel)
+        self.verticalLayout_14.addWidget(self.label_channel)
 
         self.tbl_ch_device = QTableWidget(self.frame_table_2)
         self.tbl_ch_device.setObjectName(u"tbl_ch_device")
@@ -663,28 +732,31 @@ class Ui_blf_analysis(object):
         self.tbl_ch_device.setSizeAdjustPolicy(QAbstractScrollArea.AdjustIgnored)
         self.tbl_ch_device.setDragEnabled(True)
         self.tbl_ch_device.horizontalHeader().setCascadingSectionResizes(False)
+        self.tbl_ch_device.horizontalHeader().setMinimumSectionSize(38)
         self.tbl_ch_device.horizontalHeader().setProperty("showSortIndicator", False)
         self.tbl_ch_device.horizontalHeader().setStretchLastSection(True)
         self.tbl_ch_device.verticalHeader().setVisible(False)
+        self.tbl_ch_device.verticalHeader().setMinimumSectionSize(28)
+        self.tbl_ch_device.verticalHeader().setDefaultSectionSize(30)
 
-        self.verticalLayout_7.addWidget(self.tbl_ch_device)
+        self.verticalLayout_14.addWidget(self.tbl_ch_device)
 
 
-        self.horizontalLayout_2.addWidget(self.frame_table_2)
+        self.horizontalLayout_3.addWidget(self.frame_table_2)
 
-        self.frame_signal = QFrame(self.frame_content_wid_3)
+        self.frame_signal = QFrame(self.frame_content_wid_5)
         self.frame_signal.setObjectName(u"frame_signal")
         self.frame_signal.setFrameShape(QFrame.StyledPanel)
         self.frame_signal.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_10 = QVBoxLayout(self.frame_signal)
-        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.verticalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_15 = QVBoxLayout(self.frame_signal)
+        self.verticalLayout_15.setObjectName(u"verticalLayout_15")
+        self.verticalLayout_15.setContentsMargins(0, 0, 0, 0)
         self.label_signal = QLabel(self.frame_signal)
         self.label_signal.setObjectName(u"label_signal")
         self.label_signal.setFont(font1)
         self.label_signal.setStyleSheet(u"")
 
-        self.verticalLayout_10.addWidget(self.label_signal)
+        self.verticalLayout_15.addWidget(self.label_signal)
 
         self.pText_signal = QPlainTextEdit(self.frame_signal)
         self.pText_signal.setObjectName(u"pText_signal")
@@ -695,19 +767,19 @@ class Ui_blf_analysis(object):
         self.pText_signal.setSizePolicy(sizePolicy2)
         self.pText_signal.setFont(font1)
 
-        self.verticalLayout_10.addWidget(self.pText_signal)
+        self.verticalLayout_15.addWidget(self.pText_signal)
 
 
-        self.horizontalLayout_2.addWidget(self.frame_signal)
+        self.horizontalLayout_3.addWidget(self.frame_signal)
 
 
-        self.verticalLayout_5.addWidget(self.frame_content_wid_3)
+        self.verticalLayout_12.addWidget(self.frame_content_wid_5)
 
 
-        self.verticalLayout_4.addWidget(self.frame_div_content)
+        self.verticalLayout_11.addWidget(self.frame_div_content_2)
 
 
-        self.verticalLayout.addWidget(self.row_2)
+        self.verticalLayout_7.addWidget(self.row_3)
 
 
         self.horizontalLayout_4.addWidget(self.pagesContainer)
@@ -736,10 +808,15 @@ class Ui_blf_analysis(object):
         self.label_taget_title.setText(QCoreApplication.translate("blf_analysis", u"  THIS SPACE IS ASSIGNED FOR ANOTHER FUNCTION  ", None))
         self.btn_Result_Folder.setText(QCoreApplication.translate("blf_analysis", u"Open Result", None))
         self.btn_Run_Analysis.setText(QCoreApplication.translate("blf_analysis", u"RUN ANALYSIS", None))
-        self.label_path_descript.setText(QCoreApplication.translate("blf_analysis", u"Please Open and Load the script with a path.", None))
+        self.label_path_descript_2.setText(QCoreApplication.translate("blf_analysis", u"Please Open and Load the Configuration with a path.", None))
+        self.line_cfg_path.setText("")
+        self.line_cfg_path.setPlaceholderText(QCoreApplication.translate("blf_analysis", u"Configuration File Path", None))
+        self.btn_cfg_save.setText(QCoreApplication.translate("blf_analysis", u"Save Cfg", None))
+        self.btn_cfg_load.setText(QCoreApplication.translate("blf_analysis", u"Load Cfg", None))
+        self.label_path_descript.setText(QCoreApplication.translate("blf_analysis", u"Please Open and Load the BLF file with a path.", None))
         self.line_blf_path.setText("")
-        self.line_blf_path.setPlaceholderText(QCoreApplication.translate("blf_analysis", u"BLF Path", None))
-        self.btn_blf_load.setText(QCoreApplication.translate("blf_analysis", u"Load", None))
+        self.line_blf_path.setPlaceholderText(QCoreApplication.translate("blf_analysis", u"BLF File Path", None))
+        self.btn_blf_load.setText(QCoreApplication.translate("blf_analysis", u"Load BLF", None))
         self.label_channel.setText(QCoreApplication.translate("blf_analysis", u"CHANNEL", None))
         self.label_signal.setText(QCoreApplication.translate("blf_analysis", u"SIGNALS", None))
     # retranslateUi

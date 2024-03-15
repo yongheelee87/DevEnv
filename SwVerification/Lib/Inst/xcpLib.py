@@ -1,4 +1,7 @@
 import time
+
+import numpy as np
+import pandas as pd
 from can import Message
 from Lib.Common import *
 
@@ -23,7 +26,7 @@ class XcpProtocol:
         self.xcp_rx_id = rx_id
 
     # noinspection PyMethodMayBeStatic
-    def _get_df_symbol(self, map_file: str):
+    def _get_df_symbol(self, map_file: str) -> pd.DataFrame:
         '''
         :param map_file: map file path
         :return: Dataframe with symbols corresponding to hex address
@@ -35,8 +38,7 @@ class XcpProtocol:
                 '* Symbols (sorted on address)')].splitlines()[7:-2]
             for symbol_line in symbol_lines:
                 lst_symbol.append(symbol_line.replace(' ', '')[1:].split('|')[:2])
-        df_symbol = pd.DataFrame(lst_symbol, columns=['Name', 'Address']).set_index(keys='Name', drop=True)
-        return df_symbol
+        return pd.DataFrame(np.array(lst_symbol, dtype=object), columns=['Name', 'Address']).set_index(keys='Name', drop=True)
 
     def _get_addr_hex_from_df(self, sym: str):
         '''
@@ -50,7 +52,7 @@ class XcpProtocol:
                 addr = self.df_symbol.loc[sym].values[0]
             else:
                 addr = '0x00000000'
-                print("Error: Get address of symbol [{}]\nThere is no symbol information in map\n".format(sym))
+                print(f"Error: Get address of symbol [{sym}]\nThere is no symbol information in map\n")
         return addr
 
     def connect(self, bus):

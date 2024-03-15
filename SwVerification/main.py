@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
         # Logging module 초기화
         logging_initialize()
-        logging_print("The program is named SW TEST Automation {}. It provides the functions for the measurement and automation with various devices\n".format(System.Ver))
+        logging_print(f"The program is named SW TEST Automation {System.Ver}. It provides the functions for the measurement and automation with various devices\n")
 
         # QApplication : 프로그램을 실행시켜주는 클래스
         app = QApplication()
@@ -42,13 +42,13 @@ if __name__ == "__main__":
         check_env.run()  # Check Environment 실행
     else:
         from Lib.TestProcess import *
-        print("The program is named SW TEST Automation {}. It provides the functions for the measurement and automation with various devices\n".format(System.Ver))
+        print(f"The program is named SW TEST Automation {System.Ver}. It provides the functions for the measurement and automation with various devices\n")
 
         # 테스트 자동화 시행 클래스
         yaml_path = os.path.join(Configure.set['system']['git_path'].replace('mcu_rgw_project', ''), 'test_map.yaml')
         auto_test = AutoTest(test_yaml='./data/config/test_map.yaml') if System.Yaml is False else AutoTest(test_yaml=yaml_path)
         
-        print("Current Test Environment\n{}\n".format(auto_test.df_inst))
+        print(f"Current Test Environment\n{auto_test.df_inst}\n")
         auto_test.run()  # 테스트 자동화 실행
 
     # 프로그램 동작이 끌날시 시스템 종료 코드

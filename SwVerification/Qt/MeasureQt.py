@@ -72,7 +72,7 @@ class MeasureWindow(QWidget):
         self.ui_meas.tbl_script.clear()
         # Select Dataframe
         self.df_testEnv = pd.read_csv(self.ui_meas.line_script_path.text(), dtype=object, encoding='cp1252')
-        logging_print("Current Test Environment\n{}\n".format(self.df_testEnv))
+        logging_print(f"Current Test Environment\n{self.df_testEnv}\n")
         # Table Contents
         self.ui_meas.tbl_script.setColumnCount(len(self.df_testEnv.columns))
         self.ui_meas.tbl_script.setHorizontalHeaderLabels(self.df_testEnv.columns.tolist())

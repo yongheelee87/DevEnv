@@ -20,7 +20,7 @@ dev_all_sigs = []
 # Dev signal List End
 
 out_col, lst_t32_out = find_out_signals_for_col(dev_out_sigs)
-total_col = ['Step', 'Elapsed_Time'] + ['In: {}'.format(sig[2]) for sig in dev_in_sigs] + out_col
+total_col = ['Step', 'Elapsed_Time'] + [f'In: {sig[2]}' for sig in dev_in_sigs] + out_col
 outcome.append(total_col)
 
 final_result = 'Pass'  # Final result to be recorded
