@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib
-# matplotlib.use('Agg')
-import os
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from Lib.Inst import *
@@ -47,7 +46,11 @@ def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, f
             if max_y == 0:
                 yticks_val = range(min_y, max_y + 2)
             else:
-                yticks_val = range(min_y, max_y + 1)
+                if max_y > 8:
+                    yticks_val = list(range(min_y, max_y, int(max_y / 7)))
+                    yticks_val[-1] = max_y
+                else:
+                    yticks_val = range(min_y, max_y + 1)
         axs[i].set_yticks(yticks_val)
         yticks_labels = []
         for y_val in yticks_val:

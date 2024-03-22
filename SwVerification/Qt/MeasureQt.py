@@ -1,6 +1,6 @@
 from templates import *
 from sys import modules
-from PyQt5.QtCore import QDateTime, QThread, pyqtSlot, QTimer
+from PyQt5.QtCore import pyqtSlot
 
 from measure import *
 

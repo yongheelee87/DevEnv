@@ -1,6 +1,7 @@
 from templates import *
 import re
 from Lib.TestProcess import *
+from . _thread import TaskThread
 
 
 class TestCaseWindow(QWidget):
@@ -17,13 +18,13 @@ class TestCaseWindow(QWidget):
 
         self.testcase_num_str = []
         self.dic_test_mode = {}
-
+        self.single_mode = False
         self.connectCBoxInit()  # dic_test_mode가 먼저 선언 필요
 
         self._update_map_script()
         self._update_map_mode()
 
-        self.test_th = TestThread(self.swTest)  # Test Class 선언 및 설정
+        self.test_th = TaskThread(task_model=self.swTest)  # Test Class 선언 및 설정
 
         # self.test_watch_dog = QTimer()
         # self.test_watch_dog.setInterval(50)
@@ -47,19 +48,23 @@ class TestCaseWindow(QWidget):
 
     def func_cbox_project(self):
         self.project = self.ui_tc.cbox_project.currentText().strip()
+        self.single_mode = True if self.project != Configure.set['system']['project'].strip() else False
         self._update_map_script()
         self._update_map_mode()
         self.test_th.update_model(model=self.swTest)
 
     def func_btn_apply(self):
         configure_str = self.ui_tc.pText_map_test.toPlainText()
-        with open(f'./data/input/script/{self.project}/set/map_script_sw_test.yaml', 'w', encoding='utf-8') as f:
-            f.write(configure_str)
-
+        if self.single_mode is True:
+            with open(f'./data/input/script/{self.project}/set/map_script_sw_test.yaml', 'w', encoding='utf-8') as f:
+                f.write(configure_str)
         logging_print('[INFO] The map script is modified as seen in the display\n')
 
     def func_btn_Script_Folder(self):
-        open_path(f'./data/input/script/{self.project}')
+        if self.single_mode is True:
+            open_path(f'./data/input/script/{self.project}')
+        else:
+            open_path('./data/config')
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Result_Folder(self):
@@ -70,13 +75,18 @@ class TestCaseWindow(QWidget):
         open_path('Deleted Function')
 
     def func_btn_Map_Mode(self):
-        open_path(os.path.join('data', 'input', 'script', self.project, 'set', 'map_test_mode.yaml'))
+        if self.single_mode is True:
+            open_path(os.path.join('data', 'input', 'script', self.project, 'set', 'map_test_mode.yaml'))
 
     def func_btn_testcase(self):
-        self._update_testcase()  # Line에 기입된 Case Number 정렬하기
-        if self.testcase_num_str:
-            self.swTest.ui_ON = True
-            self.swTest.update_test_case(pjt=self.project, test_num=self.testcase_num_str)
+        if self.single_mode is True:
+            self._update_testcase()  # Line에 기입된 Case Number 정렬하기
+            if self.testcase_num_str:
+                self.swTest.update_test_case(pjt=self.project, test_num=self.testcase_num_str)
+                self.test_th.update_model(model=self.swTest)
+                self.test_th.start()
+        else:
+            self.swTest.test_map = yaml.load(self.ui_tc.pText_map_test.toPlainText(), Loader=yaml.SafeLoader)
             self.test_th.update_model(model=self.swTest)
             self.test_th.start()
 
@@ -89,6 +99,7 @@ class TestCaseWindow(QWidget):
     def _get_project(self):
         project_lst = os.listdir('./data/input/script')
         project_lst.remove('cmd')
+        project_lst.append(self.project)  # 전체 기능 실행
         return project_lst
 
     def _update_testcase(self):
@@ -112,8 +123,13 @@ class TestCaseWindow(QWidget):
                 self.testcase_num_str.append(v)
 
     def _update_map_script(self):
-        self.swTest.script_path = os.path.join('data', 'input', 'script', self.project)
-        with open(f'{self.swTest.script_path}/set/map_script_sw_test.yaml', 'r', encoding='utf-8') as f:
+        if self.single_mode is True:
+            self.swTest.script_path = os.path.join('data', 'input', 'script', self.project)
+            path = f'{self.swTest.script_path}/set/map_script_sw_test.yaml'
+        else:
+            path = self.swTest.yaml_path
+
+        with open(path, 'r', encoding='utf-8') as f:
             f_lines = f.readlines()
             map_test = "".join(f_lines)
         self.ui_tc.pText_map_test.setPlainText(map_test)
@@ -122,22 +138,3 @@ class TestCaseWindow(QWidget):
         self.ui_tc.cbox_Test_mode.clear()
         self.dic_test_mode = self.swTest.update_map_mode(self.project)
         self.ui_tc.cbox_Test_mode.addItems(list(self.dic_test_mode.keys()))
-
-
-class TestThread(QThread):
-    """ MeasurementProcessThread(parent:QThread) """
-
-    def __init__(self, test_model):
-        super().__init__()
-        self.test_meas = test_model
-
-    def run(self):
-        self.test_meas.run()
-
-    def stop(self):
-        self.test_meas.stop()
-        self.terminate()
-        self.wait(2)
-
-    def update_model(self, model):
-        self.test_meas = model

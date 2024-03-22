@@ -699,10 +699,20 @@ Button */
                                 </font>
                                </property>
                                <property name="styleSheet">
-                                <string notr="true">font-weight:500;
-color:black;
-background-color: #c8f7c8;
-border: 1px solid black;</string>
+                                <string notr="true">QPushButton {
+	font-weight:500;
+	color:black;
+	border: 1px solid black;
+	background-color: #c8f7c8;
+}
+QPushButton:hover {
+	background-color: #42f566;
+	border: 2px solid #c8f7c8;
+}
+QPushButton:pressed {	
+	background-color: rgb(35, 40, 49);
+	border: 5px solid transparent;
+}</string>
                                </property>
                                <property name="text">
                                 <string>RUN ANALYSIS</string>

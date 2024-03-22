@@ -13,17 +13,47 @@ class BlfAnalysis:
         self.df_log = None
         self.dict_blf = {}
         self.maxT = 0
+        self.blf_path = ''
+        self.dic_channel = {}
+        self.can_sigs = []
 
     def get_ch_dev(self) -> dict:
         return {i: dev for i, dev in enumerate(canBus.lst_dev)}
 
-    def read_blf(self, blf_path: str, dic_channel: dict, sigs: list):
-        log = list(BLFReader(blf_path))
+    def run(self):
+        print("************************************************************")
+        print("*** BLF Analysis Start!\n"
+              "*** Please Do not try additional command until it completes")
+        print("************************************************************\n")
+
+        start_time = time.localtime(time.time())
+        start_time_str = time.strftime("%a, %d-%b-%Y %I:%M:%S", start_time)
+        print(f'Starting at: {start_time_str}')
+
+        self.read_blf()
+        self.display_graph()
+        self.stop()
+
+    def stop(self):
+        end_time_str = time.strftime("%a, %d-%b-%Y %I:%M:%S", time.localtime(time.time()))
+        print(f'Ending at: {end_time_str}')
+        print("************************************************************")
+        print("*** BLF Analysis completed")
+        print("************************************************************\n")
+        time.sleep(1)
+
+    def update_param(self, blf_path: str, dic_channel: dict, sigs: list):
+        self.blf_path = blf_path
+        self.dic_channel = dic_channel
+        self.can_sigs = sigs
+
+    def read_blf(self):
+        log = list(BLFReader(self.blf_path))
         log_output = []
         for msg in log:
             time_secs = msg.timestamp - log[0].timestamp
-            if msg.channel in dic_channel.keys():
-                device_ch = dic_channel[msg.channel]
+            if msg.channel in self.dic_channel.keys():
+                device_ch = self.dic_channel[msg.channel]
             else:
                 device_ch = msg.channel
 
@@ -68,12 +98,12 @@ class BlfAnalysis:
             writer.writerows(log_output)
         '''
         self.df_log = pd.DataFrame(log_output, columns=LOG_COL)
-        self.dict_blf, self.maxT = self.convert_dict_blf(sigs)
+        self.dict_blf, self.maxT = self.convert_dict_blf()
 
     def display_graph(self):
         plt.rcParams['axes.xmargin'] = 0
         fig = plt.figure(figsize=(26, 26))
-        axs = fig.add_gridspec(len(self.dict_blf), hspace=0.1).subplots(sharex=True, sharey=False)
+        axs = fig.add_gridspec(len(self.dict_blf), hspace=0.2).subplots(sharex=True, sharey=False)
 
         for i, (k, data) in enumerate(self.dict_blf.items()):
             color_idx = i % 20
@@ -86,7 +116,16 @@ class BlfAnalysis:
             if y_data.size == 0:
                 yticks_val = range(0, 2)
             else:
-                yticks_val = range(0, max(y_data) + 2)
+                min_y = int(min(y_data))
+                max_y = int(max(y_data))
+                if max_y == 0:
+                    yticks_val = range(min_y, max_y + 2)
+                else:
+                    if max_y > 8:
+                        yticks_val = list(range(min_y, max_y, int(max_y / 7)))
+                        yticks_val[-1] = max_y
+                    else:
+                        yticks_val = range(min_y, max_y + 1)
             axs[i].set_yticks(yticks_val)
             yticks_labels = []
             for y_val in yticks_val:
@@ -104,17 +143,19 @@ class BlfAnalysis:
             for ax in axs:
                 ax.legend(loc='upper right')
                 ax.label_outer()
+            filepath = os.path.join('./data/result/', os.path.basename(self.blf_path).replace('blf', 'png'))
+            plt.savefig(filepath, format='png')
+            print(f"[INFO] {filepath} has been created\n")
+            open_path(filepath)
+            # plt.savefig(filepath, format='svg')
+            plt.cla()  # clear the current axes
+            plt.clf()  # clear the current figure
+            plt.close()  # closes the current figure
 
-            plt.show()
-            # plt.savefig(f'{filepath}/{filename}.png')
-            # plt.cla()  # clear the current axes
-            # plt.clf()  # clear the current figure
-            # plt.close()  # closes the current figure
-
-    def convert_dict_blf(self, can_sigs: list):
+    def convert_dict_blf(self):
         dict_sig = {}
         maxTime = 0
-        for sig in can_sigs:
+        for sig in self.can_sigs:
             df_sig = self._get_signal_value(ch=sig[0], msg_name=sig[1], signal_name=sig[2])
             dict_sig[sig[0], sig[1], sig[2]] = df_sig
             if maxTime < df_sig['Time'].max():

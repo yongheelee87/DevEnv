@@ -541,10 +541,20 @@ class Ui_blf_analysis(object):
         font2.setBold(True)
         font2.setItalic(False)
         self.btn_Run_Analysis.setFont(font2)
-        self.btn_Run_Analysis.setStyleSheet(u"font-weight:500;\n"
-"color:black;\n"
-"background-color: #c8f7c8;\n"
-"border: 1px solid black;")
+        self.btn_Run_Analysis.setStyleSheet(u"QPushButton {\n"
+"	font-weight:500;\n"
+"	color:black;\n"
+"	border: 1px solid black;\n"
+"	background-color: #c8f7c8;\n"
+"}\n"
+"QPushButton:hover {\n"
+"	background-color: #42f566;\n"
+"	border: 2px solid #c8f7c8;\n"
+"}\n"
+"QPushButton:pressed {	\n"
+"	background-color: rgb(35, 40, 49);\n"
+"	border: 5px solid transparent;\n"
+"}")
         icon1 = QIcon()
         icon1.addFile(u":/images/images/start.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_Run_Analysis.setIcon(icon1)

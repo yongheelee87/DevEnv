@@ -15,8 +15,9 @@ class AutoTest:
     def __init__(self, test_yaml: str):
         self.swTest = None # TestProcess class 메모리
         self.df_inst = get_inst_status()  # Instruments status 가져오기
-        self.test_map, self.total_map = self._update_test_map(path=test_yaml)  # update map file for test
-        self.ui_ON = False
+        self.yaml_path = test_yaml if os.path.isfile(test_yaml) else './data/config/remote/test_map.yaml' # 지정된 장소에 파일이 없을 경우 remote에 설정된 파일 로드
+        self.test_map, self.total_map = self._update_test_map(path=self.yaml_path)  # update map file for test
+        self.single_mode = False
         self.script_path = None  # Test script path
         self.result_path = None  # Result Path to be exported
         self.version = None
@@ -41,7 +42,7 @@ class AutoTest:
         print(f"SW version\n{self.version}\n")
 
         total_res = {}
-        if self.ui_ON is True:
+        if self.single_mode is True:
             total_res[self.project] = self.test_module(self.project)
         else:
             for pjt in self.test_map.keys():
@@ -68,7 +69,7 @@ class AutoTest:
         self.script_path = os.path.join('data', 'input', 'script', project)
 
         project_tc = {}
-        if self.ui_ON is True:
+        if self.single_mode is True:
             for tc in self.test_case:
                 project_tc[tc] = self.total_map[project][tc]
         else:
@@ -105,10 +106,6 @@ class AutoTest:
         return res_tc
 
     def _update_test_map(self, path: str) -> (dict, dict):
-        # 지정된 장소에 파일이 없을 경우 remote에 설정된 파일 로드
-        if not os.path.isfile(path):
-            path = './data/config/remote/test_map.yaml'
-
         # Todo unicode 에러 발생
         with open(path, encoding="utf-8") as f:
             raw_lines = f.readlines()

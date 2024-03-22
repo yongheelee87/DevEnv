@@ -1,7 +1,7 @@
 from templates import *
 from sys import modules
-from PyQt5.QtCore import QDateTime, QThread, pyqtSlot, QTimer
 from App.blf import *
+from . _thread import TaskThread
 
 
 class BlfAnalysisWindow(QWidget):
@@ -17,8 +17,10 @@ class BlfAnalysisWindow(QWidget):
         self.backgroundInit()
         self.connectBtnInit()
 
-        self.blf_path = ''
-        self.cfg_path = ''
+        self.blf_path = './'
+        self.cfg_path = './'
+
+        self.blf_th = TaskThread(task_model=self.blf)  # BLF Task Class 선언 및 설정
 
     def backgroundInit(self):
         self._update_ch_tbl(dict_ch_dev=self.blf.get_ch_dev())
@@ -54,8 +56,9 @@ class BlfAnalysisWindow(QWidget):
             self.blf_path = input_blf_file
 
     def func_btn_Run_Analysis(self):
-        self.blf.read_blf(blf_path=self.blf_path, dic_channel=self._extract_channel(), sigs=self._read_signals())
-        self.blf.display_graph()
+        self.blf.update_param(blf_path=self.blf_path, dic_channel=self._extract_channel(), sigs=self._read_signals())
+        self.blf_th.update_model(model=self.blf)
+        self.blf_th.start()  # BLF Analysis 실행
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Result_Folder(self):

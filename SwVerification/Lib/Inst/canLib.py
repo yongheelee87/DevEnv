@@ -237,7 +237,10 @@ class CANDev:
                     sig_name = temp_head[1]
                     dict_val = {}
                     for val, decode in zip(temp_head[2:], temp[1::2]):
-                        dict_val[int(val)] = decode
+                        if '~' not in decode:
+                            dict_val[int(val)] = decode
+                        else:
+                            dict_val[int(val)] = int(val)
                     dict_decode_val[sig_name] = dict_val
         return dict_decode_val
 
