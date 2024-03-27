@@ -56,7 +56,7 @@ class BlfAnalysisWindow(QWidget):
             self.blf_path = input_blf_file
 
     def func_btn_Run_Analysis(self):
-        self.blf.update_param(blf_path=self.blf_path, dic_channel=self._extract_channel(), sigs=self._read_signals())
+        self.blf.update_param(blf_path=self.blf_path, dic_channel=self._extract_channel(), sigs=self._read_signals(), rate=self._read_rate())
         self.blf_th.update_model(model=self.blf)
         self.blf_th.start()  # BLF Analysis 실행
 
@@ -100,3 +100,9 @@ class BlfAnalysisWindow(QWidget):
             if self.ui_blf.tbl_ch_device.item(r, 0).text() != '':
                 dict_ch_dev[int(self.ui_blf.tbl_ch_device.item(r, 0).text())] = str(self.ui_blf.tbl_ch_device.item(r, 1).text())
         return dict_ch_dev
+
+    def _read_rate(self) -> str:
+        str_line_Resample_Rate = self.ui_blf.line_Resample_Rate.text().strip()
+        if str_line_Resample_Rate == '' or str_line_Resample_Rate == 'Resample Rate':
+            str_line_Resample_Rate = '200ms'
+        return str_line_Resample_Rate

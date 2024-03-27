@@ -1,3 +1,5 @@
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from can import BLFReader
 from Lib.Inst import *
@@ -11,11 +13,14 @@ class BlfAnalysis:
     """
     def __init__(self):
         self.df_log = None
-        self.dict_blf = {}
+        self.df_blf = None
         self.maxT = 0
         self.blf_path = ''
         self.dic_channel = {}
         self.can_sigs = []
+        self.resample_rate = '100ms'
+
+        isdir_and_make('./data/result/blf')
 
     def get_ch_dev(self) -> dict:
         return {i: dev for i, dev in enumerate(canBus.lst_dev)}
@@ -32,6 +37,7 @@ class BlfAnalysis:
 
         self.read_blf()
         self.display_graph()
+        self.resample_blf()
         self.stop()
 
     def stop(self):
@@ -42,10 +48,11 @@ class BlfAnalysis:
         print("************************************************************\n")
         time.sleep(1)
 
-    def update_param(self, blf_path: str, dic_channel: dict, sigs: list):
+    def update_param(self, blf_path: str, dic_channel: dict, sigs: list, rate: str):
         self.blf_path = blf_path
         self.dic_channel = dic_channel
         self.can_sigs = sigs
+        self.resample_rate = rate
 
     def read_blf(self):
         log = list(BLFReader(self.blf_path))
@@ -97,20 +104,26 @@ class BlfAnalysis:
             writer = csv.writer(f, dialect='excel')
             writer.writerows(log_output)
         '''
-        self.df_log = pd.DataFrame(log_output, columns=LOG_COL)
-        self.dict_blf, self.maxT = self.convert_dict_blf()
+        self.df_log = pd.DataFrame(np.array(log_output, dtype=object), columns=LOG_COL)
+        self.df_blf, self.maxT = self._convert_df_blf()
+        self.df_blf.to_csv(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '.csv')), encoding='utf-8-sig')
 
     def display_graph(self):
         plt.rcParams['axes.xmargin'] = 0
         fig = plt.figure(figsize=(26, 26))
-        axs = fig.add_gridspec(len(self.dict_blf), hspace=0.2).subplots(sharex=True, sharey=False)
+        data_col = self.df_blf.columns.tolist()
 
-        for i, (k, data) in enumerate(self.dict_blf.items()):
+        axs = fig.add_gridspec(len(data_col), hspace=0.2).subplots(sharex=True, sharey=False)
+
+        for i, signal in enumerate(data_col):
             color_idx = i % 20
-            dev_name = k[0]
-            sig_name = k[-1]
-            x_data = data['Time'].values
-            y_data = data['Value'].values
+            lst_signal = signal.split(', ')
+            dev_name = lst_signal[0]
+            sig_name = lst_signal[-1]
+
+            df_signal = self.df_blf[[signal]].dropna(axis=0)
+            x_data = df_signal.index.values  # ['Time'].values
+            y_data = df_signal.values  # ['Value'].values
 
             axs[i].step(x_data, y_data, 'o-', markersize=2, label=sig_name, c=plt.cm.tab20(color_idx), where='post', linewidth=1.0)
             if y_data.size == 0:
@@ -129,21 +142,21 @@ class BlfAnalysis:
             axs[i].set_yticks(yticks_val)
             yticks_labels = []
             for y_val in yticks_val:
-                if y_val in canBus.devs[dev_name].sig_val[sig_name].keys():
+                if (sig_name in canBus.devs[dev_name].sig_val.keys()) and (y_val in canBus.devs[dev_name].sig_val[sig_name].keys()):
                     yticks_labels.append(canBus.devs[dev_name].sig_val[sig_name][y_val])
                 else:
                     yticks_labels.append(f'{y_val}(RAW)')
             axs[i].set_yticklabels(yticks_labels)
             axs[i].set_xlim(left=0, right=self.maxT + 1)
 
-            if i == len(self.dict_blf) - 1:
+            if i == len(data_col) - 1:
                 axs[i].set_xlabel('Time[sec]')
 
             # Hide x labels and tick labels for all but bottom plot
             for ax in axs:
                 ax.legend(loc='upper right')
                 ax.label_outer()
-            filepath = os.path.join('./data/result/', os.path.basename(self.blf_path).replace('blf', 'png'))
+            filepath = os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '.png'))
             plt.savefig(filepath, format='png')
             print(f"[INFO] {filepath} has been created\n")
             open_path(filepath)
@@ -152,18 +165,28 @@ class BlfAnalysis:
             plt.clf()  # clear the current figure
             plt.close()  # closes the current figure
 
-    def convert_dict_blf(self):
-        dict_sig = {}
+    def resample_blf(self):
+        self.df_blf.index = pd.to_timedelta(self.df_blf.index, 's')
+        df_resample = self.df_blf.resample(self.resample_rate, label='right', closed='right').last()
+        df_resample.index = df_resample.index.total_seconds()
+        rate = self.resample_rate.replace('s', '')
+        rate = float(rate.replace('m', '')) / 1000 if 'm' in rate else float(rate)
+        df_resample.insert(loc=0, column='TimeDiff[sec]', value=rate)
+        df_resample.to_csv(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', f'_{self.resample_rate}.csv')), encoding='utf-8-sig')
+
+    def _convert_df_blf(self) -> (pd.DataFrame, float or int):
+        lst_df_sig = []
         maxTime = 0
         for sig in self.can_sigs:
             df_sig = self._get_signal_value(ch=sig[0], msg_name=sig[1], signal_name=sig[2])
-            dict_sig[sig[0], sig[1], sig[2]] = df_sig
             if maxTime < df_sig['Time'].max():
                 maxTime = df_sig['Time'].max()
-        return dict_sig, maxTime
+            lst_df_sig.append(df_sig.set_index('Time'))
+        return pd.concat(lst_df_sig, axis=1).sort_index(ascending=True), maxTime
 
-    def _get_signal_value(self, ch, msg_name, signal_name) -> pd.DataFrame:
+    def _get_signal_value(self, ch: str, msg_name: str, signal_name: str) -> pd.DataFrame:
         df_temp = self.df_log[(self.df_log['Channel'] == ch) & (self.df_log['Frame Name'] == msg_name)]
         time_log = df_temp['Time'].values
         sig_value = df_temp['Data(Decode)'].apply(lambda x: x[signal_name]).values
-        return pd.DataFrame({'Time': time_log, 'Value': sig_value})
+        col_sig = ', '.join((ch, msg_name, signal_name))
+        return pd.DataFrame({'Time': time_log, col_sig: sig_value})

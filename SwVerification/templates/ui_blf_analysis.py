@@ -18,7 +18,7 @@ class Ui_blf_analysis(object):
     def setupUi(self, blf_analysis):
         if not blf_analysis.objectName():
             blf_analysis.setObjectName(u"blf_analysis")
-        blf_analysis.resize(997, 698)
+        blf_analysis.resize(944, 766)
         blf_analysis.setStyleSheet(u"/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
 "\n"
 "SET APP STYLESHEET - FULL STYLES HERE\n"
@@ -717,6 +717,7 @@ class Ui_blf_analysis(object):
         self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
         self.label_channel = QLabel(self.frame_table_2)
         self.label_channel.setObjectName(u"label_channel")
+        self.label_channel.setMinimumSize(QSize(0, 30))
         self.label_channel.setFont(font1)
         self.label_channel.setStyleSheet(u"")
 
@@ -758,26 +759,49 @@ class Ui_blf_analysis(object):
         self.frame_signal.setObjectName(u"frame_signal")
         self.frame_signal.setFrameShape(QFrame.StyledPanel)
         self.frame_signal.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_15 = QVBoxLayout(self.frame_signal)
-        self.verticalLayout_15.setObjectName(u"verticalLayout_15")
-        self.verticalLayout_15.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout = QGridLayout(self.frame_signal)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.gridLayout.setHorizontalSpacing(6)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.label_signal = QLabel(self.frame_signal)
         self.label_signal.setObjectName(u"label_signal")
+        self.label_signal.setMinimumSize(QSize(0, 30))
         self.label_signal.setFont(font1)
         self.label_signal.setStyleSheet(u"")
 
-        self.verticalLayout_15.addWidget(self.label_signal)
+        self.gridLayout.addWidget(self.label_signal, 0, 0, 1, 1)
+
+        self.horizontalSpacer_3 = QSpacerItem(431, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer_3, 0, 1, 1, 1)
+
+        self.line_Resample_Rate = QLineEdit(self.frame_signal)
+        self.line_Resample_Rate.setObjectName(u"line_Resample_Rate")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.line_Resample_Rate.sizePolicy().hasHeightForWidth())
+        self.line_Resample_Rate.setSizePolicy(sizePolicy2)
+        self.line_Resample_Rate.setMinimumSize(QSize(150, 30))
+        self.line_Resample_Rate.setFont(font1)
+        self.line_Resample_Rate.setLayoutDirection(Qt.LeftToRight)
+        self.line_Resample_Rate.setStyleSheet(u"qproperty-cursorPosition: 0;\n"
+"border: 1px solid rgb(113, 126, 149);")
+        self.line_Resample_Rate.setFrame(True)
+        self.line_Resample_Rate.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout.addWidget(self.line_Resample_Rate, 0, 2, 1, 1)
 
         self.pText_signal = QPlainTextEdit(self.frame_signal)
         self.pText_signal.setObjectName(u"pText_signal")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.pText_signal.sizePolicy().hasHeightForWidth())
-        self.pText_signal.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.pText_signal.sizePolicy().hasHeightForWidth())
+        self.pText_signal.setSizePolicy(sizePolicy3)
         self.pText_signal.setFont(font1)
 
-        self.verticalLayout_15.addWidget(self.pText_signal)
+        self.gridLayout.addWidget(self.pText_signal, 1, 0, 1, 3)
 
 
         self.horizontalLayout_3.addWidget(self.frame_signal)
@@ -829,5 +853,6 @@ class Ui_blf_analysis(object):
         self.btn_blf_load.setText(QCoreApplication.translate("blf_analysis", u"Load BLF", None))
         self.label_channel.setText(QCoreApplication.translate("blf_analysis", u"CHANNEL", None))
         self.label_signal.setText(QCoreApplication.translate("blf_analysis", u"SIGNALS", None))
+        self.line_Resample_Rate.setText(QCoreApplication.translate("blf_analysis", u"Resample Rate", None))
     # retranslateUi
 

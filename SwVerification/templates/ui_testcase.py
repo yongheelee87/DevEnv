@@ -745,7 +745,7 @@ class Ui_testcase(object):
 
         self.gridLayout_2.addWidget(self.btn_testmode, 1, 5, 1, 1)
 
-        self.horizontalSpacer_4 = QSpacerItem(70, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(70, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
 
         self.gridLayout_2.addItem(self.horizontalSpacer_4, 1, 3, 1, 1)
 
