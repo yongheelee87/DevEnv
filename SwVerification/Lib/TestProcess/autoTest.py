@@ -5,13 +5,13 @@ import time
 from Lib.Inst import *
 from Lib.Common import *
 from Lib.DataProcess import *
-from . updatePy import *
+from . updatePy import UpdatePY
 
 RESULT_FILE_PATH = os.path.join(os.getcwd(), 'data', 'result')
 MODULES = ['CCW', 'CTCW', 'SWA', 'SDR', 'CDW', 'BSW']
 
 
-class AutoTest:
+class AutoTest(UpdatePY):
     def __init__(self, test_yaml: str):
         self.swTest = None # TestProcess class 메모리
         self.df_inst = get_inst_status()  # Instruments status 가져오기
@@ -145,7 +145,7 @@ class AutoTest:
             ret = 'Skip'
         else:
             if os.path.isfile(csv_res_file) is False:
-                py_lines, df_tc = update_py(py_path=script_file, output_path=export_path, title=test_script)  # python testcase code update
+                py_lines, df_tc = self.update_py(py_path=script_file, output_path=export_path, title=test_script)  # python testcase code update
                 if df_tc is not None:
                     self.tc_script[test_script] = df_tc
                     self.num_lines += len(df_tc)

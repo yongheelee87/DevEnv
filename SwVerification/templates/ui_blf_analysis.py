@@ -18,7 +18,7 @@ class Ui_blf_analysis(object):
     def setupUi(self, blf_analysis):
         if not blf_analysis.objectName():
             blf_analysis.setObjectName(u"blf_analysis")
-        blf_analysis.resize(944, 766)
+        blf_analysis.resize(964, 766)
         blf_analysis.setStyleSheet(u"/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
 "\n"
 "SET APP STYLESHEET - FULL STYLES HERE\n"
@@ -245,30 +245,37 @@ class Ui_blf_analysis(object):
 "/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
 "CheckBox */\n"
 "QCheckBox::indicator {\n"
-"    border: 3px solid rgb(52, 59, 72);\n"
-"	width: 15px;\n"
-"	height: 15px;\n"
-"	border-radius: 10px;\n"
+"    border: 3px solid rgb(134, 149, 179);\n"
+"	width: 20px;\n"
+"	height: 18px;\n"
+"	border-radius: 12px;\n"
 "    background: rgb(44, 49, 60);\n"
 "}\n"
 "QCheckBox::indicator:hover {\n"
-"    border: 3px solid rgb(58, 66, 81);\n"
+"    border: 3px solid rgb(81, 176, 98);\n"
+"}\n"
+"QCheckBox::indicator:checked:hover {\n"
+"    border: 3px solid rgb(81, 176, 98);\n"
 "}\n"
 "QCheckBox::indicator:checked {\n"
 "    background: 3px solid rgb(52, 59, 72);\n"
-"	border: 3px solid rgb(52, 59, 72);	\n"
-"	background-image: url(:/icons/icons/cil-check-alt.png);\n"
+"	border: 3px solid rgb(134, 149, 179);\n"
+"	width: 20px;\n"
+"	height: 18px;\n"
+"	border-radius: 12px;\n"
+"	background-image: url(:/icons/icons/cil-check-alt.png) no-repeat;\n"
+"	background-position: center center;\n"
 "}\n"
 "\n"
-"/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
+"/* //////////////////////////////////////////////////////////////////////////////"
+                        "///////////////////\n"
 "RadioButton */\n"
 "QRadioButton::indicator {\n"
 "    border: 3px solid rgb(52, 59, 72);\n"
 "	width: 15px;\n"
 "	height: 15px;\n"
 "	border-radius: 10px;\n"
-"    background: rgb(44, 49, 60);"
-                        "\n"
+"    background: rgb(44, 49, 60);\n"
 "}\n"
 "QRadioButton::indicator:hover {\n"
 "    border: 3px solid rgb(58, 66, 81);\n"
@@ -297,13 +304,13 @@ class Ui_blf_analysis(object):
 "	border-left-width: 3px;\n"
 "	border-left-color: rgba(39, 44, 54, 150);\n"
 "	border-left-style: solid;\n"
-"	border-top-right-radius: 3px;\n"
+""
+                        "	border-top-right-radius: 3px;\n"
 "	border-bottom-right-radius: 3px;	\n"
 "	background-image: url(:/icons/icons/cil-arrow-bottom.png);\n"
 "	background-position: center;\n"
 "	background-repeat: no-repeat;\n"
-" }"
-                        "\n"
+" }\n"
 "QComboBox QAbstractItemView {\n"
 "	color: rgb(113, 192, 217);	\n"
 "	background-color: rgb(33, 37, 43);\n"
@@ -330,7 +337,8 @@ class Ui_blf_analysis(object):
 "	border-radius: 5px;\n"
 "}\n"
 "QSlider::handle:horizontal:hover {\n"
-"    background-color: rgb(147, 181, 249);\n"
+"    background-color: rgb(147, 181, 249);"
+                        "\n"
 "}\n"
 "QSlider::handle:horizontal:pressed {\n"
 "    background-color: rgb(113, 192, 217);\n"
@@ -340,8 +348,7 @@ class Ui_blf_analysis(object):
 "    border-radius: 5px;\n"
 "    width: 10px;\n"
 "    margin: 0px;\n"
-""
-                        "	background-color: rgb(52, 59, 72);\n"
+"	background-color: rgb(52, 59, 72);\n"
 "}\n"
 "QSlider::groove:vertical:hover {\n"
 "	background-color: rgb(55, 62, 76);\n"
@@ -370,15 +377,15 @@ class Ui_blf_analysis(object):
 "	color: rgb(113, 192, 217);\n"
 "}\n"
 "QCommandLinkButton:hover {	\n"
-"	color: rgb(113, 192, 217);\n"
+"	color: "
+                        "rgb(113, 192, 217);\n"
 "	background-color: rgb(44, 49, 60);\n"
 "}\n"
 "QCommandLinkButton:pressed {	\n"
 "	color: rgb(147, 207, 249);\n"
 "	background-color: rgb(52, 58, 71);\n"
 "}\n"
-"/* /////////////////////////"
-                        "////////////////////////////////////////////////////////////////////////\n"
+"/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
 "SpinBox */\n"
 "QSpinBox {	\n"
 "	background-color: rgb(33, 37, 43);\n"
@@ -403,7 +410,8 @@ class Ui_blf_analysis(object):
 "	border: 5px solid rgb(81, 176, 98);\n"
 "}\n"
 "#pagesContainer QPushButton:pressed {	\n"
-"	background-color: rgb(35, 40, 49);\n"
+"	background-color: rgb("
+                        "35, 40, 49);\n"
 "	border: 5px solid rgb(43, 50, 61);\n"
 "}\n"
 "\n"
@@ -497,21 +505,24 @@ class Ui_blf_analysis(object):
         self.frame_content_wid_1.setObjectName(u"frame_content_wid_1")
         self.frame_content_wid_1.setFrameShape(QFrame.NoFrame)
         self.frame_content_wid_1.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_9 = QVBoxLayout(self.frame_content_wid_1)
-        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
-        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout = QHBoxLayout(self.frame_content_wid_1)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.label_taget_title = QLabel(self.frame_content_wid_1)
-        self.label_taget_title.setObjectName(u"label_taget_title")
-        self.label_taget_title.setStyleSheet(u"color: rgb(113, 126, 149);")
-        self.label_taget_title.setLineWidth(1)
-        self.label_taget_title.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
-
-        self.horizontalLayout.addWidget(self.label_taget_title)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(351, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.chk_show_graph = QCheckBox(self.frame_content_wid_1)
+        self.chk_show_graph.setObjectName(u"chk_show_graph")
+        icon = QIcon()
+        icon.addFile(u":/icons/icons/cil-image-plus.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.chk_show_graph.setIcon(icon)
+        self.chk_show_graph.setChecked(False)
+
+        self.horizontalLayout.addWidget(self.chk_show_graph)
+
+        self.horizontalSpacer_2 = QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_2)
 
         self.btn_Result_Folder = QPushButton(self.frame_content_wid_1)
         self.btn_Result_Folder.setObjectName(u"btn_Result_Folder")
@@ -526,9 +537,9 @@ class Ui_blf_analysis(object):
         self.btn_Result_Folder.setFont(font1)
         self.btn_Result_Folder.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_Result_Folder.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon = QIcon()
-        icon.addFile(u":/icons/icons/cil-folder-open.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btn_Result_Folder.setIcon(icon)
+        icon1 = QIcon()
+        icon1.addFile(u":/icons/icons/cil-folder-open.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btn_Result_Folder.setIcon(icon1)
 
         self.horizontalLayout.addWidget(self.btn_Result_Folder)
 
@@ -555,16 +566,13 @@ class Ui_blf_analysis(object):
 "	background-color: rgb(35, 40, 49);\n"
 "	border: 5px solid transparent;\n"
 "}")
-        icon1 = QIcon()
-        icon1.addFile(u":/images/images/start.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btn_Run_Analysis.setIcon(icon1)
+        icon2 = QIcon()
+        icon2.addFile(u":/images/images/start.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btn_Run_Analysis.setIcon(icon2)
         self.btn_Run_Analysis.setCheckable(True)
         self.btn_Run_Analysis.setChecked(True)
 
         self.horizontalLayout.addWidget(self.btn_Run_Analysis)
-
-
-        self.verticalLayout_9.addLayout(self.horizontalLayout)
 
 
         self.verticalLayout_17.addWidget(self.frame_content_wid_1)
@@ -623,9 +631,9 @@ class Ui_blf_analysis(object):
         self.btn_cfg_save.setFont(font1)
         self.btn_cfg_save.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_cfg_save.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon2 = QIcon()
-        icon2.addFile(u":/icons/icons/cil-save.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btn_cfg_save.setIcon(icon2)
+        icon3 = QIcon()
+        icon3.addFile(u":/icons/icons/cil-save.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btn_cfg_save.setIcon(icon3)
 
         self.gridLayout_3.addWidget(self.btn_cfg_save, 0, 1, 1, 1)
 
@@ -637,7 +645,7 @@ class Ui_blf_analysis(object):
         self.btn_cfg_load.setFont(font1)
         self.btn_cfg_load.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_cfg_load.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btn_cfg_load.setIcon(icon)
+        self.btn_cfg_load.setIcon(icon1)
 
         self.gridLayout_3.addWidget(self.btn_cfg_load, 0, 2, 1, 1)
 
@@ -669,7 +677,7 @@ class Ui_blf_analysis(object):
         self.btn_blf_load.setFont(font1)
         self.btn_blf_load.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_blf_load.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.btn_blf_load.setIcon(icon)
+        self.btn_blf_load.setIcon(icon1)
 
         self.gridLayout_2.addWidget(self.btn_blf_load, 0, 2, 1, 1)
 
@@ -839,7 +847,7 @@ class Ui_blf_analysis(object):
     def retranslateUi(self, blf_analysis):
         blf_analysis.setWindowTitle(QCoreApplication.translate("blf_analysis", u"blf_analysis", None))
         self.label_title.setText(QCoreApplication.translate("blf_analysis", u"BLF ANALYSIS", None))
-        self.label_taget_title.setText(QCoreApplication.translate("blf_analysis", u"  THIS SPACE IS ASSIGNED FOR ANOTHER FUNCTION  ", None))
+        self.chk_show_graph.setText(QCoreApplication.translate("blf_analysis", u"Show Interactive Graph", None))
         self.btn_Result_Folder.setText(QCoreApplication.translate("blf_analysis", u"Open Result", None))
         self.btn_Run_Analysis.setText(QCoreApplication.translate("blf_analysis", u"RUN ANALYSIS", None))
         self.label_path_descript_2.setText(QCoreApplication.translate("blf_analysis", u"Please Open and Load the Configuration with a path.", None))

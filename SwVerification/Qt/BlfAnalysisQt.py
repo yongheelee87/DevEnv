@@ -16,6 +16,7 @@ class BlfAnalysisWindow(QWidget):
 
         self.backgroundInit()
         self.connectBtnInit()
+        self.connectChkInit()
 
         self.blf_path = './'
         self.cfg_path = './'
@@ -31,6 +32,9 @@ class BlfAnalysisWindow(QWidget):
         self.ui_blf.btn_cfg_save.clicked.connect(self.func_btn_cfg_save)
         self.ui_blf.btn_cfg_load.clicked.connect(self.func_btn_cfg_load)
         self.ui_blf.btn_blf_load.clicked.connect(self.func_btn_blf_load)
+
+    def connectChkInit(self):
+        self.ui_blf.chk_show_graph.stateChanged.connect(self.func_chk_show_graph)
 
     def func_btn_cfg_save(self):
         cfg = {'CHANNEL': self._extract_channel(), 'SIGNALS': self._read_signals()}
@@ -63,6 +67,12 @@ class BlfAnalysisWindow(QWidget):
     # noinspection PyMethodMayBeStatic
     def func_btn_Result_Folder(self):
         open_path('./data/result/')
+
+    def func_chk_show_graph(self):
+        if self.ui_blf.chk_show_graph.isChecked():
+            self.blf.inter_graph = True
+        else:
+            self.blf.inter_graph = False
 
     def _update_ch_tbl(self, dict_ch_dev: dict):
         # 테이블 위젯 값 쓰기

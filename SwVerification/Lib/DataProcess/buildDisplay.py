@@ -54,7 +54,7 @@ def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, f
         axs[i].set_yticks(yticks_val)
         yticks_labels = []
         for y_val in yticks_val:
-            if (sig_name == sigs[i][-1]) and (sigs[i][0] != 'T32'):
+            if (sig_name == sigs[i][-1]) and (sigs[i][0] != 'T32') and (sigs[i][0] != 'LIN'):
                 if (sig_name in canBus.devs[sigs[i][0]].sig_val.keys()) and (y_val in canBus.devs[sigs[i][0]].sig_val[sig_name].keys()):
                     yticks_labels.append(canBus.devs[sigs[i][0]].sig_val[sig_name][y_val])
                 else:

@@ -1,11 +1,17 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from can import BLFReader
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+from mplcursors import cursor
 from Lib.Inst import *
+import warnings
+warnings.filterwarnings("ignore")
+
 
 LOG_COL = ['Time', 'Channel', 'CAN / CAN FD', 'Frame Type', 'CAN ID(HEX)', 'Frame Name', 'DLC', 'Data(HEX)', 'Data(Decode)']
-
+CAN_DECODE_MAX = 8
 
 class BlfAnalysis:
     """
@@ -18,6 +24,7 @@ class BlfAnalysis:
         self.blf_path = ''
         self.dic_channel = {}
         self.can_sigs = []
+        self.inter_graph = False
         self.resample_rate = '100ms'
 
         isdir_and_make('./data/result/blf')
@@ -134,8 +141,8 @@ class BlfAnalysis:
                 if max_y == 0:
                     yticks_val = range(min_y, max_y + 2)
                 else:
-                    if max_y > 8:
-                        yticks_val = list(range(min_y, max_y, int(max_y / 7)))
+                    if max_y > CAN_DECODE_MAX:
+                        yticks_val = list(range(min_y, max_y, int(max_y / (CAN_DECODE_MAX-1))))
                         yticks_val[-1] = max_y
                     else:
                         yticks_val = range(min_y, max_y + 1)
@@ -159,7 +166,14 @@ class BlfAnalysis:
             filepath = os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '.png'))
             plt.savefig(filepath, format='png')
             print(f"[INFO] {filepath} has been created\n")
-            open_path(filepath)
+
+            # Interative Graph Flag
+            if self.inter_graph is True:
+                cursor(hover=True, highlight=False)
+                plt.show()
+            else:
+                open_path(filepath)  # Open png file
+
             # plt.savefig(filepath, format='svg')
             plt.cla()  # clear the current axes
             plt.clf()  # clear the current figure
