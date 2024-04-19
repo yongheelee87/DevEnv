@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 from can import BLFReader
-import matplotlib
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from mplcursors import cursor
 from Lib.Inst import *
@@ -12,6 +10,7 @@ warnings.filterwarnings("ignore")
 
 LOG_COL = ['Time', 'Channel', 'CAN / CAN FD', 'Frame Type', 'CAN ID(HEX)', 'Frame Name', 'DLC', 'Data(HEX)', 'Data(Decode)']
 CAN_DECODE_MAX = 8
+
 
 class BlfAnalysis:
     """
@@ -26,7 +25,7 @@ class BlfAnalysis:
         self.can_sigs = []
         self.inter_graph = False
         self.resample_rate = '100ms'
-
+        self.fig = plt.Figure(figsize=(26, 26))
         isdir_and_make('./data/result/blf')
 
     def get_ch_dev(self) -> dict:
@@ -106,21 +105,20 @@ class BlfAnalysis:
                 data_decode = 'N/A'
 
             log_output.append([time_secs, device_ch, can_fd, frame_type, can_id, frame_name, msg.dlc, data, data_decode])
-        '''
-        with open("output.csv", "w", newline='') as f:
-            writer = csv.writer(f, dialect='excel')
-            writer.writerows(log_output)
-        '''
+
         self.df_log = pd.DataFrame(np.array(log_output, dtype=object), columns=LOG_COL)
+        self.df_blf.to_csv(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '_raw.csv')), encoding='utf-8-sig')
         self.df_blf, self.maxT = self._convert_df_blf()
         self.df_blf.to_csv(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '.csv')), encoding='utf-8-sig')
 
     def display_graph(self):
+        self.fig.clf()  # figure clear
+        self.fig.set_size_inches(26, 26)  # resize
+
         plt.rcParams['axes.xmargin'] = 0
-        fig = plt.figure(figsize=(26, 26))
         data_col = self.df_blf.columns.tolist()
 
-        axs = fig.add_gridspec(len(data_col), hspace=0.2).subplots(sharex=True, sharey=False)
+        axs = self.fig.add_gridspec(len(data_col), hspace=0.2).subplots(sharex=True, sharey=False)
 
         for i, signal in enumerate(data_col):
             color_idx = i % 20
@@ -170,14 +168,13 @@ class BlfAnalysis:
             # Interative Graph Flag
             if self.inter_graph is True:
                 cursor(hover=True, highlight=False)
-                plt.show()
             else:
                 open_path(filepath)  # Open png file
 
             # plt.savefig(filepath, format='svg')
-            plt.cla()  # clear the current axes
-            plt.clf()  # clear the current figure
-            plt.close()  # closes the current figure
+            # plt.cla()  # clear the current axes
+            # plt.clf()  # clear the current figure
+            # plt.close()  # closes the current figure
 
     def resample_blf(self):
         self.df_blf.index = pd.to_timedelta(self.df_blf.index, 's')

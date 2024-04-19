@@ -15,6 +15,3 @@ class TaskThread(QThread):
         self._task.stop()
         self.terminate()
         self.wait(2)
-
-    def update_model(self, model):
-        self._task = model

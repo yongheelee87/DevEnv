@@ -1,7 +1,7 @@
 from templates import *
 from sys import modules
 from App.blf import *
-from . _thread import TaskThread
+from . _graph import GraphView
 
 
 class BlfAnalysisWindow(QWidget):
@@ -13,15 +13,14 @@ class BlfAnalysisWindow(QWidget):
         self.ui_blf.setupUi(self)
 
         self.blf = BlfAnalysis()
+        self.graph = GraphView(fig=self.blf.fig, title='BLF Analysis Graph')
 
         self.backgroundInit()
         self.connectBtnInit()
         self.connectChkInit()
 
-        self.blf_path = './'
-        self.cfg_path = './'
-
-        self.blf_th = TaskThread(task_model=self.blf)  # BLF Task Class 선언 및 설정
+        self.blf_path = os.path.join(os.getcwd(), 'removed.blf')
+        self.cfg_path = os.path.join('./data/config/blf', 'removed.yaml')
 
     def backgroundInit(self):
         self._update_ch_tbl(dict_ch_dev=self.blf.get_ch_dev())
@@ -42,27 +41,28 @@ class BlfAnalysisWindow(QWidget):
             yaml.dump(cfg, f, default_flow_style=None)
 
     def func_btn_cfg_load(self):
-        cfg_name = QFileDialog.getOpenFileName(self, 'Open File', './data/config/blf', 'cfg File(*.yaml);; All File(*)')
-        input_cfg_file = cfg_name[0]
+        input_cfg_file = QFileDialog.getOpenFileName(self, 'Open File', os.path.dirname(self.cfg_path), 'cfg File(*.yaml);; All File(*)')[0]
         if input_cfg_file:
             self.ui_blf.line_cfg_path.setText(input_cfg_file)
-            self.cfg_path = input_cfg_file
-            with open(self.cfg_path, encoding="utf-8-sig") as f:
+            with open(input_cfg_file, encoding="utf-8-sig") as f:
                 cfg_yaml = yaml.load(f, Loader=yaml.SafeLoader)
                 self._update_ch_tbl(dict_ch_dev=cfg_yaml['CHANNEL'])
                 self._update_signal_txt(lst_sigs=cfg_yaml['SIGNALS'])
+            self.cfg_path = input_cfg_file
 
     def func_btn_blf_load(self):
-        blf_name = QFileDialog.getOpenFileName(self, 'Open File', './', 'blf File(*.blf);; All File(*)')
-        input_blf_file = blf_name[0]
+        input_blf_file = QFileDialog.getOpenFileName(self, 'Open File', os.path.dirname(self.blf_path), 'blf File(*.blf);; All File(*)')[0]
         if input_blf_file:
             self.ui_blf.line_blf_path.setText(input_blf_file)
             self.blf_path = input_blf_file
 
     def func_btn_Run_Analysis(self):
         self.blf.update_param(blf_path=self.blf_path, dic_channel=self._extract_channel(), sigs=self._read_signals(), rate=self._read_rate())
-        self.blf_th.update_model(model=self.blf)
-        self.blf_th.start()  # BLF Analysis 실행
+        self.blf.run()
+        if self.blf.inter_graph is True:
+            main_geometry = self.frameGeometry()
+            self.graph.show_widget(main_geometry)
+            self.graph.canvas.draw()
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Result_Folder(self):

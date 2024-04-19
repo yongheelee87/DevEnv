@@ -10,6 +10,7 @@ class Trace32Window(QWidget):
         # SET AS IMAGE WIDGETS
         self.ui_t32 = Ui_trace32()
         self.ui_t32.setupUi(self)
+        self.cmm_path = os.path.join('./data/input/script', 'removed.cmm')
 
         self.backgroundInit()
         self.connectBtnInit()
@@ -35,11 +36,11 @@ class Trace32Window(QWidget):
         self._update_status()
 
     def func_btn_cmm_load(self):
-        cmm_name = QFileDialog.getOpenFileName(self, 'Open File', './data/input/script', 'cmm File(*.cmm);; All File(*)')
-        input_dbc_file = cmm_name[0]
-        if input_dbc_file:
-            self.ui_t32.line_cmm_path.setText(input_dbc_file)
-            t32.cmd(f"CD.DO {input_dbc_file}")
+        input_cmm_file = QFileDialog.getOpenFileName(self, 'Open File', os.path.dirname(self.cmm_path), 'cmm File(*.cmm);; All File(*)')[0]
+        if input_cmm_file:
+            self.ui_t32.line_cmm_path.setText(input_cmm_file)
+            t32.cmd(f"CD.DO {input_cmm_file}")
+            self.cmm_path = input_cmm_file
 
     def func_btn_send(self):
         try:

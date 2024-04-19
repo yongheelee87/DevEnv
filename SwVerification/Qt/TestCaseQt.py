@@ -51,7 +51,6 @@ class TestCaseWindow(QWidget):
         self.single_mode = True if self.project != Configure.set['system']['project'].strip() else False
         self._update_map_script()
         self._update_map_mode()
-        self.test_th.update_model(model=self.swTest)
 
     def func_btn_apply(self):
         configure_str = self.ui_tc.pText_map_test.toPlainText()
@@ -83,11 +82,9 @@ class TestCaseWindow(QWidget):
             self._update_testcase()  # Line에 기입된 Case Number 정렬하기
             if self.testcase_num_str:
                 self.swTest.update_test_case(pjt=self.project, test_num=self.testcase_num_str)
-                self.test_th.update_model(model=self.swTest)
                 self.test_th.start()
         else:
             self.swTest.test_map = yaml.load(self.ui_tc.pText_map_test.toPlainText(), Loader=yaml.SafeLoader)
-            self.test_th.update_model(model=self.swTest)
             self.test_th.start()
 
     def func_btn_testmode(self):

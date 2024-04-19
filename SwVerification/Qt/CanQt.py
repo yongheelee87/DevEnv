@@ -20,7 +20,8 @@ class CanWindow(QWidget):
         self.dbc_dev = ''
         self.read_dev = ''
         self.Rx_rate = 200
-        
+        self.dbc_path = os.path.join('./data/input/can', 'removed.dbc')
+
         self.backgroundInit()
         self.connectBtnInit()
         self.connectLineInit()
@@ -56,7 +57,8 @@ class CanWindow(QWidget):
         self.ui_can.line_Rx_Rate.textChanged.connect(self.func_line_Rx_Rate)
         self.ui_can.line_Rx_Rate.returnPressed.connect(self.func_line_Rx_Rate)
         if len(canBus.lst_dev) != 0:
-            self.ui_can.line_dbc_path.setText(canBus.devs[self.dbc_dev].db_path)
+            self.dbc_path = canBus.devs[self.dbc_dev].db_path
+            self.ui_can.line_dbc_path.setText(self.dbc_path)
 
         self._update_status()
 
@@ -79,11 +81,12 @@ class CanWindow(QWidget):
         self.read_dev = self.ui_can.cbox_read_dev.currentText().strip()  # 현재 설정된 Read dev
 
     def func_btn_dbc_load(self):
-        input_dbc_file = QFileDialog.getOpenFileName(self, 'Open File', './data/input/can', 'dbc File(*.dbc);; All File(*)')[0]
+        input_dbc_file = QFileDialog.getOpenFileName(self, 'Open File', os.path.dirname(self.dbc_path), 'dbc File(*.dbc);; All File(*)')[0]
         if input_dbc_file:
             canBus.devs[self.dbc_dev].db_path = input_dbc_file
             canBus.devs[self.dbc_dev].db = database.load_file(input_dbc_file)  # path of .dbc file; CAN DBC 불러오기
-            self.ui_can.line_dbc_path.setText(canBus.devs[self.dbc_dev].db_path)
+            self.ui_can.line_dbc_path.setText(input_dbc_file)
+            self.dbc_path = input_dbc_file
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Connect(self):
