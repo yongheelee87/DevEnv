@@ -121,6 +121,34 @@ def make_pjt_HTML(df_sum, project: str, version: str, dict_tc: dict, tc_script: 
         html_file.write(html_text.format(title=project, ver=version, sum_body=_write_summary(df_sum), res_body=_write_tc_res_body(dict_tc, tc_script)))
 
 
+def make_meas_HTML(df_sum, project: str, tc_script: pd.DataFrame, export_path: str):
+    html_text = """
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="EUC-KR">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+            <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap' type='text/css'>
+            <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Jua&display=swap' type='text/css'>
+            <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Nunito:400,300' type='text/css'>
+            <title>{title} Result</title>
+        </head>
+        <body>
+            <h1 style="font-family: 'Black Han Sans', sans-serif;font-size: 2.5em;color: red;margin: 20px 0 10px 10px;>{title}</h1>
+    {sum_body}
+    {res_body}
+            <h2 style="font-family: 'Jua', sans-serif;font-size: 1.0em;color: black;margin: 0 0 10px 40px;><a href="./" style="text-decoration:none">테스트 원본 파일을 다운받으시려면 여기를 클릭해주세요</a></h2>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+        </body>
+    </html>
+    """
+
+    export_file = os.path.join(export_path, f'Result_{project}.html')
+    with open(export_file, 'w') as html_file:
+        html_file.write(html_text.format(title=project, sum_body=_write_summary(df_sum), res_body=_write_meas_res(project, tc_script)))
+
+
 def make_home_HTML(data: dict, export_path: str, df_ver: pd.DataFrame):
     test_date = os.path.basename(export_path)
 
@@ -227,12 +255,12 @@ def _write_tc_res_body(dict_tc: dict, tc_script: dict) -> str:
     tc_res_html = ''
     for tc in dict_tc.keys():
         sub_title = dict_tc[tc]
-        img_src = tc + '.png'
+        img_src = f'{tc}.png'
         if tc_script and tc_script[tc] is not None:
-            tc_str_script = _write_tc(tc_script[tc])
+            str_tc_script = _write_tc(tc_script[tc])
             tc_res_body = f"""
             <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">{sub_title}</h3>
-            {tc_str_script}
+            {str_tc_script}
             <img src="{img_src}" width="1400" height="1400" style="width: 1400px; height: 1150px; object-fit:cover;margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
             """
         else:
@@ -242,6 +270,17 @@ def _write_tc_res_body(dict_tc: dict, tc_script: dict) -> str:
             """
         tc_res_html += tc_res_body
     return tc_res_html
+
+
+def _write_meas_res(project: str, tc_script: pd.DataFrame) -> str:
+    img_src = f'{project}.png'
+    str_tc_script = _write_tc(tc_script)
+    res_html = f"""
+               <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">Script and Result Graph</h3>
+               {str_tc_script}
+               <img src="{img_src}" width="1400" height="1400" style="width: 1400px; height: 1150px; object-fit:cover;margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
+               """
+    return res_html
 
 
 def _write_tc(df_script: pd.DataFrame) -> str:

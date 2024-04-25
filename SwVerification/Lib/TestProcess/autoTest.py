@@ -5,15 +5,19 @@ import time
 from Lib.Inst import *
 from Lib.Common import *
 from Lib.DataProcess import *
-from . updatePy import UpdatePY
+from . updatePy import UpdatePy
 
 RESULT_FILE_PATH = os.path.join(os.getcwd(), 'data', 'result')
 MODULES = ['CCW', 'CTCW', 'SWA', 'SDR', 'CDW', 'BSW']
 
 
-class AutoTest(UpdatePY):
+class AutoTest(UpdatePy):
     def __init__(self, test_yaml: str):
-        self.swTest = None # TestProcess class 메모리
+        '''
+        :param test_yaml: test yaml file including list of functions corresponding to test cases
+        '''
+        UpdatePy.__init__(self)
+
         self.df_inst = get_inst_status()  # Instruments status 가져오기
         self.yaml_path = test_yaml if os.path.isfile(test_yaml) else './data/config/remote/test_map.yaml' # 지정된 장소에 파일이 없을 경우 remote에 설정된 파일 로드
         self.test_map, self.total_map = self._update_test_map(path=self.yaml_path)  # update map file for test
@@ -65,7 +69,7 @@ class AutoTest(UpdatePY):
         print("************************************************************\n")
         time.sleep(1)
 
-    def test_module(self, project: str):
+    def test_module(self, project: str) -> dict:
         self.script_path = os.path.join('data', 'input', 'script', project)
 
         project_tc = {}
@@ -85,24 +89,22 @@ class AutoTest(UpdatePY):
 
         start_time = time.time()  # 시작 시간 저장
 
-        export_path = os.path.join(self.result_path, project)
-        isdir_and_make(export_path)
+        self.py_output_path = os.path.join(self.result_path, project)
+        isdir_and_make(self.py_output_path)
 
         res_tc = {}
         self.tc_script = {}  # Initialize for each module
         self.num_lines = 0
         for idx, test_script in enumerate(project_tc.keys()):
             print(f'Running {test_script} ({idx+1}/{num_tc})')
-            res_tc[project_tc[test_script]] = self._run_test_case(test_script, export_path)
+            res_tc[project_tc[test_script]] = self._run_test_case(test_script)
             if 'Fail' in res_tc[project_tc[test_script]]:
                 print('Result: Fail')
             else:
                 print(f'Result: {res_tc[project_tc[test_script]]}')
             print(f'{test_script} has been Done ({idx+1}/{num_tc})\n')
 
-        self._export_test_sum(file_path=export_path, start_time=start_time,
-                              elapsed_time=time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)),  # 경과 시간 저장
-                              project=project, tc_dict=project_tc, res_dict=res_tc)
+        self._export_test_sum(start_time=start_time, project=project, tc_dict=project_tc, res_dict=res_tc)
         return res_tc
 
     def _update_test_map(self, path: str) -> (dict, dict):
@@ -131,21 +133,20 @@ class AutoTest(UpdatePY):
             total_dict = yaml.load(''.join(lst_total), Loader=yaml.SafeLoader)
         return auto_dict, total_dict
 
-    def _run_test_case(self, test_script: str, export_path: str) -> str:
+    def _run_test_case(self, test_script: str) -> str:
         '''
         :param test_script: Test Script
-        :param export_path: path to export result
         :return: test result
         '''
-        script_file = os.path.join(self.script_path, f'{test_script}.py')  # 실행할 테스트 python 코드
-        csv_file = os.path.join(self.script_path, f'{test_script}.csv')  # 실행할 테스트 csv 파일
-        csv_res_file = os.path.join(export_path, f'{test_script}.csv')  # 생성된 결과 파일
-
-        if os.path.isfile(script_file) is False and os.path.isfile(csv_file) is False:  # py파일과 csv파일이 없을 경우
+        self.py_title = test_script
+        self.py_path = os.path.join(self.script_path, f'{self.py_title}.py')  # 실행할 테스트 python 코드
+        csv_file = os.path.join(self.script_path, f'{self.py_title}.csv')  # 실행할 테스트 csv 파일
+        csv_res_file = os.path.join(self.py_output_path, f'{self.py_title}.csv')  # 생성된 결과 파일
+        if os.path.isfile(self.py_path) is False and os.path.isfile(csv_file) is False:  # py파일과 csv파일이 없을 경우
             ret = 'Skip'
         else:
             if os.path.isfile(csv_res_file) is False:
-                py_lines, df_tc = self.update_py(py_path=script_file, output_path=export_path, title=test_script)  # python testcase code update
+                py_lines, df_tc = self.update_py()  # python testcase code update
                 if df_tc is not None:
                     self.tc_script[test_script] = df_tc
                     self.num_lines += len(df_tc)
@@ -169,17 +170,18 @@ class AutoTest(UpdatePY):
                 pass
         return tc_pass_state
 
-    def _export_test_sum(self, file_path: str, start_time: float, elapsed_time: str, project: str, tc_dict: dict, res_dict: dict):
+    def _export_test_sum(self, start_time: float, project: str, tc_dict: dict, res_dict: dict):
         '''
-        :param file_path:
         :param start_time:
-        :param elapsed_time: elapsed time for test
         :param project: project name
+        :param tc_dict: a dict of test cases
         :param res_dict: a dict of test result
         '''
+        end_time = time.time()
+        str_end = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(end_time))
+        elapsed_time = time.strftime("%H:%M:%S", time.gmtime(end_time - start_time))
+        str_start = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(start_time))
 
-        time_start = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(start_time))
-        time_end = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(time.time()))
 
         len_pass = 0
         len_skip = 0
@@ -207,16 +209,16 @@ class AutoTest(UpdatePY):
 
         lst_tc = list(res_dict.keys())
         tc_names = ', '.join(lst_tc)  # 한글 버전
-        df_tc_sum = pd.DataFrame(np.array([time_start, time_end, elapsed_time, tc_names, len(lst_tc), len_pass, len_skip, len_fail, fail_case, self.num_lines], dtype=object),
+        df_tc_sum = pd.DataFrame(np.array([str_start, str_end, elapsed_time, tc_names, len(lst_tc), len_pass, len_skip, len_fail, fail_case, self.num_lines], dtype=object),
                                  columns=["Value"],
                                  index=["Date_Start", "Date_End", "Elapsed_Time", "TestCase_Names", "TestCase_Amt", "Pass_Amt", "Skip_Amt", "Fail_Amt", "Fail_Case", "Steps"])
-        df_tc_sum.to_csv(file_path + "\\" + f"Summary_{os.path.basename(file_path)}.csv", encoding='utf-8-sig')
+        df_tc_sum.to_csv(self.py_output_path + "\\" + f"Summary_{os.path.basename(self.py_output_path)}.csv", encoding='utf-8-sig')
         df_ver = self.version.set_index(keys='Module')
 
         print(f"*** Number of Pass Test Case: {len_pass}/{len(lst_tc)}")
         print(f"*** Number of Fail Test Case: {len_fail}/{len(lst_tc)}")
-        print(f"*** The Test for Module {os.path.basename(file_path)} has been completed\n")
-        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(file_path), version=df_ver.loc[project, 'Version'], dict_tc=tc_dict, tc_script=self.tc_script, export_path=file_path)  # 최종 결과물 HTML로 산출
+        print(f"*** The Test for Module {os.path.basename(self.py_output_path)} has been completed\n")
+        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(self.py_output_path), version=df_ver.loc[project, 'Version'], dict_tc=tc_dict, tc_script=self.tc_script, export_path=file_path)  # 최종 결과물 HTML로 산출
 
     def _get_sw_version(self) -> pd.DataFrame:
         t32._wait_until_command_ends(timeout=5)

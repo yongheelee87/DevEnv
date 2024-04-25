@@ -18,7 +18,7 @@ class Ui_measure(object):
     def setupUi(self, measure):
         if not measure.objectName():
             measure.setObjectName(u"measure")
-        measure.resize(836, 847)
+        measure.resize(1111, 1043)
         measure.setStyleSheet(u"/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
 "\n"
 "SET APP STYLESHEET - FULL STYLES HERE\n"
@@ -582,10 +582,20 @@ class Ui_measure(object):
         font2.setBold(True)
         font2.setItalic(False)
         self.btn_Run_Script.setFont(font2)
-        self.btn_Run_Script.setStyleSheet(u"font-weight:500;\n"
-"color:black;\n"
-"background-color: #c8f7c8;\n"
-"border: 1px solid black;")
+        self.btn_Run_Script.setStyleSheet(u"QPushButton {\n"
+"	font-weight:500;\n"
+"	color:black;\n"
+"	border: 1px solid black;\n"
+"	background-color: #c8f7c8;\n"
+"}\n"
+"QPushButton:hover {\n"
+"	background-color: #42f566;\n"
+"	border: 2px solid #c8f7c8;\n"
+"}\n"
+"QPushButton:pressed {	\n"
+"	background-color: rgb(35, 40, 49);\n"
+"	border: 5px solid transparent;\n"
+"}")
         icon1 = QIcon()
         icon1.addFile(u":/images/images/start.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_Run_Script.setIcon(icon1)
@@ -677,6 +687,151 @@ class Ui_measure(object):
 
         self.verticalLayout_5.addWidget(self.frame_content_wid_2)
 
+        self.frame_content_wid_3 = QFrame(self.frame_div_content)
+        self.frame_content_wid_3.setObjectName(u"frame_content_wid_3")
+        self.frame_content_wid_3.setFrameShape(QFrame.NoFrame)
+        self.frame_content_wid_3.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_2 = QHBoxLayout(self.frame_content_wid_3)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalSpacer_2 = QSpacerItem(281, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+
+        self.label_fill_zero = QLabel(self.frame_content_wid_3)
+        self.label_fill_zero.setObjectName(u"label_fill_zero")
+        self.label_fill_zero.setStyleSheet(u"color: rgb(113, 126, 149);")
+        self.label_fill_zero.setLineWidth(1)
+        self.label_fill_zero.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.horizontalLayout_2.addWidget(self.label_fill_zero)
+
+        self.cbox_fill_zero = QComboBox(self.frame_content_wid_3)
+        self.cbox_fill_zero.addItem("")
+        self.cbox_fill_zero.addItem("")
+        self.cbox_fill_zero.setObjectName(u"cbox_fill_zero")
+        sizePolicy1.setHeightForWidth(self.cbox_fill_zero.sizePolicy().hasHeightForWidth())
+        self.cbox_fill_zero.setSizePolicy(sizePolicy1)
+        self.cbox_fill_zero.setMinimumSize(QSize(80, 0))
+        self.cbox_fill_zero.setFont(font1)
+        self.cbox_fill_zero.setLayoutDirection(Qt.LeftToRight)
+        self.cbox_fill_zero.setStyleSheet(u"QComboBox\n"
+"{\n"
+"background-color: rgb(40, 44, 52);\n"
+"selection-background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #565656, stop: 0.1 #525252, stop: 0.5 #4e4e4e, stop: 0.9 #4a4a4a, stop: 1 #464646);\n"
+"border: 1px solid transparent;\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView\n"
+"{\n"
+"background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #565656, stop: 0.1 #525252, stop: 0.5 #4e4e4e, stop: 0.9 #4a4a4a, stop: 1 #464646);\n"
+"selection-background-color: rgb(170, 170, 255);\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox:hover\n"
+"{\n"
+"border: 4px solid green;\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down\n"
+"{\n"
+"border-width: 0px;\n"
+"}\n"
+"")
+        self.cbox_fill_zero.setFrame(True)
+
+        self.horizontalLayout_2.addWidget(self.cbox_fill_zero)
+
+        self.label_judge_type = QLabel(self.frame_content_wid_3)
+        self.label_judge_type.setObjectName(u"label_judge_type")
+        self.label_judge_type.setStyleSheet(u"color: rgb(113, 126, 149);")
+        self.label_judge_type.setLineWidth(1)
+        self.label_judge_type.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.horizontalLayout_2.addWidget(self.label_judge_type)
+
+        self.cbox_judge_type = QComboBox(self.frame_content_wid_3)
+        self.cbox_judge_type.addItem("")
+        self.cbox_judge_type.addItem("")
+        self.cbox_judge_type.setObjectName(u"cbox_judge_type")
+        sizePolicy1.setHeightForWidth(self.cbox_judge_type.sizePolicy().hasHeightForWidth())
+        self.cbox_judge_type.setSizePolicy(sizePolicy1)
+        self.cbox_judge_type.setMinimumSize(QSize(150, 0))
+        self.cbox_judge_type.setFont(font1)
+        self.cbox_judge_type.setLayoutDirection(Qt.LeftToRight)
+        self.cbox_judge_type.setStyleSheet(u"QComboBox\n"
+"{\n"
+"background-color: rgb(40, 44, 52);\n"
+"selection-background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #565656, stop: 0.1 #525252, stop: 0.5 #4e4e4e, stop: 0.9 #4a4a4a, stop: 1 #464646);\n"
+"border: 1px solid transparent;\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView\n"
+"{\n"
+"background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #565656, stop: 0.1 #525252, stop: 0.5 #4e4e4e, stop: 0.9 #4a4a4a, stop: 1 #464646);\n"
+"selection-background-color: rgb(170, 170, 255);\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox:hover\n"
+"{\n"
+"border: 4px solid green;\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down\n"
+"{\n"
+"border-width: 0px;\n"
+"}\n"
+"")
+        self.cbox_judge_type.setFrame(True)
+
+        self.horizontalLayout_2.addWidget(self.cbox_judge_type)
+
+        self.label_num_match = QLabel(self.frame_content_wid_3)
+        self.label_num_match.setObjectName(u"label_num_match")
+        self.label_num_match.setStyleSheet(u"color: rgb(113, 126, 149);")
+        self.label_num_match.setLineWidth(1)
+        self.label_num_match.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.horizontalLayout_2.addWidget(self.label_num_match)
+
+        self.line_sample_rate = QLineEdit(self.frame_content_wid_3)
+        self.line_sample_rate.setObjectName(u"line_sample_rate")
+        sizePolicy.setHeightForWidth(self.line_sample_rate.sizePolicy().hasHeightForWidth())
+        self.line_sample_rate.setSizePolicy(sizePolicy)
+        self.line_sample_rate.setMinimumSize(QSize(0, 40))
+        self.line_sample_rate.setFocusPolicy(Qt.WheelFocus)
+        self.line_sample_rate.setToolTipDuration(2)
+        self.line_sample_rate.setStyleSheet(u"background-color: rgb(33, 37, 43);")
+        self.line_sample_rate.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_2.addWidget(self.line_sample_rate)
+
+        self.label_path_descript_3 = QLabel(self.frame_content_wid_3)
+        self.label_path_descript_3.setObjectName(u"label_path_descript_3")
+        self.label_path_descript_3.setStyleSheet(u"color: rgb(113, 126, 149);")
+        self.label_path_descript_3.setLineWidth(1)
+        self.label_path_descript_3.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.horizontalLayout_2.addWidget(self.label_path_descript_3)
+
+        self.line_num_match = QLineEdit(self.frame_content_wid_3)
+        self.line_num_match.setObjectName(u"line_num_match")
+        sizePolicy.setHeightForWidth(self.line_num_match.sizePolicy().hasHeightForWidth())
+        self.line_num_match.setSizePolicy(sizePolicy)
+        self.line_num_match.setMinimumSize(QSize(0, 40))
+        self.line_num_match.setStyleSheet(u"background-color: rgb(33, 37, 43);")
+        self.line_num_match.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_2.addWidget(self.line_num_match)
+
+
+        self.verticalLayout_5.addWidget(self.frame_content_wid_3)
+
         self.frame_table = QFrame(self.frame_div_content)
         self.frame_table.setObjectName(u"frame_table")
         self.frame_table.setFrameShape(QFrame.StyledPanel)
@@ -685,9 +840,15 @@ class Ui_measure(object):
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.tbl_script = QTableWidget(self.frame_table)
         self.tbl_script.setObjectName(u"tbl_script")
-        self.tbl_script.setFont(font1)
+        font3 = QFont()
+        font3.setFamilies([u"Segoe UI"])
+        font3.setPointSize(9)
+        font3.setBold(False)
+        font3.setItalic(False)
+        self.tbl_script.setFont(font3)
         self.tbl_script.setStyleSheet(u"QTableView\n"
 "{\n"
+"	font: 9pt \"Segoe UI\";\n"
 "    border: 1px solid white;\n"
 "    gridline-color: rgb(33, 37, 43);\n"
 "}\n"
@@ -737,7 +898,7 @@ class Ui_measure(object):
         measure.setWindowTitle(QCoreApplication.translate("measure", u"measure", None))
         self.label_title.setText(QCoreApplication.translate("measure", u"MEASUREMENT", None))
         self.label_taget_title.setText(QCoreApplication.translate("measure", u"Measure Target : ", None))
-        self.cbox_project.setItemText(0, QCoreApplication.translate("measure", u"  CTCW", None))
+        self.cbox_project.setItemText(0, QCoreApplication.translate("measure", u"  RGW", None))
 
         self.btn_Result_Folder.setText(QCoreApplication.translate("measure", u"Open Result", None))
         self.btn_Run_Script.setText(QCoreApplication.translate("measure", u"RUN SCRIPT", None))
@@ -746,5 +907,19 @@ class Ui_measure(object):
         self.line_script_path.setPlaceholderText(QCoreApplication.translate("measure", u"Script Path", None))
         self.btn_script_save.setText(QCoreApplication.translate("measure", u"Save", None))
         self.btn_script_load.setText(QCoreApplication.translate("measure", u"Load", None))
+        self.label_fill_zero.setText(QCoreApplication.translate("measure", u"Fill Zero: ", None))
+        self.cbox_fill_zero.setItemText(0, QCoreApplication.translate("measure", u"True", None))
+        self.cbox_fill_zero.setItemText(1, QCoreApplication.translate("measure", u"False", None))
+
+        self.label_judge_type.setText(QCoreApplication.translate("measure", u"Judge Type: ", None))
+        self.cbox_judge_type.setItemText(0, QCoreApplication.translate("measure", u"same time", None))
+        self.cbox_judge_type.setItemText(1, QCoreApplication.translate("measure", u"independent", None))
+
+        self.label_num_match.setText(QCoreApplication.translate("measure", u"Sample Rate (sec): ", None))
+        self.line_sample_rate.setText(QCoreApplication.translate("measure", u"0.1", None))
+        self.line_sample_rate.setPlaceholderText(QCoreApplication.translate("measure", u"0.1", None))
+        self.label_path_descript_3.setText(QCoreApplication.translate("measure", u"Num Of Match: ", None))
+        self.line_num_match.setText(QCoreApplication.translate("measure", u"1", None))
+        self.line_num_match.setPlaceholderText(QCoreApplication.translate("measure", u"1", None))
     # retranslateUi
 

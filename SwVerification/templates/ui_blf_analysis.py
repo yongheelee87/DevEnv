@@ -18,7 +18,7 @@ class Ui_blf_analysis(object):
     def setupUi(self, blf_analysis):
         if not blf_analysis.objectName():
             blf_analysis.setObjectName(u"blf_analysis")
-        blf_analysis.resize(964, 766)
+        blf_analysis.resize(1168, 889)
         blf_analysis.setStyleSheet(u"/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
 "\n"
 "SET APP STYLESHEET - FULL STYLES HERE\n"

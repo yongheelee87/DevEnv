@@ -1079,7 +1079,7 @@ class Ui_MainWindow(object):
         sizePolicy3.setHeightForWidth(self.pText_log.sizePolicy().hasHeightForWidth())
         self.pText_log.setSizePolicy(sizePolicy3)
         self.pText_log.setMinimumSize(QSize(0, 0))
-        self.pText_log.setMaximumSize(QSize(16777215, 200))
+        self.pText_log.setMaximumSize(QSize(16777215, 120))
 
         self.verticalLayout.addWidget(self.pText_log)
 

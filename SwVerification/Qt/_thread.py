@@ -3,7 +3,6 @@ from PySide6.QtCore import QThread
 
 class TaskThread(QThread):
     """ Main Function Thread(parent:QThread) """
-
     def __init__(self, task_model):
         super().__init__()
         self._task = task_model

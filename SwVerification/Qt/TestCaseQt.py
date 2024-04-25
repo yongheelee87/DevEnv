@@ -26,10 +26,6 @@ class TestCaseWindow(QWidget):
 
         self.test_th = TaskThread(task_model=self.swTest)  # Test Class 선언 및 설정
 
-        # self.test_watch_dog = QTimer()
-        # self.test_watch_dog.setInterval(50)
-        # self.test_watch_dog.timeout.connect(self.run_finish)
-
     def connectBtnInit(self):
         self.ui_tc.btn_testcase.clicked.connect(self.func_btn_testcase)
         self.ui_tc.btn_testmode.clicked.connect(self.func_btn_testmode)
@@ -95,7 +91,7 @@ class TestCaseWindow(QWidget):
 
     def _get_project(self):
         project_lst = os.listdir('./data/input/script')
-        project_lst.remove('cmd')
+        project_lst.remove('Measure')
         project_lst.append(self.project)  # 전체 기능 실행
         return project_lst
 

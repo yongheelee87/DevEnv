@@ -12,4 +12,3 @@
 
 # basic library
 from . autoTest import *
-from . updatePy import *

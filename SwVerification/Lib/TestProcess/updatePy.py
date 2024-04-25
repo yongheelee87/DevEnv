@@ -1,10 +1,8 @@
-import os.path
-
 from Lib.Inst import *
 from Lib.Common import *
 
 
-class UpdatePY:
+class UpdatePy:
     tc_head_body = """
 # USE CSV INTERFACE
 from threading import Thread
@@ -84,6 +82,13 @@ for i in input_data:
         log_th.in_data = i[2:]
 
         canBus.stop_all_period_msg()
+    elif i[2] == 253:
+        log_th.step = int(i[0])
+        i[2] = None
+        log_th.in_data = i[2:]
+
+        canBus.stop_all_period_msg()
+        t32.flash_binary(run_cmd=Configure.set['TRACE32']['flash_all_cmm'])
     else:
 {write_msg}
 
@@ -98,7 +103,7 @@ for log_lst in log_th.log_lst:
     outcome.append(log_lst)
 
 df_log = pd.DataFrame(np.array(log_th.log_lst, dtype=np.float32), columns=total_col)
-signal_step_graph(df=df_log.copy(), sigs=dev_all_sigs, x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0])
+signal_step_graph(df=df_log.copy(), sigs=dev_all_sigs, x_col='Elapsed_Time', filepath=OUTPUT_PATH, filename=title[0], fill_zero=True)
 
 # Result judgement logic
 JUDGE_TYPE = "same"  # define type to judge data
@@ -108,38 +113,50 @@ outcome = judge_final_result(df_result=df_log[['Step'] + out_col], expected_outs
 export_csv_list(OUTPUT_PATH, title[0], outcome)
 """
 
-    def update_py(self, py_path: str, output_path: str, title: str) -> (str, pd.DataFrame):
-        codes, use_csv = self.parse_script_py(py_path, output_path, title)
+    def __init__(self):
+        self.py_path = ''
+        self.py_title = ''
+        self.py_output_path = ''
+
+    def update_py(self) -> (str, pd.DataFrame):
+        codes, use_csv = self.parse_script_py()
         df_tc_raw = None
         if use_csv is True:
-            lst_df = load_csv_list(file_path=py_path.replace('.py', '.csv'))
+            lst_df = load_csv_list(file_path=self.py_path.replace('.py', '.csv'))
             df_tc_raw = pd.DataFrame(lst_df[5:], columns=lst_df[4])
-            df_tc = df_tc_raw.drop(['Scenario'], axis=1).apply(pd.to_numeric)
-            in_col, out_col, inputs, outputs, total = self._get_msg_in_out(df=df_tc)
-            in_data = str(df_tc[in_col].values.tolist()).replace('nan', 'None')
-            out_data = str(df_tc[out_col].values.tolist()).replace('nan', 'None')
-            lst_condition = [['# Data Begin', '# Data End', f'input_data = {in_data}\nexpected_data = {out_data}'],
-                             ['# Dev signal List Begin', '# Dev signal List End',
-                              f'dev_in_sigs = {str(inputs)}\ndev_out_sigs = {str(outputs)}\ndev_all_sigs = {str(total)}'],
-                             ['# LogThread Begin', '# LogThread End',
-                              self.log_thread_body.format(len_in=len(in_col) - 2, sample_rate=lst_df[0][1],
-                                                     read_msg=self._get_msg_read(outputs))],
-                             ['# Dev Input Begin', '# Dev Input End', self._get_msg_write(inputs)],
-                             ['# TC main Begin', '# TC main End',
-                              self.tc_main_body.format(write_msg=self._get_msg_write(inputs))]]
-
-            for con in lst_condition:
-                codes = self.apply_csv_code(lines=codes, s_str=con[0], e_str=con[1], new_str=con[2])
-            codes = codes.replace('JUDGE_TYPE = "same"', f'JUDGE_TYPE = "{lst_df[1][1]}"')  # judge type 적용
-            codes = codes.replace('NUM_OF_MATCH = 0', f'NUM_OF_MATCH = {lst_df[2][1]}')  # match 갯수 적용
-            df_tc_raw.replace('', 'None').replace('255', 'Reset')
+            codes, df_tc_raw = self.fill_variables(df=df_tc_raw, py_code=codes, rate=lst_df[0][1], judge=lst_df[1][1], n_match=lst_df[2][1])
         return codes, df_tc_raw
 
-    def parse_script_py(self, py_path: str, output_path: str, title: str) -> (str, bool):
-        new_lines = []
+    def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
+        if 'Scenario' in df.columns:
+            df_tc = df.drop(['Scenario'], axis=1).apply(pd.to_numeric)
+        else:
+            df_tc = df.apply(pd.to_numeric)
+        in_col, out_col, inputs, outputs, total = self._get_msg_in_out(df=df_tc)
+        in_data = str(df_tc[in_col].values.tolist()).replace('nan', 'None')
+        out_data = str(df_tc[out_col].values.tolist()).replace('nan', 'None')
+        lst_condition = [['# Data Begin', '# Data End', f'input_data = {in_data}\nexpected_data = {out_data}'],
+                         ['# Dev signal List Begin', '# Dev signal List End',
+                          f'dev_in_sigs = {str(inputs)}\ndev_out_sigs = {str(outputs)}\ndev_all_sigs = {str(total)}'],
+                         ['# LogThread Begin', '# LogThread End',
+                          self.log_thread_body.format(len_in=len(in_col) - 2, sample_rate=rate, read_msg=self._get_msg_read(outputs))],
+                         ['# Dev Input Begin', '# Dev Input End', self._get_msg_write(inputs)],
+                         ['# TC main Begin', '# TC main End',
+                          self.tc_main_body.format(write_msg=self._get_msg_write(inputs))]]
+
+        for con in lst_condition:
+            py_code = self.apply_csv_code(lines=py_code, s_str=con[0], e_str=con[1], new_str=con[2])
+        if fill_zero is False:
+            py_code = py_code.replace('fill_zero=True', 'fill_zero=False')  # No Fill Zero 적용
+        py_code = py_code.replace('JUDGE_TYPE = "same"', f'JUDGE_TYPE = "{judge}"')  # judge type 적용
+        py_code = py_code.replace('NUM_OF_MATCH = 0', f'NUM_OF_MATCH = {n_match}')  # match 갯수 적용
+        df = df.replace('254', 'CAN Trans Stop').replace('255', 'Reset')
+        return py_code, df
+
+    def parse_script_py(self) -> (str, bool):
         csv_interface = False
-        if os.path.isfile(py_path) is True:
-            with open(to_raw(py_path), "r+", encoding='utf-8') as file:
+        if os.path.isfile(self.py_path) is True:
+            with open(to_raw(self.py_path), "r+", encoding='utf-8') as file:
                 lines = file.readlines()
         else:
             lines = self.tc_head_body.splitlines(True)[1:]
@@ -147,20 +164,25 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         if '# USE CSV INTERFACE' in lines[0]:
             csv_interface = True
 
-        for line in lines:
-            if "OUTPUT_PATH = " in line:
-                line = f"OUTPUT_PATH = r'{output_path}'\n"
-            if 'title = [' in line:
-                line = f"title = [r'{title}']\n"
-            new_lines.append(line)
-        new_line = ''.join(new_lines)
-        return new_line, csv_interface
+        rev_line = self._fill_header(lines)
+        return rev_line, csv_interface
 
     def apply_csv_code(self, lines: str, s_str: str, e_str: str, new_str: str) -> str:
         if s_str in lines:
             s_inx, e_inx = find_str_inx(lines, start_str=s_str, end_str=e_str)
             lines = lines.replace(lines[s_inx:e_inx], new_str)
         return lines
+
+    def _fill_header(self, lines: list) -> str:
+        new_lines = []
+        for line in lines:
+            if "OUTPUT_PATH = " in line:
+                line = f"OUTPUT_PATH = r'{self.py_output_path}'\n"
+            if 'title = [' in line:
+                line = f"title = [r'{self.py_title}']\n"
+            new_lines.append(line)
+        new_line = ''.join(new_lines)
+        return new_line
 
     def _get_msg_write(self, lst_input: list) -> str:
         lst_line = []
@@ -261,5 +283,3 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
 
             lst_line.append(line)
         return '\n'.join(lst_line)
-
-
