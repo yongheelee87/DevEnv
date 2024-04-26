@@ -497,8 +497,9 @@ class Ui_measure(object):
         self.frame_content_wid_1.setObjectName(u"frame_content_wid_1")
         self.frame_content_wid_1.setFrameShape(QFrame.NoFrame)
         self.frame_content_wid_1.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_9 = QVBoxLayout(self.frame_content_wid_1)
-        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.horizontalLayout_3 = QHBoxLayout(self.frame_content_wid_1)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_3.setContentsMargins(-1, 0, -1, 0)
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.label_taget_title = QLabel(self.frame_content_wid_1)
@@ -573,6 +574,20 @@ class Ui_measure(object):
 
         self.horizontalLayout.addWidget(self.btn_Result_Folder)
 
+        self.btn_show_graph = QPushButton(self.frame_content_wid_1)
+        self.btn_show_graph.setObjectName(u"btn_show_graph")
+        sizePolicy.setHeightForWidth(self.btn_show_graph.sizePolicy().hasHeightForWidth())
+        self.btn_show_graph.setSizePolicy(sizePolicy)
+        self.btn_show_graph.setMinimumSize(QSize(150, 40))
+        self.btn_show_graph.setFont(font1)
+        self.btn_show_graph.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_show_graph.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+        icon1 = QIcon()
+        icon1.addFile(u":/icons/icons/cil-chart-line.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btn_show_graph.setIcon(icon1)
+
+        self.horizontalLayout.addWidget(self.btn_show_graph)
+
         self.btn_Run_Script = QPushButton(self.frame_content_wid_1)
         self.btn_Run_Script.setObjectName(u"btn_Run_Script")
         self.btn_Run_Script.setMinimumSize(QSize(150, 40))
@@ -596,16 +611,16 @@ class Ui_measure(object):
 "	background-color: rgb(35, 40, 49);\n"
 "	border: 5px solid transparent;\n"
 "}")
-        icon1 = QIcon()
-        icon1.addFile(u":/images/images/start.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btn_Run_Script.setIcon(icon1)
+        icon2 = QIcon()
+        icon2.addFile(u":/images/images/start.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btn_Run_Script.setIcon(icon2)
         self.btn_Run_Script.setCheckable(True)
         self.btn_Run_Script.setChecked(True)
 
         self.horizontalLayout.addWidget(self.btn_Run_Script)
 
 
-        self.verticalLayout_9.addLayout(self.horizontalLayout)
+        self.horizontalLayout_3.addLayout(self.horizontalLayout)
 
 
         self.verticalLayout_17.addWidget(self.frame_content_wid_1)
@@ -638,6 +653,7 @@ class Ui_measure(object):
         self.frame_content_wid_2.setFrameShadow(QFrame.Raised)
         self.verticalLayout_8 = QVBoxLayout(self.frame_content_wid_2)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.verticalLayout_8.setContentsMargins(-1, 0, -1, 0)
         self.gridLayout_2 = QGridLayout()
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.label_path_descript = QLabel(self.frame_content_wid_2)
@@ -663,9 +679,9 @@ class Ui_measure(object):
         self.btn_script_save.setFont(font1)
         self.btn_script_save.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_script_save.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon2 = QIcon()
-        icon2.addFile(u":/icons/icons/cil-save.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.btn_script_save.setIcon(icon2)
+        icon3 = QIcon()
+        icon3.addFile(u":/icons/icons/cil-save.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.btn_script_save.setIcon(icon3)
 
         self.gridLayout_2.addWidget(self.btn_script_save, 0, 1, 1, 1)
 
@@ -901,6 +917,7 @@ class Ui_measure(object):
         self.cbox_project.setItemText(0, QCoreApplication.translate("measure", u"  RGW", None))
 
         self.btn_Result_Folder.setText(QCoreApplication.translate("measure", u"Open Result", None))
+        self.btn_show_graph.setText(QCoreApplication.translate("measure", u"Show Graph", None))
         self.btn_Run_Script.setText(QCoreApplication.translate("measure", u"RUN SCRIPT", None))
         self.label_path_descript.setText(QCoreApplication.translate("measure", u"Please Open and Load the script with a path.", None))
         self.line_script_path.setText("")

@@ -2,6 +2,7 @@ from templates import *
 from sys import modules
 from measure import *
 from . _thread import TaskThread
+from . _graph import GraphView
 
 
 class MeasureWindow(QWidget):
@@ -20,6 +21,8 @@ class MeasureWindow(QWidget):
         self.connectLineInit()
         self.connectCBoxInit()
 
+        self.graph = GraphView(fig=self.measure.fig, title='Measurement Graph')
+
         self.measure_watch_dog = QTimer()
         self.measure_watch_dog.setInterval(500)
         self.measure_watch_dog.timeout.connect(self.run_finish)
@@ -32,6 +35,7 @@ class MeasureWindow(QWidget):
         self.ui_meas.btn_script_save.clicked.connect(self.func_btn_script_save)
         self.ui_meas.btn_Result_Folder.clicked.connect(self.func_btn_Result_Folder)
         self.ui_meas.btn_Run_Script.clicked.connect(self.func_btn_Run_Script)
+        self.ui_meas.btn_show_graph.clicked.connect(self.func_btn_show_graph)
 
     def connectLineInit(self):
         self.ui_meas.line_sample_rate.returnPressed.connect(self.func_line_sample_rate)
@@ -64,6 +68,12 @@ class MeasureWindow(QWidget):
     # noinspection PyMethodMayBeStatic
     def func_btn_script_save(self):
         print("TEST")
+
+    def func_btn_show_graph(self):
+        self.measure.step_graph()
+        main_geometry = self.frameGeometry()
+        self.graph.show_widget(main_geometry)
+        self.graph.canvas.draw()
 
     def func_line_sample_rate(self):
         str_sample_rate = self.ui_meas.line_sample_rate.text().strip()

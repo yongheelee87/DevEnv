@@ -265,6 +265,7 @@ def check_task_open(name: str) -> bool:
     print(f"The task {name} Connection: {res_open}\n")
     return res_open
 
+
 def logging_initialize():
     if os.path.isfile("./data/result/Debug.log"):
         os.remove("./data/result/Debug.log")
