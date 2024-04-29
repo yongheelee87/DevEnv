@@ -12,6 +12,7 @@ class MeasRGW(UpdatePy):
         self.num_lines = 0
         self.df_tc = None
         self.rate = '0.1'
+        self.time_type = 'Per step'
         self.judge = 'same'
         self.n_match = '1'
         self.fill_zero = True
@@ -53,7 +54,7 @@ class MeasRGW(UpdatePy):
         :return: test result
         '''
         lines = self.tc_head_body.splitlines(True)[1:]
-        py_lines, self.df_tc = self.fill_variables(df=self.df_tc, py_code=self._fill_header(lines), rate=self.rate, judge=self.judge, n_match=self.n_match, fill_zero=self.fill_zero)
+        py_lines, self.df_tc = self.fill_variables(df=self.df_tc, py_code=self._fill_header(lines), rate=self.rate, time_type=self.time_type, judge=self.judge, n_match=self.n_match, fill_zero=self.fill_zero)
         if self.df_tc is not None:
             self.num_lines = len(self.df_tc)
         data = {}

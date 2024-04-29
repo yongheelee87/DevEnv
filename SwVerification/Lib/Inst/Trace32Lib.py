@@ -76,7 +76,7 @@ class Trace32:
         else:
             print(f'Error: No file {run_cmd}\n')
 
-        start = time.time_ns()
+        start = time.time()
         elapse_time = 0
         ready_cnt = 0
         while elapse_time < 10:  # 10초 초과시
@@ -84,7 +84,7 @@ class Trace32:
                 ready_cnt += 1
                 if ready_cnt >= 10:
                     break
-            elapse_time = int((time.time_ns() - start) * 0.000000001)
+            elapse_time = time.time() - start
             time.sleep(0.5)
         self.cmd('Go')
 
@@ -92,13 +92,13 @@ class Trace32:
         '''
         :param timeout: integer number of time out
         '''
-        start = time.time_ns()
+        start = time.time()
         elapsed_time = 0
         while elapsed_time < timeout:  # Timeout
             self.connect_dev()  # 연결
             if self.status is True:
                 break
-            elapsed_time = int((time.time_ns() - start) * 0.000000001)
+            elapsed_time = time.time() - start
 
     def cmd(self, str_cmd: str, time_out: int = 10):
         '''
@@ -148,21 +148,21 @@ class Trace32:
 
     def reset_go(self):
         self.cmd('System.ResetTarget')
-        start = time.time_ns()
+        start = time.time()
         elapse_time = 0
         while elapse_time < 5:  # 5초 초과시
             self.cmd('Go')
             if self._get_state() == RUNNING:
                 break
-            elapse_time = int((time.time_ns() - start) * 0.000000001)
+            elapse_time = time.time() - start
 
     def _wait_until_command_ends(self, timeout: int):
-        start = time.time_ns()
+        start = time.time()
         elapse_time = 0
         while elapse_time < timeout:  # Timeout
             rc = self.device.library.t32_getpracticestate()  # _get_practice_state()
             if rc == 0: break
-            elapse_time = int((time.time_ns() - start) * 0.000000001)
+            elapse_time = time.time() - start
 
     def _get_state(self):
         return int.from_bytes(self.device.get_state(), "big")

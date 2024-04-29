@@ -18,7 +18,7 @@ class Ui_measure(object):
     def setupUi(self, measure):
         if not measure.objectName():
             measure.setObjectName(u"measure")
-        measure.resize(1111, 1043)
+        measure.resize(1361, 1043)
         measure.setStyleSheet(u"/* /////////////////////////////////////////////////////////////////////////////////////////////////\n"
 "\n"
 "SET APP STYLESHEET - FULL STYLES HERE\n"
@@ -807,6 +807,53 @@ class Ui_measure(object):
 
         self.horizontalLayout_2.addWidget(self.cbox_judge_type)
 
+        self.label_time_type = QLabel(self.frame_content_wid_3)
+        self.label_time_type.setObjectName(u"label_time_type")
+        self.label_time_type.setStyleSheet(u"color: rgb(113, 126, 149);")
+        self.label_time_type.setLineWidth(1)
+        self.label_time_type.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.horizontalLayout_2.addWidget(self.label_time_type)
+
+        self.cbox_time_type = QComboBox(self.frame_content_wid_3)
+        self.cbox_time_type.addItem("")
+        self.cbox_time_type.addItem("")
+        self.cbox_time_type.setObjectName(u"cbox_time_type")
+        sizePolicy1.setHeightForWidth(self.cbox_time_type.sizePolicy().hasHeightForWidth())
+        self.cbox_time_type.setSizePolicy(sizePolicy1)
+        self.cbox_time_type.setMinimumSize(QSize(110, 0))
+        self.cbox_time_type.setFont(font1)
+        self.cbox_time_type.setLayoutDirection(Qt.LeftToRight)
+        self.cbox_time_type.setStyleSheet(u"QComboBox\n"
+"{\n"
+"background-color: rgb(40, 44, 52);\n"
+"selection-background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #565656, stop: 0.1 #525252, stop: 0.5 #4e4e4e, stop: 0.9 #4a4a4a, stop: 1 #464646);\n"
+"border: 1px solid transparent;\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView\n"
+"{\n"
+"background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #565656, stop: 0.1 #525252, stop: 0.5 #4e4e4e, stop: 0.9 #4a4a4a, stop: 1 #464646);\n"
+"selection-background-color: rgb(170, 170, 255);\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox:hover\n"
+"{\n"
+"border: 4px solid green;\n"
+"color: white;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down\n"
+"{\n"
+"border-width: 0px;\n"
+"}\n"
+"")
+        self.cbox_time_type.setFrame(True)
+
+        self.horizontalLayout_2.addWidget(self.cbox_time_type)
+
         self.label_num_match = QLabel(self.frame_content_wid_3)
         self.label_num_match.setObjectName(u"label_num_match")
         self.label_num_match.setStyleSheet(u"color: rgb(113, 126, 149);")
@@ -931,6 +978,10 @@ class Ui_measure(object):
         self.label_judge_type.setText(QCoreApplication.translate("measure", u"Judge Type: ", None))
         self.cbox_judge_type.setItemText(0, QCoreApplication.translate("measure", u"same time", None))
         self.cbox_judge_type.setItemText(1, QCoreApplication.translate("measure", u"independent", None))
+
+        self.label_time_type.setText(QCoreApplication.translate("measure", u"Time Type: ", None))
+        self.cbox_time_type.setItemText(0, QCoreApplication.translate("measure", u"Per step", None))
+        self.cbox_time_type.setItemText(1, QCoreApplication.translate("measure", u"Total", None))
 
         self.label_num_match.setText(QCoreApplication.translate("measure", u"Sample Rate (sec): ", None))
         self.line_sample_rate.setText(QCoreApplication.translate("measure", u"0.1", None))

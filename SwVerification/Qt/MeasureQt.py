@@ -38,8 +38,8 @@ class MeasureWindow(QWidget):
         self.ui_meas.btn_show_graph.clicked.connect(self.func_btn_show_graph)
 
     def connectLineInit(self):
-        self.ui_meas.line_sample_rate.returnPressed.connect(self.func_line_sample_rate)
-        self.ui_meas.line_num_match.returnPressed.connect(self.func_line_num_match)
+        self.ui_meas.line_sample_rate.textChanged.connect(self.func_line_sample_rate)
+        self.ui_meas.line_num_match.textChanged.connect(self.func_line_num_match)
 
     def connectCBoxInit(self):
         self.ui_meas.cbox_project.clear()
@@ -48,6 +48,7 @@ class MeasureWindow(QWidget):
         self.ui_meas.cbox_project.setCurrentText(target)
         self.update_measure_target()
         self.ui_meas.cbox_project.currentIndexChanged.connect(self.update_measure_target)
+        self.ui_meas.cbox_time_type.currentIndexChanged.connect(self.func_cbox_time_type)
         self.ui_meas.cbox_judge_type.currentIndexChanged.connect(self.func_cbox_judge_type)
         self.ui_meas.cbox_fill_zero.currentIndexChanged.connect(self.func_cbox_fill_zero)
 
@@ -87,6 +88,13 @@ class MeasureWindow(QWidget):
             str_num_match = '1'  # 초기 값
         self.measure.n_match = str_num_match
 
+    def func_cbox_time_type(self):
+        str_time_type = self.ui_meas.cbox_time_type.currentText().strip()
+        if 'Total' in str_time_type:
+            self.measure.time_type = 'Total Time'
+        else:
+            self.measure.time_type = 'Per step'
+
     def func_cbox_judge_type(self):
         str_judge_type = self.ui_meas.cbox_judge_type.currentText().strip()
         if 'same' in str_judge_type:
@@ -118,15 +126,16 @@ class MeasureWindow(QWidget):
         self.ui_meas.tbl_script.clear()
         # Select Dataframe
         lst_df = load_csv_list(file_path=self.ui_meas.line_script_path.text())
-        judge_type = 'same time' if 'same' in lst_df[1][1] else 'independent'
-        self.ui_meas.cbox_judge_type.setCurrentText(judge_type)
+        self.ui_meas.cbox_judge_type.setCurrentIndex(1 if 'Total' in lst_df[1][1] else 0)
+        self.ui_meas.cbox_judge_type.setCurrentIndex(0 if 'same' in lst_df[2][1] else 1)
         self.ui_meas.line_sample_rate.setText(lst_df[0][1])
-        self.ui_meas.line_num_match.setText(lst_df[2][1])
+        self.ui_meas.line_num_match.setText(lst_df[3][1])
         self.func_line_sample_rate()
         self.func_line_num_match()
+        self.func_cbox_time_type()
         self.func_cbox_judge_type()
 
-        df_testEnv = pd.DataFrame(lst_df[5:], columns=lst_df[4])
+        df_testEnv = pd.DataFrame(lst_df[6:], columns=lst_df[5])
         logging_print(f"The test script has been loaded successfully\n")
         # Table Contents
         self.ui_meas.tbl_script.setColumnCount(len(df_testEnv.columns))

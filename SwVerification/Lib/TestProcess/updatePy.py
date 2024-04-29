@@ -68,6 +68,8 @@ log_th = LogThread(can_bus=canBus)
 log_th.start()
 log_th.log_state = True  # log start
 
+start_time = log_th.start_test
+elapsed_time = 0
 for i in input_data:
     if i[2] == 255:
         log_th.step = int(i[0])
@@ -123,11 +125,11 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         df_tc_raw = None
         if use_csv is True:
             lst_df = load_csv_list(file_path=self.py_path.replace('.py', '.csv'))
-            df_tc_raw = pd.DataFrame(lst_df[5:], columns=lst_df[4])
-            codes, df_tc_raw = self.fill_variables(df=df_tc_raw, py_code=codes, rate=lst_df[0][1], judge=lst_df[1][1], n_match=lst_df[2][1])
+            df_tc_raw = pd.DataFrame(lst_df[6:], columns=lst_df[5])
+            codes, df_tc_raw = self.fill_variables(df=df_tc_raw, py_code=codes, rate=lst_df[0][1], time_type=lst_df[1][1], judge=lst_df[2][1], n_match=lst_df[3][1])
         return codes, df_tc_raw
 
-    def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
+    def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, time_type: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
         if 'Scenario' in df.columns:
             df_tc = df.drop(['Scenario'], axis=1).apply(pd.to_numeric)
         else:
@@ -146,6 +148,9 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
 
         for con in lst_condition:
             py_code = self.apply_csv_code(lines=py_code, s_str=con[0], e_str=con[1], new_str=con[2])
+        if 'Total' in time_type:
+            py_code = py_code.replace('time.sleep(i[1])',
+                                      'while elapsed_time < i[1]:  # Timeout\n         elapsed_time = time.time() - start_time  # Total Time 방식')  # Total time 방식 적용
         if fill_zero is False:
             py_code = py_code.replace('fill_zero=True', 'fill_zero=False')  # No Fill Zero 적용
         py_code = py_code.replace('JUDGE_TYPE = "same"', f'JUDGE_TYPE = "{judge}"')  # judge type 적용
@@ -211,7 +216,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         col_out = cols[:1]  # Step
         lst_in = []
         lst_out = []
-        for col in cols[2:]:
+        for col in cols[2:]:  # Signals except step,time
             temp = [t.strip() for t in col.split(', ')]  # get dev, signal
             if '[OUT]' in temp[0]:  # In case of Output
                 col_out.append(col)  # Insert Output variable
