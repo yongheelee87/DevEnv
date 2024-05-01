@@ -1,10 +1,7 @@
-import os
-import subprocess  # module to create an additional process
 import time  # time module
 from threading import Thread
 import lauterbach.trace32.rcl as trace32
 from lauterbach.trace32.rcl import CommandError
-from lauterbach.trace32.rcl._rc._error import ApiConnectionTimeoutError
 from Lib.Common import *
 
 SYSTEM_DOWN = 0
@@ -45,7 +42,6 @@ class Trace32:
         try:
             self.device = trace32.connect(node='localhost', port=20001, protocol="TCP", packlen=1024, timeout=10.0)
             self.status = True
-            print('Success: TRACE32 CONNECTION\n')
         except ConnectionRefusedError:
             self.status = False
             print('Error: TRACE32 CONNECTION\nCHECK IF TRACE32 POWERVIEW IS OPENED AND RETRY THE CONNECTION\n')
@@ -70,7 +66,8 @@ class Trace32:
         if os.path.exists(run_cmd.split()[0]):
             try:
                 self.device.cmd(f"CD.DO {run_cmd}")
-            except ApiConnectionTimeoutError:
+                print(f'Flash: CD.DO {run_cmd}')
+            except:
                 self.wait_until_connect(timeout=10)
                 self.device.cmd(f"CD.DO {run_cmd}")
         else:

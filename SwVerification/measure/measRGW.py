@@ -159,7 +159,7 @@ class MeasRGW(UpdatePy):
                         yticks_labels.append(f'{y_val}')
                 else:
                     yticks_labels.append(f'{y_val}')
-            axs[i].set_yticklabels(yticks_labels)
+            axs[i].set_yticklabels(yticks_labels, fontsize=6)
 
             if step_debug is True:
                 step_location = []
@@ -180,7 +180,7 @@ class MeasRGW(UpdatePy):
 
         # Hide x labels and tick labels for all but bottom plot
         for ax in axs:
-            ax.legend(loc='upper right')
+            ax.legend(loc='upper right', fontsize=7)
             # ax.label_outer()
 
         cursor(hover=True, highlight=False)

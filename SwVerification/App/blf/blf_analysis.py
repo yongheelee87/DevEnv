@@ -151,7 +151,7 @@ class BlfAnalysis:
                     yticks_labels.append(canBus.devs[dev_name].sig_val[sig_name][y_val])
                 else:
                     yticks_labels.append(f'{y_val}(RAW)')
-            axs[i].set_yticklabels(yticks_labels)
+            axs[i].set_yticklabels(yticks_labels, fontsize=6)
             axs[i].set_xlim(left=0, right=self.maxT + 1)
 
             if i == len(data_col) - 1:
@@ -159,8 +159,8 @@ class BlfAnalysis:
 
             # Hide x labels and tick labels for all but bottom plot
             for ax in axs:
-                ax.legend(loc='upper right')
-                ax.label_outer()
+                ax.legend(loc='upper right', fontsize=7)
+                # ax.label_outer()
             filepath = os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '.png'))
             plt.savefig(filepath, format='png')
             print(f"[INFO] {filepath} has been created\n")
