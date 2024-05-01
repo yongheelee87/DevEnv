@@ -1,6 +1,9 @@
 import sys
 import os
 
+from PySide6.QtWidgets import QApplication, QSplashScreen
+from PySide6.QtGui import QPixmap
+
 
 class System:
     Ver = 'v1.0'  # SW Version
@@ -20,17 +23,20 @@ if __name__ == "__main__":
             System.Yaml = True
 
     if 'UI' in System.Exe:
+        # QApplication : 프로그램을 실행시켜주는 클래스
+        app = QApplication()
+        splash = QSplashScreen(QPixmap('./static/images/loading.png'))
+        splash.show()
+
         from Qt import *
 
         # Logging module 초기화
         logging_initialize()
         logging_print(f"The program is named SW TEST Automation {System.Ver}. It provides the functions for the measurement and automation with various devices\n")
 
-        # QApplication : 프로그램을 실행시켜주는 클래스
-        app = QApplication()
-
         # 프로그램 화면을 보여주는 코드
         window = MainWindow()
+        splash.finish(window)
 
         # 프로그램을 이벤트루프로 진입시키는(프로그램을 작동시키는) 코드
         app.exec()

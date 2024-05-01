@@ -9,7 +9,6 @@
 # interface (GUI) can be modified without any implication.
 #
 # ///////////////////////////////////////////////////////////////
-from templates import *
 from Lib.Common import *
 
 # Qt Window
