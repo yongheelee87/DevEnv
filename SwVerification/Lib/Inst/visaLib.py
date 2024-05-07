@@ -7,8 +7,8 @@ class VisaDev:
         super().__init__()
         self.config = config_sys  # Config 파일 Set
 
-        self.resource = dict()  # Class 넣을 dictionary 선언
-        self.status = dict()  # Status 넣을 dictionary 선언
+        self.resource = {}  # Class 넣을 dictionary 선언
+        self.status = {}  # Status 넣을 dictionary 선언
 
         self.lst_dev = self._find_device()
         if len(self.lst_dev) != 0:
@@ -126,11 +126,7 @@ class VisaDev:
             print('Error: COMMAND RESET\n')
 
     def _find_device(self) -> list:
-        lst_dev = []
-        for i in self.config.keys()[1:]:
-            if 'visa' in self.config[i]['type']:
-                lst_dev.append(i)
-        return lst_dev
+        return [i for i in self.config.keys()[1:] if 'visa' in self.config[i]['type']]
 
 
 # This is a new line that ends the file

@@ -13,7 +13,7 @@ class TelnetClient:
         self.device = None
         self.status = False
 
-        if 'TELNET' in self.config.keys():
+        if 'TELNET' in self.config:
             self.connect_dev(self.config['TELNET']['host'], self.config['TELNET']['port'])
 
         '''

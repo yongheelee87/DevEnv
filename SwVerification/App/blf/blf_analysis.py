@@ -65,7 +65,7 @@ class BlfAnalysis:
         log_output = []
         for msg in log:
             time_secs = msg.timestamp - log[0].timestamp
-            if msg.channel in self.dic_channel.keys():
+            if msg.channel in self.dic_channel:
                 device_ch = self.dic_channel[msg.channel]
             else:
                 device_ch = msg.channel
@@ -147,7 +147,7 @@ class BlfAnalysis:
             axs[i].set_yticks(yticks_val)
             yticks_labels = []
             for y_val in yticks_val:
-                if (sig_name in canBus.devs[dev_name].sig_val.keys()) and (y_val in canBus.devs[dev_name].sig_val[sig_name].keys()):
+                if (sig_name in canBus.devs[dev_name].sig_val) and (y_val in canBus.devs[dev_name].sig_val[sig_name]):
                     yticks_labels.append(canBus.devs[dev_name].sig_val[sig_name][y_val])
                 else:
                     yticks_labels.append(f'{y_val}(RAW)')

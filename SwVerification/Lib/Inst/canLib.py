@@ -37,8 +37,8 @@ class CANDev:
         self.rx = CANRxThread(self.buffer)  # CAN RX 시그널 THREAD 설정
         self.rx.start()  # CAN RX 시그널 THREAD 동작
 
-        self.tx_data = dict()  # CAN tx period data 선언; 메모리 보관
-        self.tx_period = dict()  # CAN tx period data 선언; 메모리 보관
+        self.tx_data = {}  # CAN tx period data 선언; 메모리 보관
+        self.tx_period = {}  # CAN tx period data 선언; 메모리 보관
         self.event_time = 0  # CAN event Time 저장
 
     def connect_dev(self, bus_type: str, ch: str or int, bit_rate: int, data_rate: int, app_type: str):
@@ -56,7 +56,7 @@ class CANDev:
                 self.status = CAN_ERR
 
     def msg_init(self):
-        self.rx.msg_dict.clear()  # 메세지 초기화
+        self.rx.msg_dict = {}  # 메세지 초기화
 
     def msg_read_id(self, can_id: int, decode_on: bool = True) -> dict:
         '''
@@ -64,8 +64,8 @@ class CANDev:
         :param decode_on: True = decoded return value False = raw value
         :return: dict rx data consisting of signals and values
         '''
-        rx_data = dict()
-        if can_id in self.rx.msg_dict.keys():
+        rx_data = {}
+        if can_id in self.rx.msg_dict:
             rx_raw_data = self.rx.msg_dict[can_id].data  # 데이터 변이 방지
             rx_data = self.db.decode_message(can_id, rx_raw_data, decode_choices=decode_on)
         return rx_data
@@ -76,9 +76,9 @@ class CANDev:
         :param decode_on: True = decoded return value False = raw value
         :return: dict rx data consisting of signals and values
         '''
-        rx_data = dict()
+        rx_data = {}
         can_id = self.get_msg_id(frame_name)
-        if can_id in self.rx.msg_dict.keys():
+        if can_id in self.rx.msg_dict:
             rx_raw_data = self.rx.msg_dict[can_id].data  # 데이터 변이 방지
             rx_data = self.db.decode_message(can_id, rx_raw_data, decode_choices=decode_on)
         return rx_data
@@ -89,9 +89,9 @@ class CANDev:
         :param decode_on: True = decoded return value False = raw value
         :return: dict rx data consisting of signals and values
         '''
-        rx_data = dict()
+        rx_data = {}
         can_id = self.get_msg_id(frame_name)
-        if can_id in self.rx.msg_dict.keys():
+        if can_id in self.rx.msg_dict:
             message = self.rx.msg_dict[can_id]  # 데이터 변이 방지
             if self.event_time != message.timestamp:
                 rx_data = self.db.decode_message(can_id, message.data, decode_choices=decode_on)
@@ -109,12 +109,10 @@ class CANDev:
         if value is not None:
             try:
                 msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
-                msg_raw_data = dict(
-                    zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
+                msg_raw_data = dict(zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
                 msg_raw_data[sig_name] = value  # 해당 signal 값 입력
                 msg_data = msg_tx.encode(msg_raw_data)  # CAN message에 맞게 Encoding
-                can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended,
-                                      is_fd=True)
+                can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
                 self.bus.send(can_message, timeout=time_out)  # 일정타임이상의 Timeout설정으로 전달이 안정적임
             except:
                 print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
@@ -130,7 +128,7 @@ class CANDev:
             '''
             Here is an Example for frame msg
 
-            frame_msg = dict()
+            frame_msg = {}
             frame_msg[sig_name] = value1
             frame_msg[sig_name] = value2
             frame_msg[sig_name] = value3
@@ -154,27 +152,20 @@ class CANDev:
         '''
         if value is not None:
             try:
-                msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
-                msg_raw_data = dict(
-                    zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
-
-                if frame_name in self.tx_data.keys():  # Frame 값이 있는지 확인
+                if frame_name in self.tx_data:  # Frame 값이 있는지 확인
                     if sig_name in self.tx_data[frame_name]:  # 같은 신호 TX 요청이 있을시 신호 값 변경
-                        sig_index = self.tx_data[frame_name].index(sig_name) + 1  # Frame내 signal value 인덱스 찾기
-                        self.tx_data[frame_name][sig_index] = value  # Frame내 signal value 변경
-                    else:  # 다른 신호 TX 요청이 있을시 추가로 넣기
-                        self.tx_data[frame_name] += [sig_name, value]
-
-                    for i in range(0, len(self.tx_data[frame_name]), 2):
-                        msg_raw_data[self.tx_data[frame_name][i]] = self.tx_data[frame_name][i + 1]  # 해당 signal 값 입력
-
+                        if value == self.tx_data[frame_name][sig_name]:  # 같은 시그널 값 요청시 동작 불필요
+                            return  # 함수 종료
+                    self.tx_data[frame_name][sig_name] = value  # Frame내 signal value 변경
                 else:  # 저장된 Frame 값이 없다면 새로 만들기
-                    self.tx_data[frame_name] = [sig_name, value]
-                    msg_raw_data[sig_name] = value  # 해당 signal 값 입력
+                    self.tx_data[frame_name] = {sig_name: value}  # Frame 및 Signal 생성
 
+                msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
+                msg_raw_data = dict(zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
+                for sig, val in self.tx_data[frame_name].items():
+                    msg_raw_data[sig] = val  # 해당 signal 값 입력
                 msg_data = msg_tx.encode(msg_raw_data)  # CAN message에 맞게 Encoding
-                can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended,
-                                      is_fd=True)
+                can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
                 self._stop_overlap_msg(frame_name)
                 self.tx_period[frame_name] = self.bus.send_periodic(can_message, period)
             except:
@@ -199,12 +190,8 @@ class CANDev:
         '''
         try:
             self.bus.stop_all_periodic_tasks()
-
-            if len(self.tx_period) != 0:
-                self.tx_period.clear()
-
-            if len(self.tx_data) != 0:
-                self.tx_data.clear()
+            self.tx_period = {}
+            self.tx_data = {}
         except CanError:
             print("Error: STOP WRITE CAN MESSAGE\n")
 
@@ -215,15 +202,16 @@ class CANDev:
         return self.db.get_message_by_name(frame_name).frame_id  # 해당 CAN message frame id 정보 가져오기
 
     def _stop_overlap_msg(self, frame_name: str):
-        if frame_name in self.tx_period.keys():
+        if frame_name in self.tx_period:
             self.tx_period[frame_name].stop()
 
     def _get_dbc(self, name: str, config) -> str:
         db_path = config['DBC_file_path']
         if db_path == 'git':
             ref_path = os.path.join(Configure.set['system']['git_path'], 'References', 'DB')
-            lst_db = [os.path.join(ref_path, file) for file in os.listdir(ref_path) if '.dbc' in file and name in file]
-            db_path = lst_db[0]
+            for file in os.listdir(ref_path):
+                if '.dbc' in file and name in file:
+                    return os.path.join(ref_path, file)
         return db_path
 
     def _get_decode_val(self, db_path: str) -> dict:
@@ -253,7 +241,7 @@ class CANRxThread(Thread):
         super().__init__()
         self.rx_buffer = buffer
         self.msg_normal = None
-        self.msg_dict = dict()
+        self.msg_dict = {}
 
     def run(self):
         while True:
@@ -269,7 +257,7 @@ class CANRxThread(Thread):
 class CANBus:
     def __init__(self, config_sys):
         self.config = config_sys  # Config 파일 Set
-        self.devs = dict()
+        self.devs = {}
 
         self.lst_dev = self._find_can()
         for dev in self.lst_dev:
@@ -298,17 +286,11 @@ class CANBus:
             self.devs[dev].msg_init()
 
     def get_all_period_msg(self):
-        all_msg = dict()
+        all_msg = {}
         for dev in self.lst_dev:
             all_msg.update(self.devs[dev].tx_data)
         return all_msg
 
     def _find_can(self):
-        lst_can = []
-        for i in list(self.config.keys())[1:]:
-            if 'can' in self.config[i]['type']:
-                lst_can.append(i)
-        return lst_can
-
-
+        return [i for i in list(self.config.keys())[1:] if 'can' in self.config[i]['type']]
 # This is a new line that ends the file

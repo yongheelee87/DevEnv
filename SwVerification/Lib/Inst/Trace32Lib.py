@@ -20,7 +20,7 @@ class Trace32:
         self.device = None  # Trace device 선언
         self.status = False  # status 선언
 
-        if 'TRACE32' in self.config.keys():
+        if 'TRACE32' in self.config:
             self.connect_dev()  # 연결 시도
             if self.config['TRACE32']['auto_open'] is True:  # Auto Start 설정시
                 if check_task_open(name="t32mppc.exe") is False:  # Trace32 Process 현재 작동 되지 않을 경우
@@ -188,7 +188,7 @@ class Trace32:
         :return: t32 symbol data from dict
         '''
         ret_data = None
-        if sym in self.rx.msg_dict.keys():  # 데이터 저장이 되어 있을 경우
+        if sym in self.rx.msg_dict:  # 데이터 저장이 되어 있을 경우
             ret_data = int(self.rx.msg_dict[sym])
         return ret_data
 

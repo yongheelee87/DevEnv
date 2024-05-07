@@ -130,10 +130,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         return codes, df_tc_raw
 
     def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, time_type: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
-        if 'Scenario' in df.columns:
-            df_tc = df.drop(['Scenario'], axis=1).apply(pd.to_numeric)
-        else:
-            df_tc = df.apply(pd.to_numeric)
+        df_tc = df.drop(['Scenario'], axis=1).apply(pd.to_numeric) if 'Scenario' in df.columns else df.apply(pd.to_numeric)
         in_col, out_col, inputs, outputs, total = self._get_msg_in_out(df=df_tc)
         in_data = str(df_tc[in_col].values.tolist()).replace('nan', 'None')
         out_data = str(df_tc[out_col].values.tolist()).replace('nan', 'None')
@@ -141,13 +138,15 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
                          ['# Dev signal List Begin', '# Dev signal List End',
                           f'dev_in_sigs = {str(inputs)}\ndev_out_sigs = {str(outputs)}\ndev_all_sigs = {str(total)}'],
                          ['# LogThread Begin', '# LogThread End',
-                          self.log_thread_body.format(len_in=len(in_col) - 2, sample_rate=rate, read_msg=self._get_msg_read(outputs))],
-                         ['# Dev Input Begin', '# Dev Input End', self._get_msg_write(inputs)],
-                         ['# TC main Begin', '# TC main End',
-                          self.tc_main_body.format(write_msg=self._get_msg_write(inputs))]]
+                          self.log_thread_body.format(len_in=len(in_col) - 2, sample_rate=rate, read_msg=self._get_msg_read(outputs))]]
+        if '# Dev Input Begin' in py_code:
+            lst_condition.append(['# Dev Input Begin', '# Dev Input End', self._get_msg_write(inputs)])
+        else:
+            lst_condition.append(['# TC main Begin', '# TC main End', self.tc_main_body.format(write_msg=self._get_msg_write(inputs))])
 
         for con in lst_condition:
             py_code = self.apply_csv_code(lines=py_code, s_str=con[0], e_str=con[1], new_str=con[2])
+
         if 'Total' in time_type:
             py_code = py_code.replace('time.sleep(i[1])',
                                       'while elapsed_time < i[1]:  # Timeout\n         elapsed_time = time.time() - start_time  # Total Time 방식')  # Total time 방식 적용
@@ -183,7 +182,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         for line in lines:
             if "OUTPUT_PATH = " in line:
                 line = f"OUTPUT_PATH = r'{self.py_output_path}'\n"
-            if 'title = [' in line:
+            elif 'title = [' in line:
                 line = f"title = [r'{self.py_title}']\n"
             new_lines.append(line)
         new_line = ''.join(new_lines)
@@ -265,12 +264,10 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
                 else:
                     dev_line = f"self.can.devs['{str_out[0]}'].msg_read_name('{str_out[1]}', decode_on=False)"
 
-                used = False
-                for used_line in used_lines.keys():
-                    if used_line == dev_line:
-                        used = True
-
-                if used is False:
+                if dev_line in used_lines:
+                    msg_var = used_lines[dev_line]
+                    line = f"                out_data.append({msg_var}['{str_out[2]}'] if {msg_var} else None)"
+                else:
                     msg_var = f'msg_{idx}'
                     used_lines[dev_line] = msg_var
                     idx += 1
@@ -282,9 +279,6 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
                         line = (
                             f"                {msg_var} = self.can.devs['{str_out[0]}'].msg_read_name('{str_out[1]}', decode_on=False)\n"
                             f"                out_data.append({msg_var}['{str_out[2]}'] if {msg_var} else None)")
-                else:
-                    msg_var = used_lines[dev_line]
-                    line = f"                out_data.append({msg_var}['{str_out[2]}'] if {msg_var} else None)"
 
             lst_line.append(line)
         return '\n'.join(lst_line)

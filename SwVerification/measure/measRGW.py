@@ -152,8 +152,8 @@ class MeasRGW(UpdatePy):
             yticks_labels = []
             for y_val in yticks_val:
                 if (sig_name == self.sig[i][-1]) and (self.sig[i][0] != 'T32') and (self.sig[i][0] != 'LIN'):
-                    if (sig_name in canBus.devs[self.sig[i][0]].sig_val.keys()) and (
-                            y_val in canBus.devs[self.sig[i][0]].sig_val[sig_name].keys()):
+                    if (sig_name in canBus.devs[self.sig[i][0]].sig_val) and (
+                            y_val in canBus.devs[self.sig[i][0]].sig_val[sig_name]):
                         yticks_labels.append(canBus.devs[self.sig[i][0]].sig_val[sig_name][y_val])
                     else:
                         yticks_labels.append(f'{y_val}')
