@@ -117,30 +117,26 @@ class CANDev:
             except:
                 print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
 
-    def msg_write_by_frame(self, frame_name: str, frame_msg: dict, time_out: float = 0.2, is_extended: bool = False):
+    def msg_write_by_frame(self, frame_name: str, sig_name: list, value: list, time_out: float = 0.02, is_extended: bool = False):
         '''
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
-        :param frame_msg: Frame dict including signals based on CAN DB. you can find it in Messages names as well
-        :param time_out: duration
+        :param sig_name: Signal name based on CAN DB. you can find it in Signals names as well
+        :param value: Input Value
+        :param time_out: message duration
         :param is_extended: message id extended
         '''
-        try:
-            '''
-            Here is an Example for frame msg
-
-            frame_msg = {}
-            frame_msg[sig_name] = value1
-            frame_msg[sig_name] = value2
-            frame_msg[sig_name] = value3
-
-            Write the Frame msg like this and put it in the function
-            '''
-            msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
-            msg_data = msg_tx.encode(frame_msg)  # CAN message에 맞게 Encoding
-            can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
-            self.bus.send(can_message, timeout=time_out)  # 일정타임이상의 Timeout설정으로 전달이 안정적임
-        except:
-            print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
+        if value != ([None] * len(value)):
+            try:
+                msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
+                msg_raw_data = dict(zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
+                for sig, val in zip(sig_name, value):
+                    if val is not None:
+                        msg_raw_data[sig] = val  # 해당 signal 값 입력
+                msg_data = msg_tx.encode(msg_raw_data)  # CAN message에 맞게 Encoding
+                can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
+                self.bus.send(can_message, timeout=time_out)  # 일정타임이상의 Timeout설정으로 전달이 안정적임
+            except:
+                print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
 
     def msg_period_write(self, frame_name: str, sig_name: str, value: int or float = 0, period: float = 0.02, is_extended: bool = False):
         '''
@@ -171,7 +167,34 @@ class CANDev:
             except:
                 print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
 
-    def raw_msg_write(self, frame_id: int, msg_data: list, time_out: float = 0.02, is_extended: bool = False):
+    def msg_period_write_by_frame(self, frame_name: str, sig_name: list, value: list, period: float = 0.02, is_extended: bool = False):
+        '''
+        :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
+        :param sig_name: Signal name based on CAN DB. you can find it in Signals names as well
+        :param value: Input Value
+        :param period: message period
+        :param is_extended: message id extended
+        '''
+        if value != ([None] * len(value)):
+            try:
+                if frame_name in self.tx_data:  # Frame 값이 있는지 확인
+                    if value == self.tx_data[frame_name]:  # 같은 시그널 값 요청시 동작 불필요
+                        return  # 함수 종료
+
+                self.tx_data[frame_name] = value  # Frame내 signal value 변경
+                msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
+                msg_raw_data = dict(zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
+                for sig, val in zip(sig_name, value):
+                    if val is not None:
+                        msg_raw_data[sig] = val  # 해당 signal 값 입력
+                msg_data = msg_tx.encode(msg_raw_data)  # CAN message에 맞게 Encoding
+                can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
+                self._stop_overlap_msg(frame_name)
+                self.tx_period[frame_name] = self.bus.send_periodic(can_message, period)
+            except:
+                print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
+
+    def msg_raw_write(self, frame_id: int, msg_data: list, time_out: float = 0.02, is_extended: bool = False):
         '''
         :param frame_id:
         :param msg_data:

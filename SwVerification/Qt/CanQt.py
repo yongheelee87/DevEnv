@@ -148,7 +148,7 @@ class CanWindow(QWidget):
                 elif 'WR:' in cmd[:3]:
                     lst_cmd = cmd[3:].strip().replace("'", '').split(",")
                     dev = lst_cmd[0].strip()
-                    canBus.devs[dev].raw_msg_write(int(lst_cmd[1].strip(), 16), to_hex_big_lst(lst_cmd[2].strip()))
+                    canBus.devs[dev].msg_raw_write(int(lst_cmd[1].strip(), 16), to_hex_big_lst(lst_cmd[2].strip()))
                     read_msg += f'Write Raw Msg {lst_cmd}\n'
                 elif 'R:' in cmd[:2]:
                     lst_cmd = cmd[2:].strip().replace("'", '').split(",")

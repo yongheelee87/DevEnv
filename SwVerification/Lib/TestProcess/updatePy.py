@@ -1,3 +1,4 @@
+from itertools import groupby
 from Lib.Inst import *
 from Lib.Common import *
 
@@ -142,7 +143,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         if '# Dev Input Begin' in py_code:
             lst_condition.append(['# Dev Input Begin', '# Dev Input End', self._get_msg_write(inputs)])
         else:
-            lst_condition.append(['# TC main Begin', '# TC main End', self.tc_main_body.format(write_msg=self._get_msg_write(inputs))])
+            lst_condition.append(['# TC main Begin', '# TC main End', self.tc_main_body.format(write_msg=self._get_msg_write_frame(inputs))])
 
         for con in lst_condition:
             py_code = self.apply_csv_code(lines=py_code, s_str=con[0], e_str=con[1], new_str=con[2])
@@ -207,6 +208,35 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
                 line = f"        t32.write_symbol(symbol='{str_in[-1]}', value=i[{idx}])"
             lst_line.append(line)
             idx += 1
+        return '\n'.join(lst_line)
+
+    def _get_msg_write_frame(self, lst_input: list) -> str:
+        lst_line = []
+        idx = 2
+
+        sorted_sigs = (list(sig) for grp, sig in groupby(lst_input, lambda x: x[1]))
+        for str_in in sorted_sigs:
+            sig = []
+            val = []
+            for lst_in in str_in:
+                sig.append(lst_in[2])
+                val.append(f"i[{idx}]")
+                idx += 1
+
+            if str_in[0][0] != 'LIN' and str_in[0][0] != 'T32':  # Only for CAN message
+                if 'Event' in str_in[0][4]:
+                    if 'Extended' in str_in[0][3]:
+                        line = f'''        canBus.devs['{str_in[0][0]}'].msg_write_by_frame('{str_in[0][1]}', {str(sig)}, {str(val).replace("'", "")}, {str_in[0][-1]}, is_extended=True)'''
+                    else:
+                        line = f'''        canBus.devs['{str_in[0][0]}'].msg_write_by_frame('{str_in[0][1]}', {str(sig)}, {str(val).replace("'", "")}, {str_in[0][-1]})'''
+                else:
+                    if 'Extended' in str_in[3]:
+                        line = f'''        canBus.devs['{str_in[0][0]}'].msg_period_write_by_frame('{str_in[0][1]}', {str(sig)}, {str(val).replace("'", "")}, {str_in[0][-1]}, is_extended=True)'''
+                    else:
+                        line = f'''        canBus.devs['{str_in[0][0]}'].msg_period_write_by_frame('{str_in[0][1]}', {str(sig)}, {str(val).replace("'", "")}, {str_in[0][-1]})'''
+            else:
+                line = f"        t32.write_symbol(symbol='{str_in[0][-1]}', value=i[{idx-1}])"
+            lst_line.append(line)
         return '\n'.join(lst_line)
 
     def _get_msg_in_out(self, df: pd.DataFrame) -> (list, list, list, list, list):
