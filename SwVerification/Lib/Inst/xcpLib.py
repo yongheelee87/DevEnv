@@ -48,8 +48,8 @@ class XcpProtocol:
         addr = sym
         # if sym is not hex address, it would find the address
         if sym[:2] != '0x':
-            if sym in self.df_symbol.index.values:
-                addr = self.df_symbol.loc[sym].values[0]
+            if sym in self.df_symbol.index.to_numpy():
+                addr = self.df_symbol.loc[sym].to_numpy()[0]
             else:
                 addr = '0x00000000'
                 print(f"Error: Get address of symbol [{sym}]\nThere is no symbol information in map\n")

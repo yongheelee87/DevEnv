@@ -22,8 +22,9 @@ if __name__ == "__main__":
         elif 'yaml' in sys.argv[v]:
             System.Yaml = True
 
+    print("Preparing equipment for initialization, please wait while loading......\n")
+
     if 'UI' in System.Exe:
-        print("Preparing equipment for initialization, please wait while loading...\n")
         # QApplication : 프로그램을 실행시켜주는 클래스
         app = QApplication()
         splash = QSplashScreen(QPixmap('./static/images/loading.png'))

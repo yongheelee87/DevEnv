@@ -12,6 +12,7 @@ class MeasureWindow(QWidget):
         # SET AS IMAGE WIDGETS
         self.ui_meas = Ui_measure()
         self.ui_meas.setupUi(self)
+        self.script_path = os.path.join('./data/input/script/Measure', 'removed.csv')
 
         self.measure = None  # Measure Class 선언 및 설정
         self.measure_th = TaskThread(task_model=self.measure)  # Measure Class 선언 및 설정
@@ -22,10 +23,6 @@ class MeasureWindow(QWidget):
         self.connectCBoxInit()
 
         self.graph = GraphView(fig=self.measure.fig, title='Measurement Graph')
-
-        self.measure_watch_dog = QTimer()
-        self.measure_watch_dog.setInterval(500)
-        self.measure_watch_dog.timeout.connect(self.run_finish)
 
     def backgroundInit(self):
         print("N/A")
@@ -52,15 +49,12 @@ class MeasureWindow(QWidget):
         self.ui_meas.cbox_judge_type.currentIndexChanged.connect(self.func_cbox_judge_type)
         self.ui_meas.cbox_fill_zero.currentIndexChanged.connect(self.func_cbox_fill_zero)
 
-    def run_finish(self):
-        if self.measure_th.isFinished() is True:
-            self.measure_watch_dog.stop()
-
     def func_btn_script_load(self):
-        input_script_file = QFileDialog.getOpenFileName(self, 'Open File', './data/input/script/Measure', 'csv File(*.csv);; All File(*)')[0]
-        if input_script_file:
+        input_script_file = QFileDialog.getOpenFileName(self, 'Open File', os.path.dirname(self.script_path), 'csv File(*.csv);; All File(*)')[0]
+        if 'csv' in input_script_file:
             self.ui_meas.line_script_path.setText(input_script_file)
             self._update_tbl_from_df()
+            self.script_path = input_script_file
 
     # noinspection PyMethodMayBeStatic
     def func_btn_Result_Folder(self):
@@ -68,7 +62,10 @@ class MeasureWindow(QWidget):
 
     # noinspection PyMethodMayBeStatic
     def func_btn_script_save(self):
-        print("TEST")
+        input_script_file = QFileDialog.getSaveFileName(self, 'Save File', os.path.dirname(self.script_path), 'csv File(*.csv);; All File(*)')[0]
+        if 'csv' in input_script_file:
+            self.ui_meas.line_script_path.setText(input_script_file)
+            self.script_path = input_script_file
 
     def func_btn_show_graph(self):
         self.measure.step_graph()

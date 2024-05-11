@@ -6,7 +6,7 @@ from Lib.Inst import *
 
 class CheckEnv:
     def __init__(self):
-        self.inst_status = get_inst_status()['Connect'].values.tolist()
+        self.inst_status = get_inst_status()['Connect'].to_numpy().tolist()
         self.path = Configure.set['system']['archive_path']
         self.file = os.path.join(self.path, 'env_available.txt')
         if os.path.isfile(self.file):  # 시작전 파일이 있다면 삭제

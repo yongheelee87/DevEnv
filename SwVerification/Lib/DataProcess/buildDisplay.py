@@ -14,8 +14,9 @@ def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, f
     # Step Column 제거
     step_dict = {}
     if data_col[0] == 'Step':
-        for step, group in df.groupby(['Step']):
-            step_dict[int(step[0])] = (group.index.values[0], group.index.values[-1])
+        for step, group in df.groupby('Step'):
+            time_sec = group.index.to_numpy()  # 스텝 별 시간 데이터
+            step_dict[step] = (time_sec[0], time_sec[-1])
 
         df.drop(labels='Step', axis=1, inplace=True)
         data_col.remove('Step')
@@ -31,8 +32,8 @@ def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, f
         sig_color_idx = i % 20
         sig_name = data_col[i].replace('In: ', '').replace('Out: ', '')
         df_signal = df[[signal]].dropna(axis=0)
-        x_data = df_signal.index.values
-        y_data = df_signal.values
+        x_data = df_signal.index.to_numpy()
+        y_data = df_signal.to_numpy()
 
         axs[i].step(x_data, y_data, 'o-', markersize=2, label=sig_name, c=plt.cm.tab20(sig_color_idx), where='post', linewidth=1.0)
 

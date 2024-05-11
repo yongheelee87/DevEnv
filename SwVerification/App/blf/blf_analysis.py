@@ -127,8 +127,8 @@ class BlfAnalysis:
             sig_name = lst_signal[-1]
 
             df_signal = self.df_blf[[signal]].dropna(axis=0)
-            x_data = df_signal.index.values  # ['Time'].values
-            y_data = df_signal.values  # ['Value'].values
+            x_data = df_signal.index.to_numpy()  # ['Time'].values
+            y_data = df_signal.to_numpy()  # ['Value'].values
 
             axs[i].step(x_data, y_data, 'o-', markersize=2, label=sig_name, c=plt.cm.tab20(color_idx), where='post', linewidth=1.0)
             if y_data.size == 0:
@@ -197,7 +197,7 @@ class BlfAnalysis:
 
     def _get_signal_value(self, ch: str, msg_name: str, signal_name: str) -> pd.DataFrame:
         df_temp = self.df_log[(self.df_log['Channel'] == ch) & (self.df_log['Frame Name'] == msg_name)]
-        time_log = df_temp['Time'].values
-        sig_value = df_temp['Data(Decode)'].apply(lambda x: x[signal_name]).values
+        time_log = df_temp['Time'].to_numpy()
+        sig_value = df_temp['Data(Decode)'].apply(lambda x: x[signal_name]).to_numpy()
         col_sig = ', '.join((ch, msg_name, signal_name))
         return pd.DataFrame({'Time': time_log, col_sig: sig_value})

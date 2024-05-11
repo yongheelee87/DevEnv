@@ -19,7 +19,7 @@ class AutoTest(UpdatePy):
         UpdatePy.__init__(self)
 
         self.df_inst = get_inst_status()  # Instruments status 가져오기
-        self.yaml_path = test_yaml if os.path.isfile(test_yaml) else './data/config/remote/test_map.yaml' # 지정된 장소에 파일이 없을 경우 remote에 설정된 파일 로드
+        self.yaml_path = test_yaml if os.path.isfile(test_yaml) else './data/config/remote/test_map.yaml'  # 지정된 장소에 파일이 없을 경우 remote에 설정된 파일 로드
         self.test_map, self.total_map = self._update_test_map(path=self.yaml_path)  # update map file for test
         self.single_mode = False
         self.script_path = None  # Test script path
@@ -96,7 +96,7 @@ class AutoTest(UpdatePy):
         self.tc_script = {}  # Initialize for each module
         self.num_lines = 0
         for idx, test_script in enumerate(project_tc.keys()):
-            print(f'Running {test_script} ({idx+1}/{num_tc})')
+            print(f'Starting on: {test_script} ({idx+1}/{num_tc})')
             res_tc[project_tc[test_script]] = self._run_test_case(test_script)
             if 'Fail' in res_tc[project_tc[test_script]]:
                 print('Result: Fail')
@@ -218,7 +218,7 @@ class AutoTest(UpdatePy):
         print(f"*** Number of Pass Test Case: {len_pass}/{len(lst_tc)}")
         print(f"*** Number of Fail Test Case: {len_fail}/{len(lst_tc)}")
         print(f"*** The Test for Module {os.path.basename(self.py_output_path)} has been completed\n")
-        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(self.py_output_path), version=df_ver.loc[project, 'Version'], dict_tc=tc_dict, tc_script=self.tc_script, export_path=file_path)  # 최종 결과물 HTML로 산출
+        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(self.py_output_path), version=df_ver.loc[project, 'Version'], dict_tc=tc_dict, tc_script=self.tc_script, export_path=self.py_output_path)  # 최종 결과물 HTML로 산출
 
     def _get_sw_version(self) -> pd.DataFrame:
         t32._wait_until_command_ends(timeout=5)

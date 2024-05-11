@@ -7,6 +7,7 @@ class UpdatePy:
     tc_head_body = """
 # USE CSV INTERFACE
 from threading import Thread
+from tqdm import tqdm
 import time
 from Lib.Inst import *
 from Lib.DataProcess import *
@@ -71,7 +72,13 @@ log_th.log_state = True  # log start
 
 start_time = log_th.start_test
 elapsed_time = 0
-for i in input_data:
+for i in tqdm(input_data,
+              total=len(input_data),  # 전체 진행수
+              desc='Running',  # 진행률 앞쪽 출력 문장
+              ncols=100,  # 진행률 출력 폭 조절
+              leave=True,  # True 반복문 완료시 진행률 출력 남김. False 남기지 않음.
+              colour='green'  # Bar 색
+              ):
     if i[2] == 255:
         log_th.step = int(i[0])
         i[2] = None
@@ -133,8 +140,8 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
     def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, time_type: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
         df_tc = df.drop(['Scenario'], axis=1).apply(pd.to_numeric) if 'Scenario' in df.columns else df.apply(pd.to_numeric)
         in_col, out_col, inputs, outputs, total = self._get_msg_in_out(df=df_tc)
-        in_data = str(df_tc[in_col].values.tolist()).replace('nan', 'None')
-        out_data = str(df_tc[out_col].values.tolist()).replace('nan', 'None')
+        in_data = str(df_tc[in_col].to_numpy().tolist()).replace('nan', 'None')
+        out_data = str(df_tc[out_col].to_numpy().tolist()).replace('nan', 'None')
         lst_condition = [['# Data Begin', '# Data End', f'input_data = {in_data}\nexpected_data = {out_data}'],
                          ['# Dev signal List Begin', '# Dev signal List End',
                           f'dev_in_sigs = {str(inputs)}\ndev_out_sigs = {str(outputs)}\ndev_all_sigs = {str(total)}'],

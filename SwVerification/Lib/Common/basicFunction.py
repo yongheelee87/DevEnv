@@ -142,17 +142,14 @@ def load_csv_list(file_path: str) -> list:
     :param file_path: file path to load
     :return: csv list
     '''
-    csv_lst = []
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f)
-            for row in reader:
-                csv_lst.append(row)
+            csv_lst = list(reader)
     except UnicodeDecodeError:
         with open(file_path, 'r', encoding='cp949') as f:
             reader = csv.reader(f)
-            for row in reader:
-                csv_lst.append(row)
+            csv_lst = list(reader)
     return csv_lst
 
 
