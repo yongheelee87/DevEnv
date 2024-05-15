@@ -1,9 +1,12 @@
+import os
+import time
 import numpy as np
 import pandas as pd
 from can import BLFReader
 import matplotlib.pyplot as plt
 from mplcursors import cursor
-from Lib.Inst import *
+from Lib.Common import isdir_and_make, open_path
+from Lib.Inst import canBus
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -116,7 +119,7 @@ class BlfAnalysis:
         self.fig.set_size_inches(26, 26)  # resize
 
         plt.rcParams['axes.xmargin'] = 0
-        data_col = self.df_blf.columns.tolist()
+        data_col = self.df_blf.columns
 
         axs = self.fig.add_gridspec(len(data_col), hspace=0.2).subplots(sharex=True, sharey=False)
 

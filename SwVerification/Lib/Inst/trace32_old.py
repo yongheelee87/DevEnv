@@ -1,11 +1,12 @@
+import os
 from ctypes import *  # module for C data types
 import enum  # module for C data types
 import subprocess  # module to create an additional process
 import time  # time module
-from Lib.Common import *
+from Lib.Common import check_process_open
 
 # file path
-t32api_path = config_built_in['TRACE32']['api_path']
+t32api_path = ''
 t32api = cdll.LoadLibrary(t32api_path)
 
 T32_DEV = 1

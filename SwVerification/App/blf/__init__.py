@@ -11,4 +11,4 @@
 # ///////////////////////////////////////////////////////////////
 
 # application library
-from . blf_analysis import *
+from . blf_analysis import BlfAnalysis

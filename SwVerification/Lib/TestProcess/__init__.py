@@ -11,4 +11,4 @@
 # ///////////////////////////////////////////////////////////////
 
 # basic library
-from . autoTest import *
+from . autoTest import AutoTest

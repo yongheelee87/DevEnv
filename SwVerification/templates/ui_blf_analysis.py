@@ -8,11 +8,12 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import QCoreApplication, QMetaObject, QSize, Qt
+from PySide6.QtGui import QCursor, QFont, QIcon
+from PySide6.QtWidgets import QAbstractScrollArea, QCheckBox, QFrame, QGridLayout, QHBoxLayout, QHeaderView, QLabel, QLineEdit, QPlainTextEdit, QPushButton, QSizePolicy, QVBoxLayout, QWidget, QSpacerItem, QTableWidget
 
 from . resources_rc import *
+
 
 class Ui_blf_analysis(object):
     def setupUi(self, blf_analysis):

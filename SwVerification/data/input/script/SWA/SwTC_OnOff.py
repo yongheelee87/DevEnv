@@ -1,5 +1,6 @@
 # USE CSV INTERFACE
 from threading import Thread
+from tqdm import tqdm
 import time
 from Lib.Inst import *
 from Lib.DataProcess import *

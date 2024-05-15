@@ -1,7 +1,11 @@
-from templates import *
+import os
+import time
+from cantools import database
 from PyQt5.QtCore import pyqtSlot
+from templates import *
+from Lib.Common import logging_print, to_hex_big_lst
+from Lib.Inst import canBus
 from . CanTraceQt import CanTraceWindow
-from Lib.Inst import *
 
 
 class CanWindow(QWidget):

@@ -1,6 +1,8 @@
+import os
+import time
 from templates import *
-from Lib.Inst import *
-from Lib.Common import *
+from Lib.Common import logging_print
+from Lib.Inst import t32
 
 
 class Trace32Window(QWidget):

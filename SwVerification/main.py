@@ -1,9 +1,6 @@
 import sys
 import os
 
-from PySide6.QtWidgets import QApplication, QSplashScreen
-from PySide6.QtGui import QPixmap
-
 
 class System:
     Ver = 'v1.0'  # SW Version
@@ -25,12 +22,16 @@ if __name__ == "__main__":
     print("Preparing equipment for initialization, please wait while loading......\n")
 
     if 'UI' in System.Exe:
+        from PySide6.QtWidgets import QApplication, QSplashScreen
+        from PySide6.QtGui import QPixmap
+
         # QApplication : 프로그램을 실행시켜주는 클래스
         app = QApplication()
         splash = QSplashScreen(QPixmap('./static/images/loading.png'))
         splash.show()
 
         from Qt import *
+        from Lib.Common import logging_initialize, logging_print
 
         # Logging module 초기화
         logging_initialize()
@@ -43,13 +44,14 @@ if __name__ == "__main__":
         # 프로그램을 이벤트루프로 진입시키는(프로그램을 작동시키는) 코드
         app.exec()
     elif 'check' in System.Exe:
-        from prereq.check_env import *
+        from prereq.check_env import CheckEnv
         
         # Class for Check Environment
         check_env = CheckEnv()
         check_env.run()  # Check Environment 실행
     else:
-        from Lib.TestProcess import *
+        from Lib.Common import Configure
+        from Lib.TestProcess import AutoTest
         print(f"The program is named SW TEST Automation {System.Ver}. It provides the functions for the measurement and automation with various devices\n")
 
         # 테스트 자동화 시행 클래스

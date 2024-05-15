@@ -1,8 +1,9 @@
+import os
 import time  # time module
 from threading import Thread
 import lauterbach.trace32.rcl as trace32
 from lauterbach.trace32.rcl import CommandError
-from Lib.Common import *
+from Lib.Common import check_task_open
 
 SYSTEM_DOWN = 0
 SYSTEM_READY = 2

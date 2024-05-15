@@ -9,6 +9,8 @@
 # interface (GUI) can be modified without any implication.
 #
 # ///////////////////////////////////////////////////////////////
+import yaml
+
 
 # basic library
 from . basicFunction import *
@@ -28,5 +30,6 @@ class SysConfig:
     def update(self):
         with open(self.path, encoding="utf-8-sig") as f:
             self.set = yaml.load(f, Loader=yaml.SafeLoader)
+
 
 Configure = SysConfig(path='./data/config/system_env.yaml')  # Configuration 전역변수 선언

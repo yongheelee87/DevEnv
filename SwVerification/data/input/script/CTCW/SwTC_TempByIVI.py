@@ -1,5 +1,6 @@
 # USE CSV INTERFACE
 from threading import Thread
+from tqdm import tqdm
 import time
 from Lib.Inst import *
 from Lib.DataProcess import *
@@ -53,7 +54,13 @@ log_th = LogThread(can_bus=canBus)
 log_th.start()
 log_th.log_state = True  # log start
 
-for i in input_data:
+for i in tqdm(input_data,
+              total=len(input_data),  # 전체 진행수
+              desc='Running',  # 진행률 앞쪽 출력 문장
+              ncols=100,  # 진행률 출력 폭 조절
+              leave=True,  # True 반복문 완료시 진행률 출력 남김. False 남기지 않음.
+              colour='green'  # Bar 색
+              ):
     if i[2] == 255:
         log_th.step = int(i[0])
         i[2] = None

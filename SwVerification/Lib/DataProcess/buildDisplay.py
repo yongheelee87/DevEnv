@@ -1,8 +1,9 @@
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from Lib.Inst import *
+from Lib.Inst import canBus
 
 
 def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, filename: str, fill_zero: bool = True, step_debug: bool = True):
@@ -10,7 +11,7 @@ def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, f
 
     # maxT = df[x_col].max()
     df.set_index(x_col, drop=True, inplace=True)
-    data_col = df.columns.tolist()
+    data_col = df.columns
     # Step Column 제거
     step_dict = {}
     if data_col[0] == 'Step':
@@ -19,7 +20,7 @@ def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, f
             step_dict[step] = (time_sec[0], time_sec[-1])
 
         df.drop(labels='Step', axis=1, inplace=True)
-        data_col.remove('Step')
+        data_col = data_col[1:]
 
     if fill_zero is True:
         df.fillna(0, inplace=True)  # replace None with zero

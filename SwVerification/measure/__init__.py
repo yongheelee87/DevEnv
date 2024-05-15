@@ -9,7 +9,6 @@
 # interface (GUI) can be modified without any implication.
 #
 # ///////////////////////////////////////////////////////////////
-from Lib.Common import *
 
 # Measure Class
 from . measRGW import MeasRGW

@@ -11,10 +11,11 @@
 # ///////////////////////////////////////////////////////////////
 import numpy as np
 import pandas as pd
+from Lib.Common import Configure
 
 # basic library
-from . canLib import *
-from . trace32Lib import *
+from . canLib import CANBus
+from . trace32Lib import Trace32
 # from . visaLib import *
 # from . xcpLib import *
 # from . telnetLib import *
@@ -28,6 +29,7 @@ visa = VisaDev(config_sys=Configure.set)  # ViSA 연결; 전역 변수로 사용
 telnet = TelnetClient(config_sys=Configure.set)  # Telnet 연결; 전역 변수로 사용
 '''
 
+
 def get_inst_status() -> pd.DataFrame:
     lst_inst_data = []
     lst_inst = [i for i in Configure.set.keys() if 'system' not in i and 'XCP' not in i]
@@ -35,7 +37,7 @@ def get_inst_status() -> pd.DataFrame:
         if Configure.set[inst]['type'] == 'T32':
             lst_inst_data.append([inst, 'Not Connected' if t32.status is False else 'Connected'])
         elif Configure.set[inst]['type'] == 'can':
-            lst_inst_data.append([inst, 'Not Connected' if canBus.devs[inst].status == CAN_ERR else 'Connected'])
+            lst_inst_data.append([inst, 'Not Connected' if canBus.devs[inst].status is False else 'Connected'])
         else:
             lst_inst_data.append([inst, 'Not Connected' if visa.status[inst] is False else 'Connected'])
     return pd.DataFrame(np.array(lst_inst_data, dtype=object), columns=['Name', 'Connect'])

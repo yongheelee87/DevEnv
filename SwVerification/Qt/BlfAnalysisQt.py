@@ -1,6 +1,9 @@
+import os
+import yaml
 from templates import *
 from sys import modules
-from App.blf import *
+from Lib.Common import open_path
+from App.blf import BlfAnalysis
 from . _graph import GraphView
 
 
@@ -36,9 +39,13 @@ class BlfAnalysisWindow(QWidget):
         self.ui_blf.chk_show_graph.stateChanged.connect(self.func_chk_show_graph)
 
     def func_btn_cfg_save(self):
-        cfg = {'CHANNEL': self._extract_channel(), 'SIGNALS': self._read_signals()}
-        with open(self.ui_blf.line_cfg_path.text(), 'w', encoding="utf-8-sig") as f:
-            yaml.dump(cfg, f, default_flow_style=None)
+        input_cfg_file = QFileDialog.getSaveFileName(self, 'Save File', os.path.dirname(self.cfg_path), 'cfg File(*.yaml);; All File(*)')[0]
+        if input_cfg_file:
+            self.ui_blf.line_cfg_path.setText(input_cfg_file)
+            cfg = {'CHANNEL': self._extract_channel(), 'SIGNALS': self._read_signals()}
+            with open(self.ui_blf.line_cfg_path.text(), 'w', encoding="utf-8-sig") as f:
+                yaml.dump(cfg, f, default_flow_style=None)
+            self.cfg_path = input_cfg_file
 
     def func_btn_cfg_load(self):
         input_cfg_file = QFileDialog.getOpenFileName(self, 'Open File', os.path.dirname(self.cfg_path), 'cfg File(*.yaml);; All File(*)')[0]

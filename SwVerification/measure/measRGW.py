@@ -1,7 +1,12 @@
-import datetime
+import os
 import time
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from mplcursors import cursor
-from Lib.DataProcess import *
+from Lib.Common import isdir_and_make, open_path, load_csv_list
+from Lib.Inst import canBus
+from Lib.DataProcess import make_meas_HTML
 from Lib.TestProcess.updatePy import UpdatePy
 
 
@@ -108,7 +113,7 @@ class MeasRGW(UpdatePy):
 
         df = self.df_log.copy()
         df.set_index('Elapsed_Time', drop=True, inplace=True)
-        data_col = df.columns.tolist()
+        data_col = df.columns
         # Step Column 제거
         step_dict = {}
         if data_col[0] == 'Step':
@@ -117,7 +122,7 @@ class MeasRGW(UpdatePy):
                 step_dict[step] = (time_sec[0], time_sec[-1])
 
             df.drop(labels='Step', axis=1, inplace=True)
-            data_col.remove('Step')
+            data_col = data_col[1:]
 
         if self.fill_zero is True:
             df.fillna(0, inplace=True)  # replace None with zero

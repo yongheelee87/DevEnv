@@ -1,7 +1,6 @@
-import sys
 import os
-import shutil
-from Lib.Inst import *
+from Lib.Common import isdir_and_make, Configure
+from Lib.Inst import t32, get_inst_status
 
 
 class CheckEnv:

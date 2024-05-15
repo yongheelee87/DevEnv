@@ -14,9 +14,10 @@
 #
 # ///////////////////////////////////////////////////////////////
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QRect, QSize
+from PySide6.QtGui import QCursor
+from PySide6.QtWidgets import QWidget, QSizeGrip, QFrame, QHBoxLayout
+
 
 class CustomGrip(QWidget):
     def __init__(self, parent, position, disable_color = False):

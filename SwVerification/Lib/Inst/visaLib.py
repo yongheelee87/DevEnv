@@ -1,5 +1,5 @@
 from pyvisa import ResourceManager, VisaIOError
-from Lib.Common import *
+from Lib.Common import Configure
 
 
 class VisaDev:

@@ -1,6 +1,9 @@
-from templates import *
+import os
+import pandas as pd
 from sys import modules
-from measure import *
+from templates import *
+from Lib.Common import Configure, open_path, load_csv_list, logging_print, export_csv_list
+from measure import MeasRGW
 from . _thread import TaskThread
 from . _graph import GraphView
 
@@ -66,6 +69,7 @@ class MeasureWindow(QWidget):
         if 'csv' in input_script_file:
             self.ui_meas.line_script_path.setText(input_script_file)
             self.script_path = input_script_file
+            self._generate_script_file()
 
     def func_btn_show_graph(self):
         self.measure.step_graph()
@@ -107,7 +111,8 @@ class MeasureWindow(QWidget):
             self.measure.fill_zero = False
 
     def func_btn_Run_Script(self):
-        self.measure.df_tc = self._convert_df_from_tbl()
+        script_data = self._convert_data_from_tbl()
+        self.measure.df_tc = pd.DataFrame(script_data[1:], columns=script_data[0])
         print("START: MEASUREMENT WITH SCRIPT\n")
         self.measure_th.start()
 
@@ -136,7 +141,7 @@ class MeasureWindow(QWidget):
         logging_print(f"The test script has been loaded successfully\n")
         # Table Contents
         self.ui_meas.tbl_script.setColumnCount(len(df_testEnv.columns))
-        self.ui_meas.tbl_script.setHorizontalHeaderLabels(df_testEnv.columns.tolist())
+        self.ui_meas.tbl_script.setHorizontalHeaderLabels(df_testEnv.columns)
         rowCnt = int(len(df_testEnv.index) * 1.5) if len(df_testEnv.index) < 20 else len(df_testEnv.index) + 10
         self.ui_meas.tbl_script.setRowCount(rowCnt)
 
@@ -146,20 +151,29 @@ class MeasureWindow(QWidget):
         self.ui_meas.tbl_script.resizeColumnsToContents()
 
     # noinspection PyMethodMayBeStatic
-    def _convert_df_from_tbl(self) -> pd.DataFrame:
-        '''
+    def _convert_data_from_tbl(self) -> list:
+        """
         :return: dataframe table data
-        '''
-        number_of_rows = self.ui_meas.tbl_script.rowCount()
+        """
         number_of_columns = self.ui_meas.tbl_script.columnCount()
 
         # df indexing is slow, so use lists
-        lst_data = []
-        for row in range(number_of_rows):
+        lst_data = [[str(self.ui_meas.tbl_script.horizontalHeaderItem(i).text()) for i in range(number_of_columns)]]
+        for row in range(self.ui_meas.tbl_script.rowCount()):
             lst_temp = []
             for col in range(number_of_columns):
                 table_item = self.ui_meas.tbl_script.item(row, col)
                 lst_temp.append('' if table_item is None else str(table_item.text()))
             if lst_temp[0] != '':
                 lst_data.append(lst_temp)
-        return pd.DataFrame(lst_data, columns=[str(self.ui_meas.tbl_script.horizontalHeaderItem(i).text()) for i in range(number_of_columns)])
+        return lst_data
+
+    def _generate_script_file(self):
+        script_data = self._convert_data_from_tbl()
+        empty_str = ['' for _ in range(len(script_data[0]) - 2)]
+        header_data = [['Sample Rate', self.measure.rate] + empty_str,
+                       ['Time Type', self.measure.time_type] + empty_str,
+                       ['Judge Type', self.measure.judge] + empty_str,
+                       ['Num of Match', self.measure.n_match] + empty_str,
+                       ['' for _ in range(len(script_data[0]))]]
+        export_csv_list(file_path=os.path.dirname(self.script_path), filename=os.path.basename(self.script_path).replace(".csv", ""), lists=header_data + script_data)

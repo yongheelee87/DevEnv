@@ -1,7 +1,11 @@
 # MAIN FILE
-from Qt import *
-from . app_settings import *
-from . custom_grips import *
+from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QTimer, QEvent, Qt, QParallelAnimationGroup
+from PySide6.QtGui import QColor, QIcon
+from PySide6.QtWidgets import QMainWindow, QSizeGrip, QPushButton, QGraphicsDropShadowEffect
+
+from . ui_main import Ui_MainWindow
+from . app_settings import Settings
+from . custom_grips import CustomGrip
 
 # GLOBALS
 GLOBAL_STATE = False

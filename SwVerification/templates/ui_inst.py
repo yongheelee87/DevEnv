@@ -8,11 +8,11 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
+from PySide6.QtCore import QCoreApplication, QMetaObject, QSize, Qt
+from PySide6.QtGui import QCursor, QFont
+from PySide6.QtWidgets import QAbstractScrollArea, QFrame, QGridLayout, QHBoxLayout, QLabel, QTableWidget, QPushButton, QSizePolicy, QVBoxLayout, QWidget, QSpacerItem, QStackedWidget
 from . resources_rc import *
+
 
 class Ui_inst(object):
     def setupUi(self, inst):

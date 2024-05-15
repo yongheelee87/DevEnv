@@ -9,8 +9,10 @@
 # interface (GUI) can be modified without any implication.
 #
 # ///////////////////////////////////////////////////////////////
-import os
-import pandas as pd
+from PySide6.QtCore import QCoreApplication, QTimer
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QMainWindow, QWidget, QTableWidgetItem, QPlainTextEdit, QSizePolicy, QFileDialog, QMessageBox
+
 
 # GUI FILE
 from . ui_main import Ui_MainWindow

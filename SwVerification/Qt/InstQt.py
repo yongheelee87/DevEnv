@@ -1,8 +1,8 @@
+from templates import *
+from Lib.Common import logging_print
+from Lib.Inst import get_inst_status
 from . CanQt import CanWindow
 from . Trace32Qt import Trace32Window
-
-from templates import *
-from Lib.Inst import *
 
 
 class InstWindow(QWidget):
@@ -49,7 +49,7 @@ class InstWindow(QWidget):
         logging_print(f"Current Test Environment\n{self.df_inst}\n")
         # Table Contents
         self.ui_inst.tbl_inst_status.setColumnCount(len(self.df_inst.columns))
-        self.ui_inst.tbl_inst_status.setHorizontalHeaderLabels(self.df_inst.columns.tolist())
+        self.ui_inst.tbl_inst_status.setHorizontalHeaderLabels(self.df_inst.columns)
         self.ui_inst.tbl_inst_status.setRowCount(len(self.df_inst.index))
 
         for r in range(len(self.df_inst.index)):

@@ -1,13 +1,15 @@
+import os
 from cantools import database
 from can import interface, Notifier, BufferedReader, Message, CanError
 from threading import Thread
-from Lib.Common import *
+from Lib.Common import Configure
 
-CAN_IN_USE = 0
+CAN_ERR = 0
 CAN_DEV = 1
-CAN_ERR = 2
+CAN_IN_USE = 2
 
 CAN_EXTENDED = 0xFF
+
 
 def _get_message(msg):
     return msg
@@ -106,7 +108,7 @@ class CANDev:
         :param time_out: duration
         :param is_extended: message id extended
         """
-        if value is not None:
+        if value:
             try:
                 msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
                 msg_raw_data = dict(zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
@@ -130,7 +132,7 @@ class CANDev:
                 msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
                 msg_raw_data = dict(zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
                 for sig, val in zip(sig_name, value):
-                    if val is not None:
+                    if val:
                         msg_raw_data[sig] = val  # 해당 signal 값 입력
                 msg_data = msg_tx.encode(msg_raw_data)  # CAN message에 맞게 Encoding
                 can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
@@ -146,7 +148,7 @@ class CANDev:
         :param period: message period
         :param is_extended: message id extended
         """
-        if value is not None:
+        if value:
             try:
                 if frame_name in self.tx_data:  # Frame 값이 있는지 확인
                     if sig_name in self.tx_data[frame_name]:  # 같은 신호 TX 요청이 있을시 신호 값 변경
@@ -185,7 +187,7 @@ class CANDev:
                 msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
                 msg_raw_data = dict(zip(msg_tx.signal_tree, [0 for _ in range(len(msg_tx.signal_tree))]))  # 해당 하위 signal dict 만들기
                 for sig, val in zip(sig_name, value):
-                    if val is not None:
+                    if val:
                         msg_raw_data[sig] = val  # 해당 signal 값 입력
                 msg_data = msg_tx.encode(msg_raw_data)  # CAN message에 맞게 Encoding
                 can_message = Message(arbitration_id=msg_tx.frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
@@ -269,7 +271,7 @@ class CANRxThread(Thread):
     def run(self):
         while True:
             self.msg_normal = self.rx_buffer.get_message()
-            if self.msg_normal is not None:
+            if self.msg_normal:
                 msg_id = self.msg_normal.arbitration_id
                 self.msg_dict[msg_id] = self.msg_normal
             else:

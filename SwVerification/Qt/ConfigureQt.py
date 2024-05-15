@@ -1,5 +1,6 @@
 from templates import *
-from Lib.Inst import *
+from Lib.Common import Configure, logging_print
+from Lib.Inst import canBus, t32
 
 
 class ConfigureWindow(QWidget):

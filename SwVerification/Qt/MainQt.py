@@ -1,13 +1,12 @@
 import logging
 from templates import *
+from Lib.Common import logging_print
 # Qt Window
 from . ConfigureQt import ConfigureWindow
 from . InstQt import InstWindow
 from . MeasureQt import MeasureWindow
 from . TestCaseQt import TestCaseWindow
 from . BlfAnalysisQt import BlfAnalysisWindow
-
-from Lib.Common import *
 
 
 class QTextEditLogger(logging.Handler):

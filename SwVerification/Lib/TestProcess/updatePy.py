@@ -1,6 +1,9 @@
 from itertools import groupby
-from Lib.Inst import *
-from Lib.Common import *
+import os
+import pandas as pd
+import numpy as np
+from Lib.Inst import canBus
+from Lib.Common import load_csv_list, to_raw, find_str_inx
 
 
 class UpdatePy:
@@ -139,7 +142,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
 
     def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, time_type: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
         df_tc = df.drop(['Scenario'], axis=1).apply(pd.to_numeric) if 'Scenario' in df.columns else df.apply(pd.to_numeric)
-        in_col, out_col, inputs, outputs, total = self._get_msg_in_out(df=df_tc)
+        in_col, out_col, inputs, outputs, total = self._get_msg_in_out(cols=df_tc.columns)
         in_data = str(df_tc[in_col].to_numpy().tolist()).replace('nan', 'None')
         out_data = str(df_tc[out_col].to_numpy().tolist()).replace('nan', 'None')
         lst_condition = [['# Data Begin', '# Data End', f'input_data = {in_data}\nexpected_data = {out_data}'],
@@ -246,10 +249,9 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
             lst_line.append(line)
         return '\n'.join(lst_line)
 
-    def _get_msg_in_out(self, df: pd.DataFrame) -> (list, list, list, list, list):
-        cols = df.columns.tolist()
-        col_in = cols[:2]  # Step, Time
-        col_out = cols[:1]  # Step
+    def _get_msg_in_out(self, cols: np.array) -> (list, list, list, list, list):
+        col_in = cols[:2].tolist()  # Step, Time
+        col_out = cols[:1].tolist()  # Step
         lst_in = []
         lst_out = []
         for col in cols[2:]:  # Signals except step,time

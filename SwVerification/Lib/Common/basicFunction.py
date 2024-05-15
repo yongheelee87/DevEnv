@@ -4,8 +4,8 @@ import pandas as pd
 import pygetwindow as gw
 import os  # module for paths and directories
 import csv
-import yaml
 import struct
+import pickle
 
 
 def to_raw(string: str) -> str:

@@ -1,9 +1,9 @@
+import os
 import time
-
 import numpy as np
 import pandas as pd
 from can import Message
-from Lib.Common import *
+from Lib.Common import to_hex_little_lst
 
 
 class XcpVar:
@@ -69,7 +69,7 @@ class XcpProtocol:
         :param addr_hex: Symbol or Address Hex 입력; 메모리에 없는 address입력시 MCU 리셋
         :param data: Input Data
         """
-        if self.df_symbol is not None:
+        if self.df_symbol:
             addr = self._get_addr_hex_from_df(addr_hex)
 
             # 0xF6: set Message Transfer Agent(MTA) with Address
@@ -94,7 +94,7 @@ class XcpProtocol:
         """
         :param addr_hex: Symbol or Address Hex 입력; 메모리에 없는 address입력시 MCU 리셋
         """
-        if self.df_symbol is not None:
+        if self.df_symbol:
             addr = self._get_addr_hex_from_df(addr_hex)
 
             # 0xF4: Upload Data with Address
