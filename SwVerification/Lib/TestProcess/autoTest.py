@@ -22,12 +22,13 @@ class AutoTest(UpdatePy):
         self.df_inst = get_inst_status()  # Instruments status 가져오기
         self.yaml_path = test_yaml if os.path.isfile(test_yaml) else './data/config/remote/test_map.yaml'  # 지정된 장소에 파일이 없을 경우 remote에 설정된 파일 로드
         self.test_map, self.total_map = self._update_test_map(path=self.yaml_path)  # update map file for test
-        self.single_mode = False
-        self.script_path = None  # Test script path
-        self.result_path = None  # Result Path to be exported
+        self.script_path = ''  # Test script path
+        self.result_path = ''  # Result Path to be exported
         self.version = None
-        self.project = None
+        self.project = ''
         self.tc_script = {}
+        self.project_tc = {}
+        self.tc_res = {}
         self.num_lines = 0
         self.test_case = []
 
@@ -46,67 +47,65 @@ class AutoTest(UpdatePy):
         self.version = self._get_sw_version()  # update current sw version
         print(f"SW version\n{self.version}\n")
 
-        total_res = {}
-        if self.single_mode is True:
-            total_res[self.project] = self.test_module(self.project)
+        # Single mode (Per project) or Total Mode
+        if self.project:
+            self.project_tc = {tc: self.total_map[self.project][tc] for tc in self.test_case}
+            self.test_module()
+            total_res = {self.project: self.tc_res}
         else:
+            total_res = {}
             for pjt in self.test_map.keys():
-                total_res[pjt] = self.test_module(pjt)
+                self.project = pjt
+                self.project_tc = self.test_map[self.project]
+                self.test_module()
+                total_res[self.project] = self.tc_res
         make_home_HTML(data=total_res, export_path=self.result_path, df_ver=self.version)
         self.stop()
 
     def stop(self):
+        self.project = ''  # single mode를 위한 초기화
+        
         import shutil
         archive_path = Configure.set['system']['archive_path']
         zip_name = f'EILS_{os.path.basename(self.result_path)}'
         if os.path.exists(archive_path):
             shutil.rmtree(archive_path)
         shutil.make_archive(os.path.join(archive_path, zip_name), 'zip', self.result_path)
-        end_time_str = time.strftime("%a, %d-%b-%Y %I:%M:%S", time.localtime(time.time()))
-        print(f'Ending at: {end_time_str}')
+        print(f'Ending at: {time.strftime("%a, %d-%b-%Y %I:%M:%S", time.localtime(time.time()))}')
         print(f"[INFO] {zip_name}.zip has been created\n")
         print("************************************************************")
         print("*** SW TEST Automation Test completed")
         print("************************************************************\n")
         time.sleep(1)
 
-    def test_module(self, project: str) -> dict:
-        self.script_path = os.path.join('data', 'input', 'script', project)
+    def test_module(self) -> None:
+        self.script_path = os.path.join('data', 'input', 'script', self.project)
 
-        project_tc = {}
-        if self.single_mode is True:
-            for tc in self.test_case:
-                project_tc[tc] = self.total_map[project][tc]
-        else:
-            project_tc = self.test_map[project]  # 모듈 별 테스트 케이스
-
-        num_tc = len(project_tc.keys())  # TC 갯수
-        test_script_str = ', '.join(list(project_tc.keys()))
+        num_tc = len(self.project_tc.keys())  # TC 갯수
         print("************************************************************")
-        print(f"*** Module: {project}")
-        print(f"*** Test Script: {test_script_str}")
+        print(f"*** Module: {self.project}")
+        print(f"*** Test Script: {', '.join(list(self.project_tc.keys()))}")
         print(f"*** Number of Test: {num_tc}")
         print("************************************************************\n")
 
         start_time = time.time()  # 시작 시간 저장
 
-        self.py_output_path = os.path.join(self.result_path, project)
+        self.py_output_path = os.path.join(self.result_path, self.project)
         isdir_and_make(self.py_output_path)
 
-        res_tc = {}
+        self.tc_res = {}
         self.tc_script = {}  # Initialize for each module
         self.num_lines = 0
-        for idx, test_script in enumerate(project_tc.keys()):
+        for idx, test_script in enumerate(self.project_tc.keys()):
             print(f'Starting on: {test_script} ({idx+1}/{num_tc})')
-            res_tc[project_tc[test_script]] = self._run_test_case(test_script)
-            if 'Fail' in res_tc[project_tc[test_script]]:
+            self.tc_res[self.project_tc[test_script]] = self._run_test_case(test_script)
+            if 'Fail' in self.tc_res[self.project_tc[test_script]]:
                 print('Result: Fail')
             else:
-                print(f'Result: {res_tc[project_tc[test_script]]}')
+                print(f'Result: {self.tc_res[self.project_tc[test_script]]}')
             print(f'{test_script} has been Done ({idx+1}/{num_tc})\n')
 
-        self._export_test_sum(start_time=start_time, project=project, tc_dict=project_tc, res_dict=res_tc)
-        return res_tc
+        self._export_test_sum(start_time=start_time)
 
     def _update_test_map(self, path: str) -> (dict, dict):
         # Todo unicode 에러 발생
@@ -171,25 +170,21 @@ class AutoTest(UpdatePy):
                 pass
         return tc_pass_state
 
-    def _export_test_sum(self, start_time: float, project: str, tc_dict: dict, res_dict: dict):
+    def _export_test_sum(self, start_time: float):
         """
         :param start_time:
-        :param project: project name
-        :param tc_dict: a dict of test cases
-        :param res_dict: a dict of test result
         """
         end_time = time.time()
         str_end = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(end_time))
         elapsed_time = time.strftime("%H:%M:%S", time.gmtime(end_time - start_time))
         str_start = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(start_time))
 
-
         len_pass = 0
         len_skip = 0
         len_fail = 0
         lst_fail = []
-        for tc_name in res_dict.keys():
-            tc_res = res_dict[tc_name]
+        for tc_name in self.tc_res.keys():
+            tc_res = self.tc_res[tc_name]
             if tc_res == 'Pass':
                 len_pass += 1
             elif tc_res == 'Skip':
@@ -208,7 +203,7 @@ class AutoTest(UpdatePy):
         else:
             fail_case = ','.join(lst_fail)
 
-        lst_tc = list(res_dict.keys())
+        lst_tc = list(self.tc_res.keys())
         tc_names = ', '.join(lst_tc)  # 한글 버전
         df_tc_sum = pd.DataFrame(np.array([str_start, str_end, elapsed_time, tc_names, len(lst_tc), len_pass, len_skip, len_fail, fail_case, self.num_lines], dtype=object),
                                  columns=["Value"],
@@ -219,7 +214,7 @@ class AutoTest(UpdatePy):
         print(f"*** Number of Pass Test Case: {len_pass}/{len(lst_tc)}")
         print(f"*** Number of Fail Test Case: {len_fail}/{len(lst_tc)}")
         print(f"*** The Test for Module {os.path.basename(self.py_output_path)} has been completed\n")
-        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(self.py_output_path), version=df_ver.loc[project, 'Version'], dict_tc=tc_dict, tc_script=self.tc_script, export_path=self.py_output_path)  # 최종 결과물 HTML로 산출
+        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(self.py_output_path), version=df_ver.loc[self.project, 'Version'], dict_tc=self.project_tc, tc_script=self.tc_script, export_path=self.py_output_path)  # 최종 결과물 HTML로 산출
 
     def _get_sw_version(self) -> pd.DataFrame:
         t32._wait_until_command_ends(timeout=5)

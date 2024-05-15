@@ -29,7 +29,7 @@ from . ui_blf_analysis import Ui_blf_analysis
 from . app_settings import Settings
 
 # IMPORT FUNCTIONS
-from . ui_functions import *
+from . ui_functions import UIFunctions
 
-from . custom_grips import *
+from . custom_grips import CustomGrip
 
