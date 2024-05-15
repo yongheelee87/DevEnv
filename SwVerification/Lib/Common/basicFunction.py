@@ -9,43 +9,43 @@ import struct
 
 
 def to_raw(string: str) -> str:
-    '''
+    """
     :param string:
     :return: raw string
-    '''
+    """
     return fr'{string}'
 
 
 def to_hex_str(integerVariable: int) -> str:
-    '''
+    """
     :param integerVariable:
     :return: sting hex number
-    '''
+    """
     strHex = "0x%0.2X" % integerVariable
     return strHex
 
 
 def float_to_hex(f: float) -> hex:
-    '''
+    """
     :param f: float input value
     :return: hex str
-    '''
+    """
     return hex(struct.unpack('<I', struct.pack('<f', f))[0])
 
 
 def hex_to_float(h: str) -> float:
-    '''
+    """
     :param h: hex str
     :return: float value
-    '''
+    """
     return struct.unpack('<f', struct.pack('i', int(h, 16)))[0]
 
 
 def to_hex_little_lst(in_val: any) -> list:
-    '''
+    """
     :param in_val: input value
     :return: list of bytes
-    '''
+    """
     str_val = in_val if isinstance(in_val, str) else str(in_val)
     if '.' in str_val:
         str_val = str(float_to_hex(float(str_val)))
@@ -56,10 +56,10 @@ def to_hex_little_lst(in_val: any) -> list:
 
 
 def to_hex_big_lst(in_val: any) -> list:
-    '''
+    """
     :param in_val: input value
     :return: list of bytes
-    '''
+    """
     str_val = in_val if isinstance(in_val, str) else str(in_val)
     if '.' in str_val:
         str_val = str(float_to_hex(float(str_val)))
@@ -82,10 +82,10 @@ def isdir_and_make(dir_name: str):
 
 
 def check_process_open(keyword: str) -> bool:
-    '''
+    """
     :param keyword: window keyword
     :return: True = Open, False = Not open
-    '''
+    """
     to_do_process = gw.getWindowsWithTitle(keyword)
     # print(to_do_process)
     num_of_process = len(to_do_process)
@@ -96,9 +96,9 @@ def check_process_open(keyword: str) -> bool:
 
 
 def to_do_process_close(keyword: str):
-    '''
+    """
     :param keyword:
-    '''
+    """
     to_do_process = gw.getWindowsWithTitle(keyword)
     num_of_process = len(to_do_process)
     if num_of_process == 0:
@@ -138,10 +138,10 @@ def export_csv_dataframe(df, file_path: str, filename: str):
 
 
 def load_csv_list(file_path: str) -> list:
-    '''
+    """
     :param file_path: file path to load
     :return: csv list
-    '''
+    """
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f)
@@ -167,11 +167,11 @@ def find_str_inx(lines: str, start_str: str, end_str: str) -> (int, int):
 
 
 def check_same_value(var: any, value: any) -> bool:
-    '''
+    """
     :param var: control value
     :param value: compare value
     :return: True=same, False=Not Same
-    '''
+    """
     ret = False
     if type(var) == type(value):
         check_available = True

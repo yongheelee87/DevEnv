@@ -12,11 +12,11 @@ class XcpVar:
 
 class XcpProtocol:
     def __init__(self, bus, map_file: str, rx_id: int):
-        '''
+        """
         :param bus: can bus
         :param map_file: map file path
         :param rx_id: XCP or CCP id based on CAN DB
-        '''
+        """
         super().__init__()
         self.can = bus
         if os.path.isfile(map_file):
@@ -27,10 +27,10 @@ class XcpProtocol:
 
     # noinspection PyMethodMayBeStatic
     def _get_df_symbol(self, map_file: str) -> pd.DataFrame:
-        '''
+        """
         :param map_file: map file path
         :return: Dataframe with symbols corresponding to hex address
-        '''
+        """
         lst_symbol = []
         with open(map_file, 'r') as f:
             lines = "".join(f.readlines())
@@ -41,10 +41,10 @@ class XcpProtocol:
         return pd.DataFrame(np.array(lst_symbol, dtype=object), columns=['Name', 'Address']).set_index(keys='Name', drop=True)
 
     def _get_addr_hex_from_df(self, sym: str):
-        '''
-        :param sym: symbol or hex address
+        """
+        :param sym: symbol
         :return: hex address
-        '''
+        """
         addr = sym
         # if sym is not hex address, it would find the address
         if sym[:2] != '0x':
@@ -64,11 +64,11 @@ class XcpProtocol:
         XcpVar.status = False
 
     def send_msg_write(self, time_delay: int or float, addr_hex: str, data):
-        '''
+        """
         :param time_delay: Time after Message Transfer Request
         :param addr_hex: Symbol or Address Hex 입력; 메모리에 없는 address입력시 MCU 리셋
         :param data: Input Data
-        '''
+        """
         if self.df_symbol is not None:
             addr = self._get_addr_hex_from_df(addr_hex)
 
@@ -91,9 +91,9 @@ class XcpProtocol:
             print("Error: XCP MAP FILE IS NOT FOUND AND PLEASE RE-CHECK CONFIGURE AND FILE\n")
 
     def send_msg_read(self, addr_hex: str):
-        '''
+        """
         :param addr_hex: Symbol or Address Hex 입력; 메모리에 없는 address입력시 MCU 리셋
-        '''
+        """
         if self.df_symbol is not None:
             addr = self._get_addr_hex_from_df(addr_hex)
 

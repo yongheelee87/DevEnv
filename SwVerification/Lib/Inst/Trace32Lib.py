@@ -36,9 +36,9 @@ class Trace32:
             self.rx.start()  # TRACE32 RX 시그널 THREAD 동작
 
     def connect_dev(self):
-        '''
+        """
         Connect Device based on configuration written in config.t32 file
-        '''
+        """
         try:
             self.device = trace32.connect(node='localhost', port=20001, protocol="TCP", packlen=1024, timeout=10.0)
             self.status = True
@@ -53,9 +53,9 @@ class Trace32:
             print('[INFO] TRACE32 is NOT CONNECTED with HOST\nIF YOU WANT TO USE TRACE32, CHECK IF TRACE32 POWERVIEW IS OPENED AND RETRY THE CONNECTION\n')
 
     def open_exe(self, t32api_path: str):
-        '''
+        """
         :param t32api_path: Paths currently installed
-        '''
+        """
         t32_exe = os.path.join(t32api_path, 'bin', 'windows64', 't32mppc.exe')
         os.startfile(t32_exe)
         # Wait until the TRACE32 instance is started
@@ -86,9 +86,9 @@ class Trace32:
         self.cmd('Go')
 
     def wait_until_connect(self, timeout: int):
-        '''
+        """
         :param timeout: integer number of time out
-        '''
+        """
         start = time.time()
         elapsed_time = 0
         while elapsed_time < timeout:  # Timeout
@@ -98,10 +98,10 @@ class Trace32:
             elapsed_time = time.time() - start
 
     def cmd(self, str_cmd: str, time_out: int = 10):
-        '''
+        """
         :param str_cmd: refer to Trace32 general_ref.pdf
         :param time_out: integer number of time out
-        '''
+        """
         try:
             self.device.cmd(str_cmd)
             self._wait_until_command_ends(timeout=time_out)
@@ -109,35 +109,35 @@ class Trace32:
             print(f'Error: Run Cmd {str_cmd}\n')
 
     def cd_do(self, run_cmd: str):
-        '''
+        """
         :param run_cmd: commands including path
-        '''
+        """
         if os.path.exists(run_cmd.split()[0]):
             self.cmd(f"CD.DO {run_cmd}")
         else:
             print(f'Error: No file {run_cmd}\n')
 
     def write_symbol(self, symbol: str, value: int or float):
-        '''
+        """
         :param symbol: variable name loaded by elf
         :param value: input value
-        '''
+        """
         self.device.variable.write(symbol, value)
 
     def read_symbol(self, symbol: str):
-        '''
+        """
         :param symbol: variable name loaded by elf
         :return: only value, not array and structure
-        '''
+        """
         variable = self.device.variable.read(symbol)
         return str(variable.value)
 
     def read_symbol_arr(self, symbol: str):
-        '''
+        """
         return raw value with structure and array
         :param symbol: variable name loaded by elf
         :return: raw value with structure and array
-        '''
+        """
         return self.device.library.t32_readvariablestring(symbol)[:-1]
 
     def reset(self):
@@ -183,10 +183,10 @@ class Trace32:
         self.rx.msg_dict.clear()  # 메세지 초기화
 
     def get_symbol_data(self, sym: str) -> int:
-        '''
+        """
         :param sym: symbol variable
         :return: t32 symbol data from dict
-        '''
+        """
         ret_data = None
         if sym in self.rx.msg_dict:  # 데이터 저장이 되어 있을 경우
             ret_data = int(self.rx.msg_dict[sym])

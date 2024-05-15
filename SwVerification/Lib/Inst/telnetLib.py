@@ -25,10 +25,10 @@ class TelnetClient:
         self.servo_mode = ''
 
     def connect_dev(self, host: str = '0.0.0.0', port: str = '23'):
-        '''
+        """
         :param host: Host IP address connected by ethernet
         :param port: Host Port
-        '''
+        """
 
         if host == '' or port == '':
             host = '0.0.0.0'
@@ -43,26 +43,26 @@ class TelnetClient:
             print('[INFO] Telnet is NOT CONNECTED with HOST\nIF YOU WANT TO USE telnet, CHECK IF THERE IS PC with Ethernet\n')
 
     def msg_read(self):
-        '''
+        """
         :return: return read raw data
-        '''
+        """
         raw_data = self.device.read_eager()
         return raw_data
 
     def msg_write(self, command):
-        '''
+        """
         :param command: command via Telnet. refer to specification of the device
-        '''
+        """
         command = f'{command}\r\n'.encode()
         self.device.write(command)
         time.sleep(0.1)
         print(f"Success: WRITE TELNET MESSAGE {command}\n")
 
     def query(self, command):
-        '''
+        """
         :param command: command via Telnet. refer to specification of the device
         :return: return read decoded data
-        '''
+        """
         self.msg_write(command)
         time.sleep(0.1)
         response = self.msg_read().decode()

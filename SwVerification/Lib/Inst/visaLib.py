@@ -15,16 +15,16 @@ class VisaDev:
             self.connect_all(self.lst_dev)
 
     def connect_all(self, lst_dev: list):
-        '''
+        """
         :param lst_dev: list of device names
-        '''
+        """
         for dev in lst_dev:
             self.connect_dev(dev)
 
     def connect_dev(self, dev: str):
-        '''
+        """
         :param dev: device name or ID. In general, ID can be used
-        '''
+        """
         self.status[dev] = False
         try:
             rm = ResourceManager()
@@ -53,33 +53,33 @@ class VisaDev:
             print(f"Error: connect {dev} device with {e}\n")
 
     def write(self, dev, cmd):
-        '''
+        """
         :param dev: device name defined in the dict
         :param cmd: command via VISA. refer to specification of the device
-        '''
+        """
         self.resource[dev].write(cmd)
 
     def read(self, dev, cmd) -> str:
-        '''
+        """
         :param dev: device name defined in the dict
         :param cmd: command via VISA. refer to specification of the device
         :return: return response to the command
-        '''
+        """
         return self.resource[dev].query(cmd)
 
     def get_set_volt_curr(self, dev) -> (str, str):
-        '''
+        """
         :param dev: device name defined in the dict
         :return: source voltage, source current
-        '''
+        """
         return self.resource[dev].query(":SOUR:VOLT?"), self.resource[dev].query(":SOUR:CURR?")
 
     def set_volt_curr(self, dev, volt, curr):
-        '''
+        """
         :param dev: device name defined in the dict
         :param volt: Input voltage
         :param curr: Input current
-        '''
+        """
         try:
             self.resource[dev].write(f":SOUR:VOLT {str(volt)}")
             self.resource[dev].write(f":SOUR:CURR {str(curr)}")
@@ -88,10 +88,10 @@ class VisaDev:
             print(f'Error: SET VOLTAGE {str(volt)}V AND CURRENT {str(curr)}A\n')
 
     def output(self, dev, mode):
-        '''
+        """
         :param dev: device name defined in the dict
         :param mode: device output mode
-        '''
+        """
         try:
             self.resource[dev].write(f"OUTPut {str(mode)}")
             print(f'Success: SET OUTPUT {str(mode)}\n')
@@ -99,24 +99,24 @@ class VisaDev:
             print(f'Error: SET OUTPUT {str(mode)}\n')
 
     def meas_volt_curr(self, dev) -> (str, str):
-        '''
+        """
         :param dev: device name defined in the dict
         :return: measured voltage, measured current
-        '''
+        """
         return self.resource[dev].query(":MEAS:VOLT?"), self.resource[dev].query(":MEAS:CURR?")
 
     def fetch_volt_curr(self, dev) -> (str, str):
-        '''
+        """
         :param dev: device name defined in the dict
         :return: fetched voltage, fetched current
-        '''
+        """
         return self.resource[dev].query(":FETC:VOLT?"), self.resource[dev].query(":FETC:CURR?")
 
     # Reset Device via Command
     def _init_operation(self, dev):
-        '''
+        """
         :param dev: device name defined in the dict
-        '''
+        """
         self.resource[dev].write("*CLS")
         opc = self.resource[dev].query("*OPC?")
         if '1' in opc:

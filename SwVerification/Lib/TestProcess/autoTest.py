@@ -13,9 +13,9 @@ MODULES = ['CCW', 'CTCW', 'SWA', 'SDR', 'CDW', 'BSW']
 
 class AutoTest(UpdatePy):
     def __init__(self, test_yaml: str):
-        '''
+        """
         :param test_yaml: test yaml file including list of functions corresponding to test cases
-        '''
+        """
         UpdatePy.__init__(self)
 
         self.df_inst = get_inst_status()  # Instruments status 가져오기
@@ -134,10 +134,10 @@ class AutoTest(UpdatePy):
         return auto_dict, total_dict
 
     def _run_test_case(self, test_script: str) -> str:
-        '''
+        """
         :param test_script: Test Script
         :return: test result
-        '''
+        """
         self.py_title = test_script
         self.py_path = os.path.join(self.script_path, f'{self.py_title}.py')  # 실행할 테스트 python 코드
         csv_file = os.path.join(self.script_path, f'{self.py_title}.csv')  # 실행할 테스트 csv 파일
@@ -155,10 +155,10 @@ class AutoTest(UpdatePy):
         return ret
     
     def _check_tc_pass_state(self, tc_res_file: str) -> str:
-        '''
-        :param tc_res_file: test result individual csv file path 
+        """
+        :param tc_res_file: test result individual csv file path
         :return: tc_pass_state
-        '''
+        """
         # csv가 생성 되었는지 확인
         tc_pass_state = 'Skip'
         if os.path.isfile(tc_res_file) is True:
@@ -171,12 +171,12 @@ class AutoTest(UpdatePy):
         return tc_pass_state
 
     def _export_test_sum(self, start_time: float, project: str, tc_dict: dict, res_dict: dict):
-        '''
+        """
         :param start_time:
         :param project: project name
         :param tc_dict: a dict of test cases
         :param res_dict: a dict of test result
-        '''
+        """
         end_time = time.time()
         str_end = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(end_time))
         elapsed_time = time.strftime("%H:%M:%S", time.gmtime(end_time - start_time))

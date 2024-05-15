@@ -212,4 +212,3 @@ class CanWindow(QWidget):
             fail_devs = ', '.join(lst_fail_dev)
             self.ui_can.line_connect_status.setText(f'Not Connected: {fail_devs}')
             self.ui_can.line_connect_status.setStyleSheet("color:white;font-weight:600;background-color: %s;border: 1px solid transparent;" % "rgba(255, 0, 0, 0.70)")
-

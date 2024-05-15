@@ -59,11 +59,11 @@ class CANDev:
         self.rx.msg_dict = {}  # 메세지 초기화
 
     def msg_read_id(self, can_id: int, decode_on: bool = True) -> dict:
-        '''
+        """
         :param can_id: can id (ex.0x14A)
         :param decode_on: True = decoded return value False = raw value
         :return: dict rx data consisting of signals and values
-        '''
+        """
         rx_data = {}
         if can_id in self.rx.msg_dict:
             rx_raw_data = self.rx.msg_dict[can_id].data  # 데이터 변이 방지
@@ -71,11 +71,11 @@ class CANDev:
         return rx_data
 
     def msg_read_name(self, frame_name: str, decode_on: bool = True) -> dict:
-        '''
+        """
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
         :param decode_on: True = decoded return value False = raw value
         :return: dict rx data consisting of signals and values
-        '''
+        """
         rx_data = {}
         can_id = self.get_msg_id(frame_name)
         if can_id in self.rx.msg_dict:
@@ -84,11 +84,11 @@ class CANDev:
         return rx_data
 
     def msg_read_event(self, frame_name: str, decode_on: bool = True) -> dict:
-        '''
+        """
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
         :param decode_on: True = decoded return value False = raw value
         :return: dict rx data consisting of signals and values
-        '''
+        """
         rx_data = {}
         can_id = self.get_msg_id(frame_name)
         if can_id in self.rx.msg_dict:
@@ -99,13 +99,13 @@ class CANDev:
         return rx_data
 
     def msg_write(self, frame_name: str, sig_name: str, value: int or float = 0, time_out: float = 0.2, is_extended: bool = False):
-        '''
+        """
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
         :param sig_name: Signal name based on CAN DB. you can find it in Signals names as well
         :param value: Input Value
         :param time_out: duration
         :param is_extended: message id extended
-        '''
+        """
         if value is not None:
             try:
                 msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
@@ -118,13 +118,13 @@ class CANDev:
                 print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
 
     def msg_write_by_frame(self, frame_name: str, sig_name: list, value: list, time_out: float = 0.02, is_extended: bool = False):
-        '''
+        """
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
         :param sig_name: Signal name based on CAN DB. you can find it in Signals names as well
         :param value: Input Value
         :param time_out: message duration
         :param is_extended: message id extended
-        '''
+        """
         if value != ([None] * len(value)):
             try:
                 msg_tx = self.db.get_message_by_name(frame_name)  # 해당 CAN message frame 정보 가져오기
@@ -139,13 +139,13 @@ class CANDev:
                 print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
 
     def msg_period_write(self, frame_name: str, sig_name: str, value: int or float = 0, period: float = 0.02, is_extended: bool = False):
-        '''
+        """
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
         :param sig_name: Signal name based on CAN DB. you can find it in Signals names as well
         :param value: Input Value
         :param period: message period
         :param is_extended: message id extended
-        '''
+        """
         if value is not None:
             try:
                 if frame_name in self.tx_data:  # Frame 값이 있는지 확인
@@ -168,13 +168,13 @@ class CANDev:
                 print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
 
     def msg_period_write_by_frame(self, frame_name: str, sig_name: list, value: list, period: float = 0.02, is_extended: bool = False):
-        '''
+        """
         :param frame_name: Frame name based on CAN DB. you can find it in Messages names as well
         :param sig_name: Signal name based on CAN DB. you can find it in Signals names as well
         :param value: Input Value
         :param period: message period
         :param is_extended: message id extended
-        '''
+        """
         if value != ([None] * len(value)):
             try:
                 if frame_name in self.tx_data:  # Frame 값이 있는지 확인
@@ -195,12 +195,12 @@ class CANDev:
                 print(f"Error: WRITE CAN MESSAGE {frame_name}\n")
 
     def msg_raw_write(self, frame_id: int, msg_data: list, time_out: float = 0.02, is_extended: bool = False):
-        '''
+        """
         :param frame_id:
         :param msg_data:
         :param time_out:
         :param is_extended:
-        '''
+        """
         try:
             can_message = Message(arbitration_id=frame_id, data=msg_data, is_extended_id=is_extended, is_fd=True)
             self.bus.send(can_message, timeout=time_out)  # 일정타임이상의 Timeout설정으로 전달이 안정적임
@@ -208,9 +208,9 @@ class CANDev:
             print(f"Error: WRITE CAN MESSAGE {frame_id}\n")
 
     def msg_stop_period_write(self):
-        '''
+        """
         Stop all currently active periodic messages
-        '''
+        """
         try:
             self.bus.stop_all_periodic_tasks()
             self.tx_period = {}

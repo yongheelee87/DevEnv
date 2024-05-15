@@ -50,9 +50,9 @@ class MeasRGW(UpdatePy):
         time.sleep(1)
 
     def _run_measure(self) -> str:
-        '''
+        """
         :return: test result
-        '''
+        """
         lines = self.tc_head_body.splitlines(True)[1:]
         py_lines, self.df_tc = self.fill_variables(df=self.df_tc, py_code=self._fill_header(lines), rate=self.rate, time_type=self.time_type, judge=self.judge, n_match=self.n_match, fill_zero=self.fill_zero)
         if self.df_tc is not None:
@@ -65,10 +65,10 @@ class MeasRGW(UpdatePy):
         return self._check_tc_pass_state(tc_res_file=csv_res_file)
 
     def _check_tc_pass_state(self, tc_res_file: str) -> str:
-        '''
+        """
         :param tc_res_file: test result individual csv file path
         :return: tc_pass_state
-        '''
+        """
         # csv가 생성 되었는지 확인
         tc_pass_state = 'Skip'
         if os.path.isfile(tc_res_file) is True:
@@ -81,10 +81,10 @@ class MeasRGW(UpdatePy):
         return tc_pass_state
 
     def _export_test_sum(self, start_time: float, res: str):
-        '''
+        """
         :param start_time:
         :param res: test result
-        '''
+        """
         end_time = time.time()
         str_end = time.strftime('%Y-%m-%d,%H:%M:%S', time.localtime(end_time))
         elapsed_time = time.strftime("%H:%M:%S", time.gmtime(end_time - start_time))
