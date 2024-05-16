@@ -8,12 +8,15 @@ from Lib.Common import load_csv_list, to_raw, find_str_inx
 
 class UpdatePy:
     tc_head_body = """
-# USE CSV INTERFACE
+# USE DB INTERFACE
+import pandas as pd
+import numpy as np
 from threading import Thread
 from tqdm import tqdm
 import time
-from Lib.Inst import *
-from Lib.DataProcess import *
+from Lib.Common import export_csv_list
+from Lib.Inst import canBus, t32
+from Lib.DataProcess import signal_step_graph, judge_final_result, find_out_signals_for_col
 
 
 OUTPUT_PATH = ''
@@ -130,11 +133,12 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         self.py_path = ''
         self.py_title = ''
         self.py_output_path = ''
+        self.db_interface = False
 
     def update_py(self) -> (str, pd.DataFrame):
-        codes, use_csv = self.parse_script_py()
+        codes = self._parse_script_py()
         df_tc_raw = None
-        if use_csv is True:
+        if self.db_interface is True:
             lst_df = load_csv_list(file_path=self.py_path.replace('.py', '.csv'))
             df_tc_raw = pd.DataFrame(lst_df[6:], columns=lst_df[5])
             codes, df_tc_raw = self.fill_variables(df=df_tc_raw, py_code=codes, rate=lst_df[0][1], time_type=lst_df[1][1], judge=lst_df[2][1], n_match=lst_df[3][1])
@@ -155,8 +159,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         else:
             lst_condition.append(['# TC main Begin', '# TC main End', self.tc_main_body.format(write_msg=self._get_msg_write_frame(inputs))])
 
-        for con in lst_condition:
-            py_code = self.apply_csv_code(lines=py_code, s_str=con[0], e_str=con[1], new_str=con[2])
+        py_code = self._apply_db_to_code(lines=py_code, conditions=lst_condition)
 
         if 'Total' in time_type:
             py_code = py_code.replace('time.sleep(i[1])',
@@ -168,24 +171,25 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         df = df.replace('254', 'CAN Trans Stop').replace('255', 'Reset')
         return py_code, df
 
-    def parse_script_py(self) -> (str, bool):
-        csv_interface = False
+    def _parse_script_py(self) -> str:
+        self.db_interface = False
         if os.path.isfile(self.py_path) is True:
             with open(to_raw(self.py_path), "r+", encoding='utf-8') as file:
                 lines = file.readlines()
         else:
             lines = self.tc_head_body.splitlines(True)[1:]
 
-        if '# USE CSV INTERFACE' in lines[0]:
-            csv_interface = True
+        if '# USE DB INTERFACE' in lines[0]:
+            self.db_interface = True
 
         rev_line = self._fill_header(lines)
-        return rev_line, csv_interface
+        return rev_line
 
-    def apply_csv_code(self, lines: str, s_str: str, e_str: str, new_str: str) -> str:
-        if s_str in lines:
-            s_inx, e_inx = find_str_inx(lines, start_str=s_str, end_str=e_str)
-            lines = lines.replace(lines[s_inx:e_inx], new_str)
+    def _apply_db_to_code(self, lines: str, conditions: list) -> str:
+        for str_con in conditions:
+            if str_con[0] in lines:
+                s_inx, e_inx = find_str_inx(lines, start_str=str_con[0], end_str=str_con[1])
+                lines = lines.replace(lines[s_inx:e_inx], str_con[2])
         return lines
 
     def _fill_header(self, lines: list) -> str:

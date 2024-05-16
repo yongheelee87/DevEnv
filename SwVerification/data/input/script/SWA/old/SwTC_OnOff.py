@@ -1,4 +1,4 @@
-# USE CSV INTERFACE
+# USE DB INTERFACE
 from threading import Thread
 import time
 from Lib.Inst import *
