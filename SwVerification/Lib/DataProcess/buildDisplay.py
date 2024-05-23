@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+import string
 from Lib.Inst import canBus
 
 
@@ -87,14 +87,14 @@ def signal_step_graph(df: pd.DataFrame, sigs: list, x_col: str, filepath: str, f
         ax.label_outer()
 
     # plt.tight_layout(pad=0)
-    plt.savefig(f'{filepath}/{filename}.png', format='png')
+    plt.savefig(f'{filepath}/{filename}.png', format='png', bbox_inches='tight')
     # plt.savefig(f'{filepath}/{filename}.svg', format='svg')
     plt.cla()  # clear the current axes
     plt.clf()  # clear the current figure
     plt.close()  # closes the current figure
 
 
-def make_pjt_HTML(df_sum, project: str, version: str, dict_tc: dict, tc_script: dict, export_path: str):
+def make_pjt_HTML(df_sum, project: str, version: str, dict_tc: dict, tc_script: dict, tc_in_out: dict, export_path: str):
     html_text = """
     <!DOCTYPE html>
     <html lang="en">
@@ -120,10 +120,10 @@ def make_pjt_HTML(df_sum, project: str, version: str, dict_tc: dict, tc_script: 
 
     export_file = os.path.join(export_path, f'Result_{project}.html')
     with open(export_file, 'w') as html_file:
-        html_file.write(html_text.format(title=project, ver=version, sum_body=_write_summary(df_sum), res_body=_write_tc_res_body(dict_tc, tc_script)))
+        html_file.write(html_text.format(title=project, ver=version, sum_body=_write_summary(df_sum), res_body=_write_tc_res_body(dict_tc, tc_script, tc_in_out)))
 
 
-def make_meas_HTML(df_sum, project: str, tc_script: pd.DataFrame, export_path: str):
+def make_meas_HTML(df_sum, project: str, tc_script: pd.DataFrame, tc_in_out: list, export_path: str):
     html_text = """
     <!DOCTYPE html>
     <html lang="en">
@@ -148,7 +148,7 @@ def make_meas_HTML(df_sum, project: str, tc_script: pd.DataFrame, export_path: s
 
     export_file = os.path.join(export_path, f'Result_{project}.html')
     with open(export_file, 'w') as html_file:
-        html_file.write(html_text.format(title=project, sum_body=_write_summary(df_sum), res_body=_write_meas_res(project, tc_script)))
+        html_file.write(html_text.format(title=project, sum_body=_write_summary(df_sum), res_body=_write_meas_res(project, tc_script, tc_in_out)))
 
 
 def make_home_HTML(data: dict, export_path: str, df_ver: pd.DataFrame):
@@ -253,48 +253,66 @@ def _write_summary(df_sum: pd.DataFrame) -> str:
     return sum_html
 
 
-def _write_tc_res_body(dict_tc: dict, tc_script: dict) -> str:
+def _write_tc_res_body(dict_tc: dict, tc_script: dict, tc_in_out: dict) -> str:
     tc_res_html = ''
     for tc in dict_tc.keys():
         sub_title = dict_tc[tc]
         img_src = f'{tc}.png'
         if tc_script and tc_script[tc] is not None:
-            str_tc_script = _write_tc(tc_script[tc])
+            str_tc_prefix, str_tc_script = _write_tc(tc_script[tc], tc_in_out[tc])
             tc_res_body = f"""
             <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">{sub_title}</h3>
+            {str_tc_prefix}
             {str_tc_script}
-            <img src="{img_src}" width="1400" height="1400" style="width: 1400px; height: 1150px; object-fit:cover;margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
+            <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
             """
         else:
             tc_res_body = f"""
             <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">{sub_title}</h3>
-            <img src="{img_src}" width="1400" height="1400" style="width: 1400px; height: 1150px; object-fit:cover;margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
+            <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
             """
         tc_res_html += tc_res_body
     return tc_res_html
 
 
-def _write_meas_res(project: str, tc_script: pd.DataFrame) -> str:
+def _write_meas_res(project: str, tc_script: pd.DataFrame, tc_in_out: list) -> str:
     img_src = f'{project}.png'
-    str_tc_script = _write_tc(tc_script)
+    str_tc_prefix, str_tc_script = _write_tc(tc_script, tc_in_out)
     res_html = f"""
                <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">Script and Result Graph</h3>
+               {str_tc_prefix}
                {str_tc_script}
-               <img src="{img_src}" width="1400" height="1400" style="width: 1400px; height: 1150px; object-fit:cover;margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
+               <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
                """
     return res_html
 
 
-def _write_tc(df_script: pd.DataFrame) -> str:
-    lst_html = df_script.to_html(border=None, index=False).split('\n')
+def _write_tc(df_script: pd.DataFrame, in_out: list) -> (str, str):
+    cols = ['#', 'Scenario', 'Time[s]']
+    inputs = []
+    for i, in_sig in zip(string.ascii_uppercase, in_out[0]):
+        inputs.append(f'{i}. {in_sig.replace(", ", "/ ")}')
+        cols.append(i)
+    outs = []
+    for i, in_sig in zip(string.ascii_uppercase, in_out[0]):
+        inputs.append(f'A{i}. {in_sig.reaplace("[OUT]", "").replace(", ", "/ ")}')
+        cols.append(f'A{i}')
+
+    df_prefix = pd.DataFrame({'Input': ['spacing'.join(inputs)], 'Output': ['spacing'.join(outs)]})
+    df_script.columns = cols
+    pre_html = _table_tc_to_html(lst_html=df_prefix.to_html(border=None, index=False).split('\n'), scr=False).replace('spacing', '<br>')
+    scr_html = _table_tc_to_html(lst_html=df_script.to_html(border=None, index=False).split('\n'), scr=True, max_length=df_script['Scenario'].str.len().max()).replace('spacing', '<br>')
+    return pre_html, scr_html
+
+
+def _table_tc_to_html(lst_html, scr: bool = False, max_length: int = 10):
     new_html = []
     col_td = 0
     for line in lst_html:
         if 'class="dataframe"' in line:
-            line = """<table class="dataframe" style="font-family: 'Nunito', sans-serif;border: none;border-collapse: collapse;font-size: 1.0em;color: black;margin: 10px 0 20px 40px;padding: 20px;">"""
+            line = """<table class="dataframe" style="font-family: 'Nunito', sans-serif;border: none;border-collapse: collapse;font-size: 0.8em;color: black;margin: 10px 0 20px 40px;padding: 20px;">"""
         elif '<th>' in line:
             if 'Scenario' in line:
-                max_length = df_script['Scenario'].str.len().max()
                 if max_length <= 8:
                     pixel_num = '10'
                 elif max_length <= 15:
@@ -307,13 +325,15 @@ def _write_tc(df_script: pd.DataFrame) -> str:
             else:
                 line = line.replace(', ', '<br>').replace('<th>', '<td style="background-color: #FCF3F2;border: 1px solid #c1c4c7;text-align: center;padding: 0 10px 0 10px;">')
         elif '<td>' in line:
-            if col_td != 1:
-                line = line.replace('<td>', '<td style="border: 1px solid #c1c4c7;text-align: center;padding: 0 10px 0 10px;">')
+            if scr:
+                if col_td != 1:
+                    line = line.replace('<td>', '<td style="border: 1px solid #c1c4c7;text-align: center;padding: 0 10px 0 10px;">')
+                else:
+                    line = line.replace('<td>', '<td style="border: 1px solid #c1c4c7;text-align: left;padding: 0 10px 0 10px;">')
             else:
-                line = line.replace('<td>', '<td style="border: 1px solid #c1c4c7;text-align: left;padding: 0 10px 0 10px;">')
+                line = line.replace('<td>', '<td style="border: 1px solid #c1c4c7;text-align: left;padding: 0 10px 0 10px;vertical-align: top;">')
             col_td += 1
         elif '<tr>' in line:
             col_td = 0
         new_html.append(line)
-    scr_html = '\n'.join(new_html)
-    return scr_html
+    return '\n'.join(new_html)

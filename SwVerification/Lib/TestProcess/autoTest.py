@@ -21,12 +21,13 @@ class AutoTest(UpdatePy):
 
         self.df_inst = get_inst_status()  # Instruments status 가져오기
         self.yaml_path = test_yaml if os.path.isfile(test_yaml) else './data/config/remote/test_map.yaml'  # 지정된 장소에 파일이 없을 경우 remote에 설정된 파일 로드
-        self.test_map, self.total_map = self._update_test_map(path=self.yaml_path)  # update map file for test
+        self.test_map, self.total_map = self._update_test_map()  # update map file for test
         self.script_path = ''  # Test script path
         self.result_path = ''  # Result Path to be exported
         self.version = None
         self.project = ''
         self.tc_script = {}
+        self.tc_in_out = {}
         self.project_tc = {}
         self.tc_res = {}
         self.num_lines = 0
@@ -93,8 +94,9 @@ class AutoTest(UpdatePy):
         self.py_output_path = os.path.join(self.result_path, self.project)
         isdir_and_make(self.py_output_path)
 
-        self.tc_res = {}
-        self.tc_script = {}  # Initialize for each module
+        self.tc_res = {}  # Initialize for each module
+        self.tc_script = {}
+        self.tc_in_out = {}
         self.num_lines = 0
         for idx, test_script in enumerate(self.project_tc.keys()):
             print(f'Starting on: {test_script} ({idx+1}/{num_tc})')
@@ -107,9 +109,9 @@ class AutoTest(UpdatePy):
 
         self._export_test_sum(start_time=start_time)
 
-    def _update_test_map(self, path: str) -> (dict, dict):
+    def _update_test_map(self) -> (dict, dict):
         # Todo unicode 에러 발생
-        with open(path, encoding="utf-8") as f:
+        with open(self.yaml_path, encoding="utf-8") as f:
             raw_lines = f.readlines()
             lines = raw_lines[2:] if '# Project' in raw_lines[0] else raw_lines
             lst_total = []
@@ -149,6 +151,7 @@ class AutoTest(UpdatePy):
                 py_lines, df_tc = self.update_py()  # python testcase code update
                 if df_tc is not None:
                     self.tc_script[test_script] = df_tc
+                    self.tc_in_out[test_script] = self.in_out_sigs
                     self.num_lines += len(df_tc)
                 exec(py_lines)  # python TestCase Function 실행
             ret = self._check_tc_pass_state(tc_res_file=csv_res_file)
@@ -165,7 +168,7 @@ class AutoTest(UpdatePy):
             # 파일 Access가 가능한지 확인
             try:
                 # Result 위치 변경(가장 아래)시 수정 필요
-                tc_pass_state = load_csv_list(tc_res_file)[-1][-1].replace(' ', '')  # Pass Fail 받아오기 마지막 인덱스
+                tc_pass_state = load_csv_list(tc_res_file)[-1][-1].strip()  # Pass Fail 받아오기 마지막 인덱스
             except PermissionError:
                 pass
         return tc_pass_state
@@ -214,7 +217,7 @@ class AutoTest(UpdatePy):
         print(f"*** Number of Pass Test Case: {len_pass}/{len(lst_tc)}")
         print(f"*** Number of Fail Test Case: {len_fail}/{len(lst_tc)}")
         print(f"*** The Test for Module {os.path.basename(self.py_output_path)} has been completed\n")
-        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(self.py_output_path), version=df_ver.loc[self.project, 'Version'], dict_tc=self.project_tc, tc_script=self.tc_script, export_path=self.py_output_path)  # 최종 결과물 HTML로 산출
+        make_pjt_HTML(df_sum=df_tc_sum, project=os.path.basename(self.py_output_path), version=df_ver.loc[self.project, 'Version'], dict_tc=self.project_tc, tc_script=self.tc_script, tc_in_out=self.tc_in_out, export_path=self.py_output_path)  # 최종 결과물 HTML로 산출
 
     def _get_sw_version(self) -> pd.DataFrame:
         t32._wait_until_command_ends(timeout=5)

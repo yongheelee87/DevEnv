@@ -25,7 +25,7 @@ class Trace32:
             self.connect_dev()  # 연결 시도
             if self.config['TRACE32']['auto_open'] is True:  # Auto Start 설정시
                 if check_task_open(name="t32mppc.exe") is False:  # Trace32 Process 현재 작동 되지 않을 경우
-                    self.open_exe(t32api_path=self.config['TRACE32']['api_path'])  # T32 exe 실행
+                    self.open_exe()  # T32 exe 실행
                     '''
                     SubProcess에서 이전 작업으로 Trace32가 작동되어 있을 경우 Trace32 already is occupied by other GUI
                     config.t32에서 CONNECTIONMODE=AUTOCONNECT 설정 확인 후 CPU상태에 따라 4~7초의 Auto Connection 시간 필요
@@ -53,11 +53,8 @@ class Trace32:
         else:
             print('[INFO] TRACE32 is NOT CONNECTED with HOST\nIF YOU WANT TO USE TRACE32, CHECK IF TRACE32 POWERVIEW IS OPENED AND RETRY THE CONNECTION\n')
 
-    def open_exe(self, t32api_path: str):
-        """
-        :param t32api_path: Paths currently installed
-        """
-        t32_exe = os.path.join(t32api_path, 'bin', 'windows64', 't32mppc.exe')
+    def open_exe(self):
+        t32_exe = os.path.join(self.config['TRACE32']['api_path'], 'bin', 'windows64', 't32mppc.exe')
         os.startfile(t32_exe)
         # Wait until the TRACE32 instance is started
         time.sleep(3)

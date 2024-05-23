@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 from Lib.Inst import canBus
-from Lib.Common import load_csv_list, to_raw, find_str_inx
+from Lib.Common import load_csv_list, to_raw, find_str_inx, load_pkl_list
 
 
 class UpdatePy:
@@ -134,19 +134,21 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         self.py_title = ''
         self.py_output_path = ''
         self.db_interface = False
+        self.in_out_sigs = []
 
     def update_py(self) -> (str, pd.DataFrame):
         codes = self._parse_script_py()
         df_tc_raw = None
         if self.db_interface is True:
-            lst_df = load_csv_list(file_path=self.py_path.replace('.py', '.csv'))
-            df_tc_raw = pd.DataFrame(lst_df[6:], columns=lst_df[5])
-            codes, df_tc_raw = self.fill_variables(df=df_tc_raw, py_code=codes, rate=lst_df[0][1], time_type=lst_df[1][1], judge=lst_df[2][1], n_match=lst_df[3][1])
+            # lst_df = load_csv_list(file_path=self.py_path.replace('.py', '.csv'))
+            lst_df = load_pkl_list(file_path=self.py_path.replace('.py', '.pkl'))
+            codes, df_tc_raw = self.fill_variables(df=pd.DataFrame(lst_df[6:], columns=lst_df[5]), py_code=codes, rate=lst_df[0][1], time_type=lst_df[1][1], judge=lst_df[2][1], n_match=lst_df[3][1])
         return codes, df_tc_raw
 
     def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, time_type: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
         df_tc = df.drop(['Scenario'], axis=1).apply(pd.to_numeric) if 'Scenario' in df.columns else df.apply(pd.to_numeric)
         in_col, out_col, inputs, outputs, total = self._get_msg_in_out(cols=df_tc.columns)
+        self.in_out_sigs = [in_col[2:], out_col[1:]]
         in_data = str(df_tc[in_col].to_numpy().tolist()).replace('nan', 'None')
         out_data = str(df_tc[out_col].to_numpy().tolist()).replace('nan', 'None')
         lst_condition = [['# Data Begin', '# Data End', f'input_data = {in_data}\nexpected_data = {out_data}'],
@@ -168,7 +170,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
             py_code = py_code.replace('fill_zero=True', 'fill_zero=False')  # No Fill Zero 적용
         py_code = py_code.replace('JUDGE_TYPE = "same"', f'JUDGE_TYPE = "{judge}"')  # judge type 적용
         py_code = py_code.replace('NUM_OF_MATCH = 0', f'NUM_OF_MATCH = {n_match}')  # match 갯수 적용
-        df = df.replace('254', 'CAN Trans Stop').replace('255', 'Reset')
+        df = df.replace('254', 'CAN Stop').replace('255', 'Reset')
         return py_code, df
 
     def _parse_script_py(self) -> str:
@@ -182,8 +184,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         if '# USE DB INTERFACE' in lines[0]:
             self.db_interface = True
 
-        rev_line = self._fill_header(lines)
-        return rev_line
+        return self._fill_header(lines)
 
     def _apply_db_to_code(self, lines: str, conditions: list) -> str:
         for str_con in conditions:
@@ -200,8 +201,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
             elif 'title = [' in line:
                 line = f"title = [r'{self.py_title}']\n"
             new_lines.append(line)
-        new_line = ''.join(new_lines)
-        return new_line
+        return ''.join(new_lines)
 
     def _get_msg_write(self, lst_input: list) -> str:
         lst_line = []

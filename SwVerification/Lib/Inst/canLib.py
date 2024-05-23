@@ -27,14 +27,10 @@ class CANDev:
         self.buffer = BufferedReader()  # CAN buffer type 선언
         self.notifier = None  # CAN message 전송을 위한 notifier 선언
         self.status = CAN_ERR
-        self.db_path = self._get_dbc(name=name, config=self.config)
+        self.db_path = self._get_dbc(name=name)
         self.db = database.load_file(self.db_path)  # path of .dbc file; CAN DBC 불러오기
-        self.sig_val = self._get_decode_val(self.db_path)  # dictionary to decode value
-        self.connect_dev(bus_type=self.config['bus_type'],
-                         ch=self.config['channel'],
-                         app_type=self.config['app_type'],
-                         bit_rate=int(self.config['bit_rate']),
-                         data_rate=int(self.config['data_rate']))  # CAN device 연결
+        self.sig_val = self._get_decode_val()  # dictionary to decode value
+        self.connect_dev()  # CAN device 연결
 
         self.rx = CANRxThread(self.buffer)  # CAN RX 시그널 THREAD 설정
         self.rx.start()  # CAN RX 시그널 THREAD 동작
@@ -43,19 +39,23 @@ class CANDev:
         self.tx_period = {}  # CAN tx period data 선언; 메모리 보관
         self.event_time = 0  # CAN event Time 저장
 
-    def connect_dev(self, bus_type: str, ch: str or int, bit_rate: int, data_rate: int, app_type: str):
-        try:
-            can_message = Message(arbitration_id=0, data=[0x00], is_extended_id=False, is_fd=True)  # 의미 없는 데이터 전송
-            self.bus.send(can_message, timeout=0.2)  # 일정타임이상의 Timeout설정으로 전달이 안정적임
-            self.status = CAN_IN_USE
-        except AttributeError:
+    def connect_dev(self):
+        if not self.bus:
             try:
-                self.bus = interface.Bus(bustype=bus_type, channel=ch, bitrate=bit_rate, app_name=app_type,
-                                         data_bitrate=data_rate, fd=True)
+                self.bus = interface.Bus(bustype=self.config['bus_type'], channel=self.config['channel'], bitrate=int(self.config['bit_rate']),
+                                         app_name=self.config['app_type'], data_bitrate=int(self.config['data_rate']), fd=True)
                 self.notifier = Notifier(self.bus, [_get_message, self.buffer])
                 self.status = CAN_DEV
             except CanError:
                 self.status = CAN_ERR
+        else:
+            try:
+                can_message = Message(arbitration_id=0, data=[0x00], is_extended_id=False, is_fd=True)  # 의미 없는 데이터 전송
+                self.bus.send(can_message, timeout=0.2)  # 일정타임이상의 Timeout설정으로 전달이 안정적임
+                self.status = CAN_IN_USE
+            except AttributeError:
+                self.status = CAN_ERR
+                self.bus = None
 
     def msg_init(self):
         self.rx.msg_dict = {}  # 메세지 초기화
@@ -230,8 +230,8 @@ class CANDev:
         if frame_name in self.tx_period:
             self.tx_period[frame_name].stop()
 
-    def _get_dbc(self, name: str, config) -> str:
-        db_path = config['DBC_file_path']
+    def _get_dbc(self, name: str) -> str:
+        db_path = self.config['DBC_file_path']
         if db_path == 'git':
             ref_path = os.path.join(Configure.set['system']['git_path'], 'References', 'DB')
             for file in os.listdir(ref_path):
@@ -239,22 +239,15 @@ class CANDev:
                     return os.path.join(ref_path, file)
         return db_path
 
-    def _get_decode_val(self, db_path: str) -> dict:
+    def _get_decode_val(self) -> dict:
         dict_decode_val = {}
-        with open(db_path, "r", encoding="utf8", errors='ignore') as f:
+        with open(self.db_path, "r", encoding="utf8", errors='ignore') as f:
             raw_lines = f.readlines()
             for x in raw_lines:
                 if 'VAL_' in x[:4]:
-                    temp = [i.strip() for i in x[5:].split('"')]
-                    temp_head = temp[0::2][0].split() + temp[0::2][1:]
-                    sig_name = temp_head[1]
-                    dict_val = {}
-                    for val, decode in zip(temp_head[2:], temp[1::2]):
-                        if '~' not in decode:
-                            dict_val[int(val)] = decode
-                        else:
-                            dict_val[int(val)] = int(val)
-                    dict_decode_val[sig_name] = dict_val
+                    val_info = [i.strip() for i in x[5:].split('"')]
+                    val_head = val_info[0::2][0].split() + val_info[0::2][1:]
+                    dict_decode_val[val_head[1]] = {int(val): decode if '~' not in decode else int(val) for val, decode in zip(val_head[2:], val_info[1::2])}
         return dict_decode_val
 
 

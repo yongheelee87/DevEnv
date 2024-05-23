@@ -12,13 +12,10 @@ class VisaDev:
 
         self.lst_dev = self._find_device()
         if len(self.lst_dev) != 0:
-            self.connect_all(self.lst_dev)
+            self.connect_all()
 
-    def connect_all(self, lst_dev: list):
-        """
-        :param lst_dev: list of device names
-        """
-        for dev in lst_dev:
+    def connect_all(self):
+        for dev in self.lst_dev:
             self.connect_dev(dev)
 
     def connect_dev(self, dev: str):

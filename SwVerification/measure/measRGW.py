@@ -80,7 +80,7 @@ class MeasRGW(UpdatePy):
             # 파일 Access가 가능한지 확인
             try:
                 # Result 위치 변경(가장 아래)시 수정 필요
-                tc_pass_state = load_csv_list(tc_res_file)[-1][-1].replace(' ', '')  # Pass Fail 받아오기 마지막 인덱스
+                tc_pass_state = load_csv_list(tc_res_file)[-1][-1].strip()  # Pass Fail 받아오기 마지막 인덱스
             except PermissionError:
                 pass
         return tc_pass_state
@@ -103,7 +103,7 @@ class MeasRGW(UpdatePy):
         df_tc_sum = pd.DataFrame(np.array([str_start, str_end, elapsed_time, res, self.num_lines], dtype=object),
                                  columns=["Value"],
                                  index=["Date_Start", "Date_End", "Elapsed_Time", "Result", "Steps"])
-        make_meas_HTML(df_sum=df_tc_sum, project='RGW', tc_script=self.df_tc, export_path=self.py_output_path)  # 최종 결과물 HTML로 산출
+        make_meas_HTML(df_sum=df_tc_sum, project='RGW', tc_script=self.df_tc, tc_in_out=self.in_out_sigs, export_path=self.py_output_path)  # 최종 결과물 HTML로 산출
 
     def step_graph(self, step_debug: bool = True):
         self.fig.clf()  # figure 초기화

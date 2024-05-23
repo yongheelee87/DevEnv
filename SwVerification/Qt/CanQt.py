@@ -96,12 +96,7 @@ class CanWindow(QWidget):
     def func_btn_Connect(self):
         if len(canBus.lst_dev) != 0:
             for dev in canBus.lst_dev:
-                config = canBus.devs[dev].config
-                canBus.devs[dev].connect_dev(bus_type=config['bus_type'],
-                                             ch=config['channel'],
-                                             app_type=config['app_type'],
-                                             bit_rate=int(config['bit_rate']),
-                                             data_rate=int(config['data_rate']))  # CAN device 연결
+                canBus.devs[dev].connect_dev()  # CAN device 연결
         self._update_status()
 
     def func_line_Frame(self):

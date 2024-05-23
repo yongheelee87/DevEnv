@@ -110,9 +110,11 @@ class BlfAnalysis:
             log_output.append([time_secs, device_ch, can_fd, frame_type, can_id, frame_name, msg.dlc, data, data_decode])
 
         self.df_log = pd.DataFrame(np.array(log_output, dtype=object), columns=LOG_COL)
-        self.df_blf.to_pickle(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '_raw.pkl')))
+        self.df_blf.to_csv(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '_raw.csv')), encodings='utf-8-sig')
+        # self.df_blf.to_pickle(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '_raw.pkl')))
         self.df_blf, self.maxT = self._convert_df_blf()
-        self.df_blf.to_pickle(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '.pkl')))
+        self.df_blf.to_csv(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '.csv')), encodings='utf-8-sig')
+        # self.df_blf.to_pickle(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', '.pkl')))
 
     def display_graph(self):
         self.fig.clf()  # figure clear
@@ -186,7 +188,8 @@ class BlfAnalysis:
         rate = self.resample_rate.replace('s', '')
         rate = float(rate.replace('m', '')) / 1000 if 'm' in rate else float(rate)
         df_resample.insert(loc=0, column='TimeDiff[sec]', value=rate)
-        df_resample.to_pickle(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', f'_{self.resample_rate}.pkl')))
+        df_resample.to_csv(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', f'_{self.resample_rate}.csv')), encodings='utf-8-sig')
+        # df_resample.to_pickle(os.path.join('./data/result/blf', os.path.basename(self.blf_path).replace('.blf', f'_{self.resample_rate}.pkl')))
 
     def _convert_df_blf(self) -> (pd.DataFrame, float or int):
         lst_df_sig = []

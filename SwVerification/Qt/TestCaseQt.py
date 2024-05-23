@@ -99,7 +99,7 @@ class TestCaseWindow(QWidget):
         return project_lst
 
     def _update_testcase(self):
-        line_testcase_num_str = re.sub(r'[^0-9,~]', '', self.ui_tc.line_testcase_num.text().replace(' ', ''))
+        line_testcase_num_str = re.sub(r'[^0-9,~]', '', self.ui_tc.line_testcase_num.text().strip())
         testcase_lst = []
         for num_str in line_testcase_num_str.split(','):
             if '~' in num_str:

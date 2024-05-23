@@ -160,6 +160,12 @@ def export_csv_list(file_path: str, filename: str, lists: list):
         write.writerows(lists)
 
 
+def load_pkl_list(file_path: str) -> list:
+    with open(file_path, 'rb') as f:
+        data = pickle.load(f)
+    return data
+
+
 def find_str_inx(lines: str, start_str: str, end_str: str) -> (int, int):
     start = lines.find(start_str)
     end = lines.find(end_str) + len(end_str)
