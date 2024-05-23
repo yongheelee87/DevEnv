@@ -1,28 +1,21 @@
-from flask import Flask, render_template, request, redirect, send_file
+from fastapi import FastAPI, Form, Request, status, File, UploadFile
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+
 from werkzeug.utils import secure_filename
-from waitress import serve
-from flask_caching import Cache
 from datetime import datetime
 from src.dataProcess import *
+import uvicorn
 
 
-config = {
-    "DEBUG": False,          # some Flask specific configs
-    "CACHE_TYPE": "simple",  # Flask-Caching related configs
-    "CACHE_DEFAULT_TIMEOUT": 300,
-    "JSON_AS_ASCII": False,
-    "UPLOAD_FOLDER": "./data"
-}
-
-app = Flask(__name__)
-
-# tell Flask to use the above defined config
-app.config.from_mapping(config)
-cache = Cache(app)
+app = FastAPI()
+templates = Jinja2Templates(directory='templates')
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 class Global:
-    period = 'M'
+    period = 'ME'
 
 
 class WorkLog:
@@ -31,172 +24,181 @@ class WorkLog:
     backup_filepath = r'C:\컴인워시_백업\컴인워시_작업일지.csv'
 
 
-@app.route('/')
-@cache.cached(timeout=50)
-def home():
-    logging_print(BRIGHT_YELLOW + "알림: 홈 페이지 접속\n" + BRIGHT_END)
-    end_date = datetime.now().strftime('%Y-%m-%d')
-    return render_template('home.html', current_date=end_date)
+@app.get('/', response_class=HTMLResponse)
+async def home(request: Request):
+    print(BRIGHT_YELLOW + "알림: 홈 페이지 접속\n" + BRIGHT_END)
+    return templates.TemplateResponse(request=request, name='home.html', context={'current_date': datetime.now().strftime('%Y-%m-%d')})
 
 
-@app.route('/input')
-@cache.cached(timeout=50)
-def write_csv():
-    logging_print(BRIGHT_YELLOW + "알림: 입력 페이지 접속\n" + BRIGHT_END)
-    return render_template('input.html', file_close=is_file_close('컴인워시_작업일지'))
+@app.get('/input', response_class=HTMLResponse)
+async def write_csv(request: Request):
+    print(BRIGHT_YELLOW + "알림: 입력 페이지 접속\n" + BRIGHT_END)
+    return templates.TemplateResponse(request=request, name='input.html', context={'file_close': is_file_close('컴인워시_작업일지')})
 
 
-@app.route('/input_data', methods=['POST', 'GET'])
-def save_data():
-    if request.method == 'POST':
-        car_number = request.form['car_number']
-        car_name = request.form['car_name']
-        wash_option = request.form.getlist('wash_option')
-        pay_option = request.form.getlist('pay_in_option')
-        cost = request.form['cost']
-        remark_word = request.form['remark_word']
-        logging_print("입력 데이터\n"
-                      "차량 번호: {number}, 차량 종류: {name}, 세자 종류: {wash}\n"
-                      "결제 방식: {option}, 금액: {cost}, 비고: {remark}\n"
-                      .format(number=car_number, name=car_name, wash=wash_option, option=pay_option, cost=cost, remark=remark_word))
-
-        input_df = save_input_data(WorkLog.backup_filepath, car_number, car_name, wash_option, cost, pay_option, remark_word)
-        return redirect('/input')
+@app.post('/input_data')
+async def save_data(car_number: str = Form(''),
+                    car_name: str = Form(''),
+                    wash_option: str = Form(''),
+                    pay_option: str = Form(''),
+                    cost: str = Form(''),
+                    remark_word: str = Form('')):
+    print("입력 데이터\n"
+          "차량 번호: {number}, 차량 종류: {name}, 세자 종류: {wash}\n"
+          "결제 방식: {option}, 금액: {cost}, 비고: {remark}\n"
+          .format(number=car_number, name=car_name, wash=wash_option, option=pay_option, cost=cost, remark=remark_word))
+    save_input_data(WorkLog.backup_filepath, car_number, car_name, wash_option, cost, pay_option, remark_word)
+    return RedirectResponse(url='/input', status_code=status.HTTP_302_FOUND)
 
 
-@app.route('/data', methods=['POST', 'GET'])
-def display_filtered_data():
-    if request.method == 'POST':
-        car_number = request.form['car_number']
-        car_type = request.form['car_type']
-        remark_word = request.form['remark_word']
-        start_date = request.form['start_date']
-        end_date = request.form['end_date']
-        pay_option = request.form.getlist('pay_option')
-        logging_print("검색 데이터\n"
-                      "차량 번호: {number}\n"
-                      "차량 종류: {car_type}, 비고: {remark}\n"
-                      "시작 날짜: {start}, 끝 날짜: {end}\n"
-                      "결제 방식: {option}\n"
-                      .format(number=car_number, car_type=car_type, remark=remark_word, start=start_date, end=end_date, option=pay_option))
-        data_list, name_list = load_filtered_data(WorkLog.backup_filepath, car_number, car_type, remark_word, start_date, end_date, pay_option)
-        tables = [data.to_html(classes='blue_data') for data in data_list]
-        logging_print("검색 번호 리스트\n{}\n".format(name_list))
-        return render_template('table.html', tables=tables, titles=name_list)
+@app.post('/data')
+async def display_filtered_data(request: Request,
+                                car_number: str = Form(''),
+                                car_type: str = Form(''),
+                                remark_word: str = Form(''),
+                                start_date: str = Form(''),
+                                end_date: str = Form(''),
+                                pay_option: str = Form('')):
+    print("검색 데이터\n"
+          "차량 번호: {number}\n"
+          "차량 종류: {car_type}, 비고: {remark}\n"
+          "시작 날짜: {start}, 끝 날짜: {end}\n"
+          "결제 방식: {option}\n"
+          .format(number=car_number, car_type=car_type, remark=remark_word, start=start_date, end=end_date, option=pay_option))
+    data_list, name_list = load_filtered_data(WorkLog.backup_filepath, car_number, car_type, remark_word, start_date, end_date, pay_option)
+    tables = [data.to_html(classes='blue_data') for data in data_list]
+    print("검색 번호 리스트\n{}\n".format(name_list))
+    return templates.TemplateResponse(request=request, name='table.html', context={'tables': tables, 'titles': name_list})
 
 
-@app.route('/recent_data')
-def display_recent_data():
-    logging_print(BRIGHT_YELLOW + "알림: 최근 데이터 조회 접속\n" + BRIGHT_END)
+@app.get('/recent_data', response_class=HTMLResponse)
+async def display_recent_data(request: Request):
+    print(BRIGHT_YELLOW + "알림: 최근 데이터 조회 접속\n" + BRIGHT_END)
     data_list, name_list = load_recent_data(WorkLog.backup_filepath)
     tables = [data.to_html(classes='blue_data') for data in data_list]
-    return render_template('table.html', tables=tables, titles=name_list)
+    return templates.TemplateResponse(request=request, name='table.html', context={'tables': tables, 'titles': name_list})
 
 
-@app.route('/delete_data')
-def delete_previous_data():
+@app.get('/delete_data')
+async def delete_previous_data():
     if is_file_close('컴인워시_작업일지') != 'Open':
         data_last = remove_previous_data(WorkLog.backup_filepath)
-        logging_print(BRIGHT_GREEN + "성공: 직전 데이터 삭제\n{}\n".format(data_last) + BRIGHT_END)
-    return redirect('/recent_data')
+        print(BRIGHT_GREEN + "성공: 직전 데이터 삭제\n{}\n".format(data_last) + BRIGHT_END)
+    return RedirectResponse(url='/recent_data', status_code=status.HTTP_302_FOUND)
 
 
-@app.route("/revenue", methods=['POST', 'GET'])
-def display_revenue():
-    if request.method == 'POST':
+@app.post("/revenue")
+async def display_revenue(request: Request, period: str = Form('')):
+    # Generate the figure **without using pyplot**.
+    data = pd.read_csv(WorkLog.backup_filepath, dtype=object, encoding='cp949')
+    Global.period = period
+    end_date = datetime.now().strftime('%Y-%m-%d')
 
-        # Generate the figure **without using pyplot**.
-        data = pd.read_csv(WorkLog.backup_filepath, dtype=object, encoding='cp949')
-        Global.period = request.form['period']
-        end_date = datetime.now().strftime('%Y-%m-%d')
+    if Global.period == 'Ratio':
+        print(BRIGHT_YELLOW + "알림: 매출 비율 보기 접속\n" + BRIGHT_END)
+        revenue_cnt = calculate_revenue_ratio(data)
+        background_color = ['rgba(75, 192, 192, 0.2)', 'rgba(204, 51, 51, 0.2)', 'rgba(0, 51, 153, 0.2)',
+                            'rgba(204, 255, 0, 0.2)',
+                            'rgba(255, 153, 0, 0.2)', 'rgba(153, 0, 204, 0.2)', 'rgba(0, 102, 153, 0.2)',
+                            'rgba(153, 204, 153, 0.2)',
+                            'rgba(102, 0, 0, 0.2)', 'rgba(0, 0, 0, 0.2)']
 
-        if Global.period == 'Ratio':
-            logging_print(BRIGHT_YELLOW + "알림: 매출 비율 보기 접속\n" + BRIGHT_END)
-            revenue_cnt = calculate_revenue_ratio(data)
-            background_color = ['rgba(75, 192, 192, 0.2)', 'rgba(204, 51, 51, 0.2)', 'rgba(0, 51, 153, 0.2)',
-                                'rgba(204, 255, 0, 0.2)',
-                                'rgba(255, 153, 0, 0.2)', 'rgba(153, 0, 204, 0.2)', 'rgba(0, 102, 153, 0.2)',
-                                'rgba(153, 204, 153, 0.2)',
-                                'rgba(102, 0, 0, 0.2)', 'rgba(0, 0, 0, 0.2)']
-
-            return render_template('chart.html', x_data=revenue_cnt['종류'].values.tolist(),
-                                   y_data=revenue_cnt['횟수'].values.tolist(), background=background_color,
-                                   title_str='매출 비율', ylabel_str='횟수', current_date=end_date)
+        return templates.TemplateResponse(request=request, name='chart.html',
+                                          context={'x_data': revenue_cnt['종류'].values.tolist(),
+                                                   'y_data': revenue_cnt['횟수'].values.tolist(),
+                                                   'background': background_color,
+                                                   'title_str': '매출 비율',
+                                                   'ylabel_str': '횟수',
+                                                   'current_date': end_date})
+    else:
+        if Global.period == 'ME':
+            title = '월별 매출 그래프'
+            print(BRIGHT_YELLOW + "알림: 월별 매출 보기 접속\n" + BRIGHT_END)
+        elif Global.period == 'W-MON':
+            title = '주별 매출 그래프'
+            print(BRIGHT_YELLOW + "알림: 주별 매출 보기 접속\n" + BRIGHT_END)
         else:
-            if Global.period == 'M':
-                title = '월별 매출 그래프'
-                logging_print(BRIGHT_YELLOW + "알림: 월별 매출 보기 접속\n" + BRIGHT_END)
-            elif Global.period == 'W-MON':
-                title = '주별 매출 그래프'
-                logging_print(BRIGHT_YELLOW + "알림: 주별 매출 보기 접속\n" + BRIGHT_END)
-            else:
-                title = '일별 매출 그래프'
-                logging_print(BRIGHT_YELLOW + "알림: 일별 매출 보기 접속\n" + BRIGHT_END)
-            data_period, cost_sum = calculate_revenue(data, Global.period)
-            total_revenue = ' [총 매출액: {0:,}(천원)]'.format(int(cost_sum))
-            background_color = ['rgba(75, 192, 192, 0.2)' for _ in range(len(data_period))]
-            return render_template('chart.html', x_data=data_period['날짜'].values.tolist(),
-                                   y_data=data_period['금액'].values.tolist(), background=background_color, total_revenue=total_revenue,
-                                   title_str=title, ylabel_str='매출액(천원)', current_date=end_date)
+            title = '일별 매출 그래프'
+            print(BRIGHT_YELLOW + "알림: 일별 매출 보기 접속\n" + BRIGHT_END)
+        data_period, cost_sum = calculate_revenue(data, Global.period)
+        total_revenue = ' [총 매출액: {0:,}(천원)]'.format(int(cost_sum))
+        background_color = ['rgba(75, 192, 192, 0.2)' for _ in range(len(data_period))]
+        return templates.TemplateResponse(request=request, name='chart.html',
+                                          context={'x_data': data_period['날짜'].values.tolist(),
+                                                   'y_data': data_period['금액'].values.tolist(),
+                                                   'background': background_color,
+                                                   'total_revenue': total_revenue,
+                                                   'title_str': title,
+                                                   'ylabel_str': '매출액(천원)',
+                                                   'current_date': end_date})
 
 
-@app.route('/period_revenue', methods=['POST', 'GET'])
-def display_revenue_period():
-    if request.method == 'POST':
-        logging_print(BRIGHT_YELLOW + "알림: 매출액(기간 포함) 보기 접속\n" + BRIGHT_END)
+@app.post('/period_revenue')
+async def display_revenue_period(request: Request, start_period: str = Form(''), end_period: str = Form('')):
+    print(BRIGHT_YELLOW + "알림: 매출액(기간 포함) 보기 접속\n" + BRIGHT_END)
 
-        data_origin = pd.read_csv(WorkLog.backup_filepath, dtype=object, encoding='cp949')
-        start_date = request.form['start_period']
-        end_date = request.form['end_period']
-        data = search_by_date(data_origin, start_date, end_date)
+    data_origin = pd.read_csv(WorkLog.backup_filepath, dtype=object, encoding='cp949')
+    data = search_by_date(data_origin, start_period, end_period)
 
-        if Global.period == 'Ratio':
-            revenue_cnt = calculate_revenue_ratio(data)
-            background_color = ['rgba(75, 192, 192, 0.2)', 'rgba(204, 51, 51, 0.2)', 'rgba(0, 51, 153, 0.2)',
-                                'rgba(204, 255, 0, 0.2)',
-                                'rgba(255, 153, 0, 0.2)', 'rgba(153, 0, 204, 0.2)', 'rgba(0, 102, 153, 0.2)',
-                                'rgba(153, 204, 153, 0.2)',
-                                'rgba(102, 0, 0, 0.2)', 'rgba(0, 0, 0, 0.2)']
-            return render_template('chart.html', x_data=revenue_cnt['종류'].values.tolist(),
-                                   y_data=revenue_cnt['횟수'].values.tolist(), background=background_color,
-                                   title_str='매출 비율', ylabel_str='횟수', start_date=start_date, current_date=end_date)
+    if Global.period == 'Ratio':
+        revenue_cnt = calculate_revenue_ratio(data)
+        background_color = ['rgba(75, 192, 192, 0.2)', 'rgba(204, 51, 51, 0.2)', 'rgba(0, 51, 153, 0.2)',
+                            'rgba(204, 255, 0, 0.2)',
+                            'rgba(255, 153, 0, 0.2)', 'rgba(153, 0, 204, 0.2)', 'rgba(0, 102, 153, 0.2)',
+                            'rgba(153, 204, 153, 0.2)',
+                            'rgba(102, 0, 0, 0.2)', 'rgba(0, 0, 0, 0.2)']
+        return templates.TemplateResponse(request=request, name='chart.html',
+                                          context={'x_data': revenue_cnt['종류'].values.tolist(),
+                                                   'y_data': revenue_cnt['횟수'].values.tolist(),
+                                                   'background': background_color,
+                                                   'title_str': '매출 비율',
+                                                   'ylabel_str': '횟수',
+                                                   'start_date': start_period,
+                                                   'current_date': end_period})
+    else:
+        if Global.period == 'ME':
+            title = '월별 총 매출액'
+        elif Global.period == 'W-MON':
+            title = '주별 총 매출액'
         else:
-            if Global.period == 'M':
-                title = '월별 총 매출액'
-            elif Global.period == 'W-MON':
-                title = '주별 총 매출액'
-            else:
-                title = '일별 총 매출액'
-            data_period, cost_sum = calculate_revenue(data, Global.period)
-            total_revenue = ' [총 매출액: {0:,}(천원)]'.format(int(cost_sum))
-            background_color = ['rgba(75, 192, 192, 0.2)' for _ in range(len(data_period))]
-            return render_template('chart.html', x_data=data_period['날짜'].values.tolist(),
-                                   y_data=data_period['금액'].values.tolist(), background=background_color, total_revenue=total_revenue,
-                                   title_str=title, ylabel_str='매출액(천원)',
-                                   start_date=start_date, current_date=end_date)
+            title = '일별 총 매출액'
+        data_period, cost_sum = calculate_revenue(data, Global.period)
+        total_revenue = ' [총 매출액: {0:,}(천원)]'.format(int(cost_sum))
+        background_color = ['rgba(75, 192, 192, 0.2)' for _ in range(len(data_period))]
+        return templates.TemplateResponse(request=request, name='chart.html',
+                                          context={'x_data': data_period['날짜'].values.tolist(),
+                                                   'y_data': data_period['금액'].values.tolist(),
+                                                   'background': background_color,
+                                                   'total_revenue': total_revenue,
+                                                   'title_str': title,
+                                                   'ylabel_str': '매출액(천원)',
+                                                   'start_date': start_period,
+                                                   'current_date': end_period})
 
-@app.route('/work_log')
-@cache.cached(timeout=50)
-def work_log():
-    logging_print(BRIGHT_YELLOW + "알림: 작업 일지 페이지 접속\n" + BRIGHT_END)
-    return render_template('work.html', file_exist=is_file_exist(WorkLog.backup_filepath))
 
-@app.route('/download')
-def download_file():
+@app.get('/work_log', response_class=HTMLResponse)
+async def work_log(request: Request):
+    print(BRIGHT_YELLOW + "알림: 작업 일지 페이지 접속\n" + BRIGHT_END)
+    return templates.TemplateResponse(request=request, name='work.html', context={'file_exist': is_file_exist(WorkLog.backup_filepath)})
+
+
+@app.get('/download')
+async def download_file():
     r_csv = pd.read_csv(WorkLog.backup_filepath, dtype=object, encoding='cp949')
     save_xlsx = pd.ExcelWriter("./data/컴인워시_작업일지.xlsx")
     r_csv.to_excel(save_xlsx, index=False)  # xlsx 파일로 변환
     save_xlsx.close()  # xlsx 파일로 저장
-    return send_file("./data/컴인워시_작업일지.xlsx", mimetype='application/x-xlsx', as_attachment=True)
+    return FileResponse(path="./data/컴인워시_작업일지.xlsx", media_type='application/x-xlsx', filename="컴인워시_작업일지.xlsx")
 
 
-@app.route('/upload', methods=['POST', 'GET'])
-def upload_file():
-    if request.method == 'POST':
-        f = request.files['file']
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
-        update_file('./data', WorkLog.backup_filepath)
-        return render_template('work.html', file_exist='Success')
+@app.post('/upload')
+async def upload_file(request: Request, file: UploadFile = File(...)):
+    file_path = os.path.join('./data', secure_filename(file.filename))
+    with open(file_path, "wb") as f:
+        f.write(file.file.read())
+    update_file('./data', WorkLog.backup_filepath)
+    return templates.TemplateResponse(request=request, name='work.html', context={'file_exist': 'Success'})
+
 
 if __name__ == '__main__':
     import socket
@@ -214,5 +216,4 @@ if __name__ == '__main__':
 
     logging_initialize()
 
-    # app.run(host='0.0.0.0', port=5000, threaded=True)
-    serve(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host=ipv4, port=5000)

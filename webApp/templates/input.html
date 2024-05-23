@@ -23,7 +23,7 @@
             <li><a type="button" class="more_button" href="/delete_data" onclick="return confirm('최근 데이터 1개를 삭제하시겠습니까?')">직전 데이터 삭제</a></li>
             <li><form method="POST" action="/revenue">
               <button type="submit" class="more_button" name="period" value="Ratio">매출 비율</button>
-              <button type="submit" class="more_button" name="period" value="M">월별 매출액</button>
+              <button type="submit" class="more_button" name="period" value="ME">월별 매출액</button>
               <button type="submit" class="more_button" name="period" value="W-MON">주별 매출액</button>
               <button type="submit" class="more_button" name="period" value="D">일별 매출액</button>
             </form></li>
@@ -43,7 +43,7 @@
             <li><a type="button" class="more_button" href="/delete_data" onclick="return confirm('최근 데이터 1개를 삭제하시겠습니까?')">직전 데이터 삭제</a></li>
             <li><form method="POST" action="/revenue">
               <button type="submit" class="more_button" name="period" value="Ratio">매출 비율</button>
-              <button type="submit" class="more_button" name="period" value="M">월별 매출액</button>
+              <button type="submit" class="more_button" name="period" value="ME">월별 매출액</button>
               <button type="submit" class="more_button" name="period" value="W-MON">주별 매출액</button>
               <button type="submit" class="more_button" name="period" value="D">일별 매출액</button>
             </form></li>
@@ -107,15 +107,15 @@
           <hr class="line_break">
 
           <label>결제 방식:</label>
-          <input type="checkbox" id="ch1" value="카드" name="pay_in_option"><label class="light" for="ch1">카드</label>
+          <input type="checkbox" id="ch1" value="카드" name="pay_option"><label class="light" for="ch1">카드</label>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input type="checkbox" id="ch2" value="현금" name="pay_in_option"><label class="light" for="ch2">현금</label>
+          <input type="checkbox" id="ch2" value="현금" name="pay_option"><label class="light" for="ch2">현금</label>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input type="checkbox" id="ch3" value="이체" name="pay_in_option"><label class="light" for="ch3">이체</label>
+          <input type="checkbox" id="ch3" value="이체" name="pay_option"><label class="light" for="ch3">이체</label>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input type="checkbox" id="ch4" value="정산" name="pay_in_option"><label class="light" for="ch4">정산</label>
+          <input type="checkbox" id="ch4" value="정산" name="pay_option"><label class="light" for="ch4">정산</label>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <input type="checkbox" id="ch5" value="서비스" name="pay_in_option"><label class="light" for="ch5">서비스</label>
+          <input type="checkbox" id="ch5" value="서비스" name="pay_option"><label class="light" for="ch5">서비스</label>
           <hr class="line_break">
 
           <label for="cost">금액(천원):</label>

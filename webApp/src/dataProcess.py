@@ -142,14 +142,14 @@ def remove_previous_data(filepath):
 def calculate_revenue(data_origin, period):
     data_sort = data_reorganize(data_origin, '날짜')
     data_sort["금액"] = data_sort["금액"].str.replace(',', '').astype(int)
-    data_sort['날짜'] = pd.to_datetime(data_sort['날짜'], infer_datetime_format=True)
+    data_sort['날짜'] = pd.to_datetime(data_sort['날짜'])
     data_sort.set_index(data_sort['날짜'], inplace=True)
-    data_sort_resample = data_sort.resample(period)['금액'].agg(np.sum).fillna(0)
+    data_sort_resample = data_sort.resample(period)['금액'].sum().fillna(0)
 
     df_sort = pd.DataFrame({'날짜': data_sort_resample.index, '금액': data_sort_resample.values})
     df_sort["금액"] = df_sort["금액"] / 1000
 
-    if period == 'M':
+    if period == 'ME':
         df_sort['날짜'] = df_sort['날짜'].map(lambda x: str(x.year) + '-' + str(x.month).rjust(2, '0'))
     else:
         df_sort['날짜'] = df_sort['날짜'].dt.strftime('%Y-%m-%d')
