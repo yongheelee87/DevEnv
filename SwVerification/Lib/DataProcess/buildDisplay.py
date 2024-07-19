@@ -264,12 +264,12 @@ def _write_tc_res_body(dict_tc: dict, tc_script: dict, tc_in_out: dict) -> str:
             <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">{sub_title}</h3>
             {str_tc_prefix}
             {str_tc_script}
-            <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
+            <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 20px;" alt="NOT FOUND"></img>
             """
         else:
             tc_res_body = f"""
             <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">{sub_title}</h3>
-            <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
+            <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 20px;" alt="NOT FOUND"></img>
             """
         tc_res_html += tc_res_body
     return tc_res_html
@@ -282,7 +282,7 @@ def _write_meas_res(project: str, tc_script: pd.DataFrame, tc_in_out: list) -> s
                <h3 style="font-family: 'Jua', sans-serif;font-size: 1em;color: black;margin: 0 0 0 40px;">Script and Result Graph</h3>
                {str_tc_prefix}
                {str_tc_script}
-               <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 0px;" alt="NOT FOUND"></img>
+               <img src="{img_src}" width="1100" height="1100" style="width: 1100px; height: 850px; margin: 0 0 40px 20px;" alt="NOT FOUND"></img>
                """
     return res_html
 

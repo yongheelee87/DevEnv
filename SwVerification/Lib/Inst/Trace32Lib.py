@@ -212,8 +212,11 @@ class T32RXThread(Thread):
         while True:
             if self.update_flag is True:
                 for var in self.vars:  # for문이 비워 있을때는 실행 안함
-                    self.msg_dict[var] = self.dev.variable.read(var).value
-            time.sleep(0.001)
+                    try:
+                        self.msg_dict[var] = self.dev.variable.read(var).value
+                    except ConnectionError:
+                        pass
+            time.sleep(0.0008)
 
     def stop_log(self):
         self.update_flag = False

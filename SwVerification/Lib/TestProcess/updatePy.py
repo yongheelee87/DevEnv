@@ -6,6 +6,11 @@ from Lib.Inst import canBus
 from Lib.Common import load_csv_list, to_raw, find_str_inx, load_pkl_list
 
 
+MASK_FIRST_BIT = 1
+MASK_SECOND_BIT = 2
+T32_USE_ALL_lINE = 3
+
+
 class UpdatePy:
     tc_head_body = """
 # USE DB INTERFACE
@@ -30,7 +35,7 @@ outcome = [title]
 # Dev signal List End
 
 out_col, lst_t32_out = find_out_signals_for_col(dev_out_sigs)
-total_col = ['Step', 'Elapsed_Time'] + [f'In: {sig[2]}' for sig in dev_in_sigs] + out_col
+total_col = ['Step', 'Elapsed_Time'] + [f'In: {sig[-1]}' for sig in dev_in_sigs] + out_col
 outcome.append(total_col)
 
 # LogThread Begin
@@ -85,6 +90,7 @@ for i in tqdm(input_data,
               leave=True,  # True 반복문 완료시 진행률 출력 남김. False 남기지 않음.
               colour='green'  # Bar 색
               ):
+    # T32 Stop if use
     if i[2] == 255:
         log_th.step = int(i[0])
         i[2] = None
@@ -108,6 +114,7 @@ for i in tqdm(input_data,
     else:
 {write_msg}
 
+    # T32 Resume if use
     log_th.step = int(i[0])
     log_th.in_data = i[2:]
 
@@ -147,7 +154,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
 
     def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, time_type: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
         df_tc = df.drop(['Scenario'], axis=1).apply(pd.to_numeric) if 'Scenario' in df.columns else df.apply(pd.to_numeric)
-        in_col, out_col, inputs, outputs, total = self._get_msg_in_out(cols=df_tc.columns)
+        in_col, out_col, inputs, outputs, total, t32_usage = self._get_msg_in_out(cols=df_tc.columns)
         self.in_out_sigs = [in_col[2:], out_col[1:]]
         in_data = str(df_tc[in_col].to_numpy().tolist()).replace('nan', 'None')
         out_data = str(df_tc[out_col].to_numpy().tolist()).replace('nan', 'None')
@@ -166,6 +173,11 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         if 'Total' in time_type:
             py_code = py_code.replace('time.sleep(i[1])',
                                       'while elapsed_time < i[1]:  # Timeout\n         elapsed_time = time.time() - start_time  # Total Time 방식')  # Total time 방식 적용
+
+        if t32_usage == T32_USE_ALL_lINE:
+            py_code = py_code.replace('# T32 Stop if use', 't32.rx.stop_log()\n    time.sleep(0.003)')  # t32 logging stop
+            py_code = py_code.replace('# T32 Resume if use', 't32.rx.resume()')  # t32 logging resume
+
         if fill_zero is False:
             py_code = py_code.replace('fill_zero=True', 'fill_zero=False')  # No Fill Zero 적용
         py_code = py_code.replace('JUDGE_TYPE = "same"', f'JUDGE_TYPE = "{judge}"')  # judge type 적용
@@ -233,7 +245,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
             sig = []
             val = []
             for lst_in in str_in:
-                sig.append(lst_in[2])
+                sig.append(lst_in[-1])
                 val.append(f"i[{idx}]")
                 idx += 1
 
@@ -253,11 +265,12 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
             lst_line.append(line)
         return '\n'.join(lst_line)
 
-    def _get_msg_in_out(self, cols: np.array) -> (list, list, list, list, list):
+    def _get_msg_in_out(self, cols: np.array) -> (list, list, list, list, list, int):
         col_in = cols[:2].tolist()  # Step, Time
         col_out = cols[:1].tolist()  # Step
         lst_in = []
         lst_out = []
+        t32_usage = 0  # Not Used
         for col in cols[2:]:  # Signals except step,time
             temp = [t.strip() for t in col.split(', ')]  # get dev, signal
             if '[OUT]' in temp[0]:  # In case of Output
@@ -271,6 +284,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
                                 temp[-1] = 'Event'
                 else:  # In case of Trace32
                     temp = [temp[0], '', temp[-1]]  # Index 2를 변수로 설정 - Dev, '', symbol
+                    t32_usage |= MASK_FIRST_BIT
                 lst_out.append(temp)
             else:  # In case of Input
                 col_in.append(col)  # Insert Input variable
@@ -290,9 +304,11 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
                                     temp += ['Event', '0.2']
                                 else:
                                     temp += ['Period', str(float(i.replace('ms', '')) / 1000)]
+                else:  # In Case of Trace32
+                    t32_usage |= MASK_SECOND_BIT
                 lst_in.append(temp)
         lst_total = [msg[:3] for msg in lst_in + lst_out]  # combine all msg
-        return col_in, col_out, lst_in, lst_out, lst_total
+        return col_in, col_out, lst_in, lst_out, lst_total, t32_usage
 
     def _get_msg_read(self, lst_output: list) -> str:
         idx = 0
