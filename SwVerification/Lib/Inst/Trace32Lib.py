@@ -120,7 +120,8 @@ class Trace32:
         :param symbol: variable name loaded by elf
         :param value: input value
         """
-        self.device.variable.write(symbol, value)
+        if value is not None:
+            self.device.variable.write(symbol, value)
 
     def read_symbol(self, symbol: str):
         """
