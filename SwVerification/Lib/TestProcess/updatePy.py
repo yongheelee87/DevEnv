@@ -19,7 +19,7 @@ import numpy as np
 from threading import Thread
 from tqdm import tqdm
 import time
-from Lib.Common import export_csv_list
+from Lib.Common import export_csv_list, to_hex_big_lst
 from Lib.Inst import canBus, t32
 from Lib.DataProcess import signal_step_graph, judge_final_result, find_out_signals_for_col
 
@@ -35,7 +35,7 @@ outcome = [title]
 # Dev signal List End
 
 out_col, lst_t32_out = find_out_signals_for_col(dev_out_sigs)
-total_col = ['Step', 'Elapsed_Time'] + [f'In: {sig[-1]}' for sig in dev_in_sigs] + out_col
+total_col = ['Step', 'Elapsed_Time'] + [f'In: {sig[2]}' for sig in dev_in_sigs] + out_col
 outcome.append(total_col)
 
 # LogThread Begin
@@ -139,6 +139,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
     def __init__(self):
         self.py_path = ''
         self.py_title = ''
+        self.py_sub_title = ''
         self.py_output_path = ''
         self.db_interface = False
         self.in_out_sigs = []
@@ -147,9 +148,12 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
         codes = self._parse_script_py()
         df_tc_raw = None
         if self.db_interface is True:
-            # lst_df = load_csv_list(file_path=self.py_path.replace('.py', '.csv'))
-            lst_df = load_pkl_list(file_path=self.py_path.replace('.py', '.pkl'))
-            codes, df_tc_raw = self.fill_variables(df=pd.DataFrame(lst_df[6:], columns=lst_df[5]), py_code=codes, rate=lst_df[0][1], time_type=lst_df[1][1], judge=lst_df[2][1], n_match=lst_df[3][1])
+            lst_df = load_csv_list(file_path=self.py_path.replace('.py', '.csv'))
+            self.py_sub_title = lst_df[0][1]  # 기존 csv파일 이름 제외 별도 이름
+            # lst_df = load_pkl_list(file_path=self.py_path.replace('.py', '.pkl'))
+            codes, df_tc_raw = self.fill_variables(df=pd.DataFrame(lst_df[7:], columns=lst_df[6]), py_code=codes, rate=lst_df[1][1], time_type=lst_df[2][1], judge=lst_df[3][1], n_match=lst_df[4][1])
+        else:
+            self.py_sub_title = os.path.basename(self.py_path).replace('.py', '')
         return codes, df_tc_raw
 
     def fill_variables(self, df: pd.DataFrame, py_code: str, rate: str, time_type: str, judge: str, n_match: str, fill_zero: bool = True) -> (str, pd.DataFrame):
@@ -245,7 +249,7 @@ export_csv_list(OUTPUT_PATH, title[0], outcome)
             sig = []
             val = []
             for lst_in in str_in:
-                sig.append(lst_in[-1])
+                sig.append(lst_in[2])
                 val.append(f"i[{idx}]")
                 idx += 1
 

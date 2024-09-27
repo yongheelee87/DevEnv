@@ -50,14 +50,12 @@ class AutoTest(UpdatePy):
 
         # Single mode (Per project) or Total Mode
         if self.project:
-            self.project_tc = {tc: self.total_map[self.project][tc] for tc in self.test_case}
             self.test_module()
             total_res = {self.project: self.tc_res}
         else:
             total_res = {}
             for pjt in self.test_map.keys():
                 self.project = pjt
-                self.project_tc = self.test_map[self.project]
                 self.test_module()
                 total_res[self.project] = self.tc_res
         make_home_HTML(data=total_res, export_path=self.result_path, df_ver=self.version)
@@ -82,10 +80,10 @@ class AutoTest(UpdatePy):
     def test_module(self) -> None:
         self.script_path = os.path.join('data', 'input', 'script', self.project)
 
-        num_tc = len(self.project_tc.keys())  # TC 갯수
+        num_tc = len(self.test_map[self.project])  # TC 갯수
         print("************************************************************")
         print(f"*** Module: {self.project}")
-        print(f"*** Test Script: {', '.join(list(self.project_tc.keys()))}")
+        print(f"*** Test Script: {', '.join(list(self.test_map[self.project]))}")
         print(f"*** Number of Test: {num_tc}")
         print("************************************************************\n")
 
@@ -94,45 +92,23 @@ class AutoTest(UpdatePy):
         self.py_output_path = os.path.join(self.result_path, self.project)
         isdir_and_make(self.py_output_path)
 
-        self.tc_res = {}  # Initialize for each module
-        self.tc_script = {}
-        self.tc_in_out = {}
-        self.num_lines = 0
-        for idx, test_script in enumerate(self.project_tc.keys()):
+        self.project_tc, self.tc_res, self.tc_script, self.tc_in_out, self.num_lines = {}, {}, {}, {}, 0  # Initialize for each module
+        for idx, test_script in enumerate(self.test_map[self.project]):
             print(f'Starting on: {test_script} ({idx+1}/{num_tc})')
-            self.tc_res[self.project_tc[test_script]] = self._run_test_case(test_script)
-            if 'Fail' in self.tc_res[self.project_tc[test_script]]:
+            self.tc_res[self.py_sub_title] = self._run_test_case(test_script)
+            self.project_tc[test_script] = self.py_sub_title  # sub title 저장
+            if 'Fail' in self.tc_res[self.py_sub_title]:
                 print('Result: Fail')
             else:
-                print(f'Result: {self.tc_res[self.project_tc[test_script]]}')
+                print(f'Result: {self.tc_res[self.py_sub_title]}')
             print(f'{test_script} has been Done ({idx+1}/{num_tc})\n')
 
         self._export_test_sum(start_time=start_time)
 
     def _update_test_map(self) -> (dict, dict):
-        # Todo unicode 에러 발생
         with open(self.yaml_path, encoding="utf-8") as f:
-            raw_lines = f.readlines()
-            lines = raw_lines[2:] if '# Project' in raw_lines[0] else raw_lines
-            lst_total = []
-            lst_auto = []
-            for line in lines:
-                if line != '\n' or line != '#\n':
-                    new_line = line.replace('#', '')
-                    space = check_front_space(new_line)
-                    if space < 2:
-                        new_line = new_line.lstrip()
-                    elif space < 5:
-                        new_line = f'  {new_line.lstrip()}'
-                    else:
-                        new_line = f'    {new_line.lstrip()}'
-
-                    if '#' not in line:
-                        lst_auto.append(new_line)  # 주석 처리 적용된 yaml 적용
-                    lst_total.append(new_line)  # 주석 처리 무시된 yaml 적용
-
-            auto_dict = yaml.load(''.join(lst_auto), Loader=yaml.SafeLoader)
-            total_dict = yaml.load(''.join(lst_total), Loader=yaml.SafeLoader)
+            auto_dict = yaml.load(f, Loader=yaml.SafeLoader)
+            total_dict = yaml.load(f, Loader=yaml.SafeLoader)
         return auto_dict, total_dict
 
     def _run_test_case(self, test_script: str) -> str:

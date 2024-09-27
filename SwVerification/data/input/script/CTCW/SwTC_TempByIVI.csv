@@ -1,4 +1,5 @@
-﻿Sample_Rate,0.01,,,,,,
+﻿Title,CTCW 온도 상하한치 게산 기능 (CCU),,,,,,
+Sample_Rate,0.01,,,,,,
 Time Type,Per step,,,,,,
 Judge Type,same time,,,,,,
 Num of Match,1,,,,,,
